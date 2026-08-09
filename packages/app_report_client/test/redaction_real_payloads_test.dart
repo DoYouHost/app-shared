@@ -182,7 +182,7 @@ void main() {
       'name': 'Gniazdko w garażu',
       'plug_type': 'homeassistant',
       'ip_address': '192.168.1.44',
-      'username': 'morgan',
+      'username': 'admin',
       'password': 'hunter2',
       'ha_entity_id': 'switch.szafa_biuro',
       'ha_power_entity': 'sensor.gniazdko_moc',
