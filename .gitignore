@@ -1,0 +1,7 @@
+.dart_tool/
+build/
+.packages
+# A library resolves against its consumer's constraints; pinning here would only
+# pin the CI job.
+pubspec.lock
+.flutter-plugins-dependencies

@@ -1,0 +1,26 @@
+name: app_report_client
+description: >-
+  Client half of the app report relay: the signed-ticket transport, the on-disk
+  outbox that survives the app being killed, and the redactor deciding what never
+  reaches a log in the first place.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # SHA-256 for the proof of work.
+  crypto: ^3.0.6
+  dio: ^5.7.0
+  # The outbox slot lives in the application support directory.
+  path_provider: ^2.1.5
+  # Only for the install id, which has to outlive every recording.
+  shared_preferences: ^2.3.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
