@@ -120,10 +120,23 @@ class ReportOutbox {
 
   Future<PendingReport?> peek() async {
     final slot = await _slot();
-    if (!slot.existsSync()) return null;
+    final String raw;
+    try {
+      raw = await slot.readAsString();
+    } on PathNotFoundException {
+      // Nothing queued, or [clear] ran between opening the file and reading it.
+      //
+      // Asking `existsSync()` first cannot rule the second one out: the read is
+      // asynchronous, so the slot can be deleted while it is suspended, and the
+      // answer to "is anything queued" is the same either way. The two isolates
+      // this ships with — the UI and the foreground service — both hold an
+      // outbox, so a peek racing a clear is a real arrangement rather than a
+      // theoretical one.
+      return null;
+    }
     try {
       final report = PendingReport.fromJson(
-        (jsonDecode(await slot.readAsString()) as Map).cast<String, dynamic>(),
+        (jsonDecode(raw) as Map).cast<String, dynamic>(),
       );
       // A slot pointing at a log that is gone is worse than an empty one: it
       // would fail on every retry forever. A slot that never had one is fine.
@@ -144,15 +157,26 @@ class ReportOutbox {
   Future<String?> readLog(PendingReport report) async {
     final path = report.logPath;
     if (path == null) return null;
-    final file = File(path);
-    return file.existsSync() ? await file.readAsString() : null;
+    try {
+      return await File(path).readAsString();
+    } on PathNotFoundException {
+      // Same race as [peek], and the same answer: a log that is gone reads as
+      // no log, which is what the caller already has to handle.
+      return null;
+    }
   }
 
   Future<void> clear() async {
     final dir = await _dir();
     if (!dir.existsSync()) return;
     for (final entry in dir.listSync()) {
-      if (entry is File) await entry.delete();
+      if (entry is! File) continue;
+      try {
+        await entry.delete();
+      } on PathNotFoundException {
+        // Already gone — a concurrent clear got here first. Clearing twice has
+        // to be as harmless as clearing once, or the loser throws.
+      }
     }
   }
 }

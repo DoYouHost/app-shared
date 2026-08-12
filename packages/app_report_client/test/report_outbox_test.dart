@@ -245,4 +245,44 @@ void main() {
       expect(json['logSchema'], 1);
     });
   });
+
+  group('cleared underneath a concurrent reader', () {
+    // The two isolates this ships with — the UI and the foreground service —
+    // each hold an outbox, so a read racing a clear is a real arrangement, and
+    // it used to throw PathNotFoundException out of the read: the code asked
+    // existsSync() first and then awaited, so the slot could be deleted while
+    // that await was suspended.
+    //
+    // Only the double-clear below reproduces a race deterministically. The read
+    // side is not reproducible from here: the window opens between the check
+    // and the open, and the reader — having started first — wins it on an idle
+    // disk. It was found by a full-suite run, where eight test isolates were
+    // hammering the disk and the open got queued behind them. Driving both
+    // sides in a loop was tried and never landed in the window, so it is not
+    // pretended at. What the read tests below pin instead is the property that
+    // makes the race harmless: a missing file answers null from inside the
+    // read, with no existence check in front of it to reintroduce.
+
+    test('peek on a missing slot answers null, without a pre-check', () async {
+      await putBug(id: 'gone');
+      slot().deleteSync();
+
+      expect(await outbox.peek(), isNull);
+    });
+
+    test('readLog on a missing log answers null, without a pre-check', () async {
+      final report = await putBug(id: 'logless');
+      File(report.logPath!).deleteSync();
+
+      expect(await outbox.readLog(report), isNull);
+    });
+
+    test('clearing twice at once is as harmless as clearing once', () async {
+      await putBug(id: 'twice');
+
+      await Future.wait([outbox.clear(), outbox.clear()]);
+
+      expect(slot().existsSync(), isFalse);
+    });
+  });
 }

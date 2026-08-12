@@ -3,7 +3,7 @@ description: >-
   Client half of the app report relay: the signed-ticket transport, the on-disk
   outbox that survives the app being killed, and the redactor deciding what never
   reaches a log in the first place.
-version: 0.1.0
+version: 0.1.1
 publish_to: none
 
 environment:
