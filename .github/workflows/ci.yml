@@ -1,0 +1,71 @@
+name: CI
+
+# Every package under `packages/` is analyzed and tested here, because nothing
+# else will. These packages are consumed by pinned git tag, so a change that
+# breaks one is not noticed by the applications until somebody moves their tag —
+# by which point the break is somebody else's afternoon. This run is the only
+# thing standing between a bad commit here and a red branch over there.
+#
+# No lockfile is enforced: a library resolves against its consumer's
+# constraints, and `pubspec.lock` is deliberately gitignored in this repo.
+#
+# No `dart format` gate yet, deliberately. `app_report_client` predates the
+# formatter version the applications are on and would need an 844-line reformat
+# to go green — a decision about this repo's history, not something to slip into
+# the commit that adds a workflow. Add the gate together with that reformat.
+
+on:
+  pull_request:
+    branches: [main, master]
+    paths-ignore:
+      - "**/*.md"
+      - LICENSE
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  packages:
+    name: analyze · test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      # Which SDK actually ran matters when a failure reproduces nowhere else.
+      - name: Toolchain
+        run: flutter --version
+
+      # One loop rather than a matrix: adding a package should not also mean
+      # remembering to add it to a workflow, which is exactly the kind of step
+      # that gets forgotten and leaves a package silently unbuilt.
+      - name: Analyze and test every package
+        run: |
+          set -euo pipefail
+          failed=0
+          for dir in packages/*/; do
+            [ -f "$dir/pubspec.yaml" ] || continue
+            name=$(basename "$dir")
+            echo "::group::$name"
+            (
+              cd "$dir"
+              flutter pub get
+              flutter analyze
+              flutter test
+            ) || failed=1
+            echo "::endgroup::"
+          done
+          exit $failed

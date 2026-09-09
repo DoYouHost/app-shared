@@ -1,0 +1,6 @@
+# For this repo's own analyze and test runs only — pub applies overrides from
+# the root package of a resolution and ignores them everywhere else, so an
+# application consuming this package by git ref never sees this file.
+dependency_overrides:
+  app_report_client:
+    path: ../app_report_client

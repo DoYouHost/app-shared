@@ -9,6 +9,10 @@ is not — the same rule the OpenTofu modules follow.
 | package | what it is |
 |---|---|
 | [`app_report_client`](packages/app_report_client) | client half of [app-report-relay](https://github.com/DoYouHost/app-report-relay): ticket transport, on-disk outbox, log redaction |
+| [`app_diagnostics`](packages/app_diagnostics) | the other half — the recording session, the log record and its file mirror, the cross-isolate merge, the review summary, and the probes over taps, routes, requests, errors and lifecycle |
+
+[`docs/candidates.md`](docs/candidates.md) lists what else was measured as
+shareable, with the blocker on each.
 
 ## Licence
 
