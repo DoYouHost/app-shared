@@ -15,14 +15,27 @@ class DashContrastIssue {
   final String problem;
 
   @override
+  bool operator ==(Object other) =>
+      other is DashContrastIssue &&
+      other.brightness == brightness &&
+      other.token == token &&
+      other.problem == problem;
+
+  @override
+  int get hashCode => Object.hash(brightness, token, problem);
+
+  @override
   String toString() => '${brightness.name}: $token $problem';
 }
 
-/// Everything [brand] breaks in either theme; empty when it passes.
+/// Everything the two themes built from [brand] break; empty when both pass.
 ///
 /// A colour cannot fail a widget test on its own, so this is the check an
 /// application runs on its brand: `expect(dashContrastAudit(brand), isEmpty)`.
-/// It holds:
+///
+/// The fixed palette is measured too, although no brand can change it: this
+/// package's tests already hold it, so in an app it can only fail after a
+/// dash_ui upgrade — and that is the upgrade worth stopping. It holds:
 ///
 /// * every ink that carries small text — the two muted inks, [DashTokens.accentInk]
 ///   and [DashTokens.accentOrangeInk] — at WCAG AA's 4.5:1 on the worst surface

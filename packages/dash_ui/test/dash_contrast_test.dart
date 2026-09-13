@@ -23,10 +23,15 @@ void main() {
       withLightInk(gold, const Color(0xFF9A6E12)),
     );
 
-    expect(issues, hasLength(1));
-    expect(issues.single.brightness, Brightness.light);
-    expect(issues.single.token, 'accentInk');
-    expect(issues.single.problem, startsWith('is 3.81:1 over #'));
+    // The background's first stop under a sub-card: the harshest ground for a
+    // dark ink, not the white card that flatters it.
+    expect(issues, const [
+      DashContrastIssue(
+        Brightness.light,
+        'accentInk',
+        'is 3.81:1 over #e5ede2',
+      ),
+    ]);
   });
 
   test('an ink dark enough but of another hue fails', () {
