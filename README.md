@@ -10,6 +10,7 @@ is not — the same rule the OpenTofu modules follow.
 |---|---|
 | [`app_report_client`](packages/app_report_client) | client half of [app-report-relay](https://github.com/DoYouHost/app-report-relay): ticket transport, on-disk outbox, log redaction |
 | [`app_diagnostics`](packages/app_diagnostics) | the other half — the recording session, the log record and its file mirror, the cross-isolate merge, the review summary, and the probes over taps, routes, requests, errors and lifecycle |
+| [`dash_ui`](packages/dash_ui) | the design system — tokens resolved per brightness and brand, the type scale, the screen chrome, the Material theme, and the contrast audit each app runs on its brand |
 
 [`docs/candidates.md`](docs/candidates.md) lists what else was measured as
 shareable, with the blocker on each.
