@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -51,7 +52,17 @@ class DemoHttpClientAdapter implements HttpClientAdapter {
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
   ) async {
+    var cancelled = false;
+    unawaited(cancelFuture?.whenComplete(() => cancelled = true));
     await Future<void>.delayed(latency);
+    // Dio has already told the caller the request was cancelled. Routing it
+    // anyway would still apply a write the user backed out of.
+    if (cancelled) {
+      throw DioException.requestCancelled(
+        requestOptions: options,
+        reason: 'cancelled before the demo backend answered',
+      );
+    }
     final data = options.data;
     final result = data is FormData && uploads != null
         ? uploads!(data)

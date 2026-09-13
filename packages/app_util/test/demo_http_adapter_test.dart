@@ -131,4 +131,41 @@ void main() {
       expect(seen.body, isNull);
     });
   });
+
+  test(
+    'a request cancelled while it waits never reaches the handler',
+    () async {
+      // The handler is where a demo write lands; a cancelled one must not.
+      var calls = 0;
+      final dio = Dio(BaseOptions(baseUrl: 'https://demo.invalid'))
+        ..httpClientAdapter = DemoHttpClientAdapter((method, uri, body) {
+          calls++;
+          return (status: 200, body: null);
+        }, latency: const Duration(milliseconds: 200));
+      final token = CancelToken();
+
+      final request = dio.post<void>(
+        '/api/items',
+        data: {},
+        cancelToken: token,
+      );
+      // Inside the latency, not before the call: a token cancelled up front
+      // stops Dio before it reaches the adapter at all.
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      token.cancel();
+
+      await expectLater(
+        request,
+        throwsA(
+          isA<DioException>().having(
+            (e) => e.type,
+            'type',
+            DioExceptionType.cancel,
+          ),
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      expect(calls, 0);
+    },
+  );
 }

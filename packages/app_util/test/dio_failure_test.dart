@@ -69,14 +69,15 @@ void main() {
       );
     });
 
-    test('cancel and unknown are a connection error', () {
-      for (final type in [DioExceptionType.cancel, DioExceptionType.unknown]) {
-        expect(
-          classifyDioException(_ofType(type)),
-          DioFailure.connectionError,
-          reason: '$type',
-        );
-      }
+    test('a cancelled request is not a failure of the connection', () {
+      expect(
+        classifyDioException(_ofType(DioExceptionType.cancel)),
+        DioFailure.cancelled,
+      );
+      expect(
+        classifyDioException(_ofType(DioExceptionType.unknown)),
+        DioFailure.unknown,
+      );
     });
   });
 }

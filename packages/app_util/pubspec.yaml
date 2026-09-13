@@ -4,7 +4,7 @@ description: >-
   coercion, reading a number a person typed, measuring a label, asking a
   platform channel, byte sizes and hex colours, the demo-mode HTTP adapter, a
   server address, and the classification of a failed request.
-version: 0.1.0
+version: 0.2.0
 publish_to: none
 
 environment:

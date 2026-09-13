@@ -15,6 +15,11 @@ void main() {
     expect(formatBytes(1024 * 1024 * 512), '512 MB');
   });
 
+  test('a negative size keeps its sign and still climbs', () {
+    expect(formatBytes(-1), '-1 B');
+    expect(formatBytes(-1024 * 1024), '-1.0 MB');
+  });
+
   test('climbs to the largest unit it has', () {
     expect(formatBytes(1024 * 1024 * 1024), '1.0 GB');
     expect(formatBytes(1024 * 1024 * 1024 * 1024 * 3), '3.0 TB');

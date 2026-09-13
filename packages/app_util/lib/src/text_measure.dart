@@ -18,5 +18,9 @@ double textWidth(BuildContext context, String text, TextStyle style) {
     textDirection: Directionality.of(context),
     textScaler: MediaQuery.textScalerOf(context),
   )..layout();
-  return painter.width;
+  final width = painter.width;
+  // The paragraph holds engine memory until disposed; a layout that measures
+  // every row on every build would otherwise leave it all to the finalizer.
+  painter.dispose();
+  return width;
 }

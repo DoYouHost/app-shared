@@ -30,8 +30,12 @@ enum DioFailure {
   /// address.
   badCertificate,
 
-  /// Cancelled, or failed in a way Dio could not name.
-  connectionError,
+  /// The caller cancelled the request. Not a failure of the connection, so an
+  /// application should not word it as one.
+  cancelled,
+
+  /// Failed in a way Dio could not name.
+  unknown,
 }
 
 /// Classifies [e]. Every [DioExceptionType] is named, so a type a later Dio adds
@@ -49,6 +53,6 @@ DioFailure classifyDioException(DioException e) => switch (e.type) {
     _ => DioFailure.badResponse,
   },
   DioExceptionType.badCertificate => DioFailure.badCertificate,
-  DioExceptionType.cancel ||
-  DioExceptionType.unknown => DioFailure.connectionError,
+  DioExceptionType.cancel => DioFailure.cancelled,
+  DioExceptionType.unknown => DioFailure.unknown,
 };

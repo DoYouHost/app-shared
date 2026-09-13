@@ -1,8 +1,10 @@
 /// Human-readable byte size (binary units), e.g. `12.3 MB` / `834 KB`.
 /// The decimal survives only below 100 in the chosen unit: on a three-digit
 /// result it is noise, but between 10 and 99 it is what tells two similar
-/// files apart.
+/// files apart. A negative size — a difference, a shrink — keeps its sign and
+/// gets the unit its magnitude would.
 String formatBytes(int bytes) {
+  if (bytes < 0) return '-${formatBytes(-bytes)}';
   if (bytes < 1024) return '$bytes B';
   const units = ['KB', 'MB', 'GB', 'TB'];
   var size = bytes / 1024;
