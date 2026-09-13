@@ -152,6 +152,30 @@ void main() {
       expect((await responseRecord())['first'], isA<Map<String, dynamic>>());
     });
 
+    test(
+      'an answer JSON cannot carry costs the sample, not the call',
+      () async {
+        // What a custom transformer hands back is not necessarily JSON-shaped.
+        final dio = Dio(BaseOptions(baseUrl: 'http://server.lan:8080'))
+          ..httpClientAdapter = _CannedAdapter({'state': 'printing'})
+          ..interceptors.addAll([
+            InterceptorsWrapper(
+              onResponse: (response, handler) {
+                response.data = {'at': DateTime.utc(2026)};
+                handler.next(response);
+              },
+            ),
+            HttpProbe(
+              config: HttpProbeConfig(sampledPaths: RegExp(r'/api/v1/queue')),
+            ),
+          ]);
+
+        await expectLater(dio.get<dynamic>('/api/v1/queue'), completes);
+
+        expect((await responseRecord())['first'], isA<String>());
+      },
+    );
+
     test('the redactor can be turned off for a route that needs it', () async {
       // On by default, and an application has to be able to say why a payload
       // holds nothing of anybody's before it opts out.
@@ -318,6 +342,58 @@ void main() {
       await dio.post<dynamic>('/api/records', data: {'odometer': '1000'});
 
       expect((await responseRecord()).containsKey('body'), isFalse);
+    });
+
+    test('an unencodable body costs the sample, not the call', () async {
+      // Dio sends a stream as it is; the record cannot quote one, and a probe
+      // that handed it on to the store would fail the request on the encode.
+      final dio = dioWith(const HttpProbeConfig(sampleRequests: true));
+
+      await expectLater(
+        dio.post<dynamic>(
+          '/api/records',
+          data: Stream.value([1, 2, 3]),
+          options: Options(headers: {Headers.contentLengthHeader: 3}),
+        ),
+        completes,
+      );
+
+      expect((await requestRecord())['body'], isA<String>());
+    });
+
+    test('is never taken on a route where credentials travel', () async {
+      final dio = dioWith(
+        HttpProbeConfig(sampleRequests: true, neverSampled: RegExp('login')),
+      );
+
+      await dio.post<dynamic>('/api/login', data: {'pin': '4711'});
+
+      expect((await requestRecord()).containsKey('body'), isFalse);
+    });
+
+    test('of raw bytes is a size, not the first few bytes', () async {
+      final dio = dioWith(const HttpProbeConfig(sampleRequests: true));
+
+      await dio.post<dynamic>(
+        '/api/records',
+        data: Uint8List.fromList(List.filled(512, 7)),
+      );
+
+      expect((await requestRecord())['body'], '<512 bytes>');
+    });
+
+    test('sent as a JSON string is sampled like the map it encodes', () async {
+      final dio = dioWith(const HttpProbeConfig(sampleRequests: true));
+
+      await dio.post<dynamic>(
+        '/api/records',
+        data: jsonEncode({'odometer': '1000', 'note': 'bought from a friend'}),
+      );
+
+      expect((await requestRecord())['body'], {
+        'odometer': '1000',
+        'note': '<str:20>',
+      });
     });
   });
 }

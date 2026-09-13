@@ -50,9 +50,10 @@ class HttpProbeConfig {
   final bool redactSamples;
 
   /// Whether a write's `request` record carries the body it sent, under the
-  /// same scrub and ceilings as a response sample. A multipart body is described
-  /// instead — part names, file count, bytes, extensions — because its parts are
-  /// the user's files.
+  /// same scrub and ceilings as a response sample and never on a [neverSampled]
+  /// route. A multipart body is described instead — part names, file count,
+  /// bytes, extensions — because its parts are the user's files; raw bytes are
+  /// a size, and a JSON string is sampled as the document it encodes.
   ///
   /// Off by default: it pays where the app formats its own wire values, so the
   /// body is the suspect rather than the server's answer.
@@ -99,33 +100,70 @@ class HttpProbe extends Interceptor {
     // returns shows up as a response missing from the polling around it.
     final store = DiagnosticRecorder.active;
     if (store != null && !_isRead(options.method)) {
-      store.add(
-        LogSource.http,
-        'request',
-        lvl: LogLevel.debug,
-        fields: {
-          'method': options.method,
-          'path': _pathOf(options),
-          ..._fieldsOf(options),
-          if (config.sampleRequests)
-            'body': _requestSample(store, options.data),
-        },
-      );
+      _quietly(() {
+        final path = _pathOf(options);
+        store.add(
+          LogSource.http,
+          'request',
+          lvl: LogLevel.debug,
+          fields: {
+            'method': options.method,
+            'path': path,
+            ..._fieldsOf(options),
+            if (config.sampleRequests && !_isNeverSampled(path))
+              'body': _requestSample(store, options.data),
+          },
+        );
+      });
     }
     handler.next(options);
   }
 
+  /// Every record this probe writes goes through here: whatever an odd body or
+  /// an app's field extractor does, the log loses one record and the request
+  /// it describes still goes out.
+  static void _quietly(void Function() record) {
+    try {
+      record();
+    } on Object {
+      // Nothing to do; see above.
+    }
+  }
+
+  bool _isNeverSampled(String path) =>
+      config.neverSampled?.hasMatch(path) ?? false;
+
   Object? _requestSample(LogStore store, Object? data) {
     if (data == null) return null;
     if (data is FormData) return _uploadSummary(data);
+    if (data is List<int>) return '<${data.length} bytes>';
+    // A body the app encoded itself is sampled as what it encodes, or the
+    // shape rule measures the whole document down to one `<str:N>`.
+    final body = data is String ? _decodedJson(data) ?? data : data;
     final sample = config.redactSamples
-        ? store.redactor.scrubSample(data)
-        : data;
+        ? store.redactor.scrubSample(body)
+        : body;
     if (sample == null) return null;
-    final encoded = _encoded(sample);
+    // The sample itself goes into the record, so one that cannot be encoded
+    // (a stream, an object without `toJson`) would throw at write time.
+    final encoded = _tryEncode(sample);
+    if (encoded == null) return '<${data.runtimeType}>';
     return encoded.length > config.maxSampleChars
         ? '${encoded.substring(0, config.maxClippedChars)}…'
         : sample;
+  }
+
+  /// A JSON object or array, or null. Scalars stay strings: `"1000"` is the
+  /// body, not the number it would decode to.
+  static Object? _decodedJson(String text) {
+    final trimmed = text.trimLeft();
+    if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) return null;
+    try {
+      final decoded = jsonDecode(trimmed);
+      return decoded is Map || decoded is List ? decoded : null;
+    } on FormatException {
+      return null;
+    }
   }
 
   static Map<String, Object?> _uploadSummary(FormData data) => {
@@ -150,32 +188,35 @@ class HttpProbe extends Interceptor {
     // the fingerprint kept) only while something is recording.
     final store = DiagnosticRecorder.active;
     if (store != null) {
-      final status = response.statusCode;
-      store.add(
-        LogSource.http,
-        'response',
-        // A 4xx only reaches here when the call opted out of status validation.
-        lvl: status != null && status >= 400 ? LogLevel.warn : LogLevel.info,
-        fields: {
-          'method': response.requestOptions.method,
-          'path': _pathOf(response.requestOptions),
-          ..._fieldsOf(response.requestOptions),
-          'status': status,
-          'ms': _elapsedMs(response.requestOptions),
-          // "The queue is empty" and "the queue came back full and the app
-          // dropped all of it" are the same 200 without this.
-          'n': _countOf(response.data),
-          // dio hands back a null body for an empty response claiming to be
-          // JSON, which the data layer reads as an empty list — the one way a
-          // truncated answer reaches a screen as "there is nothing here"
-          // instead of as an error.
-          'empty':
-              _isRead(response.requestOptions.method) && response.data == null
-              ? true
-              : null,
-          ..._sampleOf(store, response),
-        },
-      );
+      _quietly(() {
+        final status = response.statusCode;
+        store.add(
+          LogSource.http,
+          'response',
+          // A 4xx only reaches here when the call opted out of status
+          // validation.
+          lvl: status != null && status >= 400 ? LogLevel.warn : LogLevel.info,
+          fields: {
+            'method': response.requestOptions.method,
+            'path': _pathOf(response.requestOptions),
+            ..._fieldsOf(response.requestOptions),
+            'status': status,
+            'ms': _elapsedMs(response.requestOptions),
+            // "The queue is empty" and "the queue came back full and the app
+            // dropped all of it" are the same 200 without this.
+            'n': _countOf(response.data),
+            // dio hands back a null body for an empty response claiming to be
+            // JSON, which the data layer reads as an empty list — the one way a
+            // truncated answer reaches a screen as "there is nothing here"
+            // instead of as an error.
+            'empty':
+                _isRead(response.requestOptions.method) && response.data == null
+                ? true
+                : null,
+            ..._sampleOf(store, response),
+          },
+        );
+      });
     }
     handler.next(response);
   }
@@ -199,7 +240,10 @@ class HttpProbe extends Interceptor {
     final sample = config.redactSamples
         ? store.redactor.scrubSample(record)!
         : record;
-    final encoded = _encoded(sample);
+    // A custom transformer can hand back a map holding values JSON cannot
+    // carry, and the sample itself goes into the record.
+    final encoded = _tryEncode(sample);
+    if (encoded == null) return {'first': '<${record.runtimeType}>'};
     final key = '${options.method} $path?${options.uri.query.hashCode}';
     final fingerprint = _fingerprintOf(encoded, _countOf(response.data));
     if (_lastSample[key] == fingerprint) return const {'same': true};
@@ -246,24 +290,30 @@ class HttpProbe extends Interceptor {
     // from "nothing listening there", which dio lumps into `connectionError`.
     final cause = err.error?.runtimeType.toString();
     final store = DiagnosticRecorder.active;
-    store?.add(
-      LogSource.http,
-      'error',
-      lvl: _levelOf(err),
-      fields: {
-        'method': err.requestOptions.method,
-        'path': _pathOf(err.requestOptions),
-        ..._fieldsOf(err.requestOptions),
-        'type': err.type.name,
-        'status': status,
-        'ms': _elapsedMs(err.requestOptions),
-        'cause': cause,
-        // dio's message only restates the status when there is a response, so
-        // it earns its place exactly when there is none.
-        'msg': status == null ? _reasonOf(err, cause) : null,
-        'body': status == null ? null : _bodyPreview(err.response?.data, store),
-      },
-    );
+    if (store != null) {
+      _quietly(
+        () => store.add(
+          LogSource.http,
+          'error',
+          lvl: _levelOf(err),
+          fields: {
+            'method': err.requestOptions.method,
+            'path': _pathOf(err.requestOptions),
+            ..._fieldsOf(err.requestOptions),
+            'type': err.type.name,
+            'status': status,
+            'ms': _elapsedMs(err.requestOptions),
+            'cause': cause,
+            // dio's message only restates the status when there is a response,
+            // so it earns its place exactly when there is none.
+            'msg': status == null ? _reasonOf(err, cause) : null,
+            'body': status == null
+                ? null
+                : _bodyPreview(err.response?.data, store),
+          },
+        ),
+      );
+    }
     handler.next(err);
   }
 
@@ -297,11 +347,6 @@ class HttpProbe extends Interceptor {
     return upper == 'GET' || upper == 'HEAD';
   }
 
-  /// `uri` resolves the relative path against the base URL, which drops the
-  /// host and the query string — where the tokens live — with it. What is left
-  /// still goes through [HttpProbeConfig.pathOf], because a path can carry the
-  /// user's own text in a segment and no redactor catches that: it is a path,
-  /// not a field.
   /// The application's own per-request fields, and never a throw: this runs on
   /// every request, and an extractor tripping over an odd URL must not be the
   /// reason a call fails.
@@ -315,6 +360,11 @@ class HttpProbe extends Interceptor {
     }
   }
 
+  /// `uri` resolves the relative path against the base URL, which drops the
+  /// host and the query string — where the tokens live — with it. What is left
+  /// still goes through [HttpProbeConfig.pathOf], because a path can carry the
+  /// user's own text in a segment and no redactor catches that: it is a path,
+  /// not a field.
   String _pathOf(RequestOptions options) {
     final path = options.uri.path;
     return config.pathOf?.call(path) ?? path;
@@ -358,13 +408,16 @@ class HttpProbe extends Interceptor {
         : text;
   }
 
-  static String _encoded(Object data) {
+  /// A streamed or otherwise unencodable body must not fail the request it
+  /// describes; its type is all we can say about it.
+  static String _encoded(Object data) =>
+      _tryEncode(data) ?? '<${data.runtimeType}>';
+
+  static String? _tryEncode(Object data) {
     try {
       return jsonEncode(data);
     } on Object {
-      // A streamed or otherwise unencodable body must not fail the request it
-      // describes; its type is all we can say about it.
-      return '<${data.runtimeType}>';
+      return null;
     }
   }
 }
