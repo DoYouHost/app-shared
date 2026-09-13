@@ -17,13 +17,23 @@ String normalizeBaseUrl(
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     url = '$defaultScheme://$url';
   }
-  while (url.endsWith('/')) {
-    url = url.substring(0, url.length - 1);
-  }
+  url = _withoutTrailingSlashes(url);
   if (apiPath != null && url.endsWith(apiPath)) {
-    url = url.substring(0, url.length - apiPath.length);
+    // Again after the API path: "host//api/v1" would otherwise leave "host/",
+    // and every endpoint path, which starts with a slash, would double it.
+    url = _withoutTrailingSlashes(
+      url.substring(0, url.length - apiPath.length),
+    );
   }
   return url;
+}
+
+String _withoutTrailingSlashes(String url) {
+  var end = url.length;
+  while (end > 0 && url[end - 1] == '/') {
+    end--;
+  }
+  return url.substring(0, end);
 }
 
 /// The base URL a probe actually reached, honouring any http→https (or host)

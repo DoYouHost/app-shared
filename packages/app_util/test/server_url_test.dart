@@ -42,6 +42,8 @@ void main() {
       expect(api('host/api'), 'https://host');
       expect(api('https://host/api/'), 'https://host');
       expect(api('https://host/proxy/api'), 'https://host/proxy');
+      expect(api('https://host//api/'), 'https://host');
+      expect(api('https://host/proxy//api'), 'https://host/proxy');
       expect(
         http('https://host/api'),
         'https://host/api',
