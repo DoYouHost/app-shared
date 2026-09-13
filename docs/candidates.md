@@ -16,27 +16,21 @@ lubelogger-mobile moved onto both packages together. The one thing it recorded
 that `app_diagnostics` could not was a write's request body, which is now
 `HttpProbeConfig.sampleRequests` (off by default, so bambuddy is unaffected).
 
-## 2. `dash_ui` — the design system
+## 2. ~~`dash_ui` — the design system~~ — done in v0.4.0
 
-The two apps' theme layers are the same system with a different brand accent.
-Both define `DashTokens` with the same token names (`cardGradient`,
-`cardBorder`, `subCard`, `subCardBorder`, `groupCard`, `textPrimary`,
-`textSecondary`, `textTertiary`, `accentOrange`, `accentBlue`, `danger`,
-`gaugeTrack`, `hairline`, `dottedRule`, `navBar`, `overlaySurface`,
-`overlayBorder`) and the same construction functions: `DashBackground`,
-`dashAppBar`, `DashPill`, `dashFieldDecoration`, `dashPrimaryButtonStyle`,
-`buildDashThemeData`.
+The brand is a `DashBrand` handed to `buildDashThemeData`, which registers the
+resolved `DashTokens` as a theme extension. Each app keeps its brand, its
+wordmark, and aliases (`accentGreen`, `accentGold`) for the generic `accent` and
+`accentInk`, so no call site had to change. bambuddy also keeps its log-tagged
+`dashAppBar` and `dashSaveAction`, which need `app_diagnostics`.
 
-What differs: the accent (`accentGreen`/`accentGreenInk` here,
-`accentGold`/`accentGoldInk` there) and a wordmark widget. Plus bambuddy's
-`dash_text.dart`, the type scale, which lubelogger has no equivalent of and
-would gain.
+The contrast test is `dashContrastAudit`. Each app runs it on its own brand.
+Running it on lubelogger's brand changed three things there, all on purpose:
 
-Blocker: this is a design-system move, not a deduplication, and two earlier
-bambuddy rounds refused smaller versions of it for exactly that reason
-(`subCardBorder` alone stands in 92 places across 20 files). It should be a
-deliberate piece of work on tokens, with a contrast test on both accents, not a
-side effect of a refactor.
+- it takes bambuddy's muted inks, which were already fixed to reach 4.5:1;
+- its light-theme gold ink moves from #9A6E12 (3.81:1) to #835E0F (4.92:1);
+- its elevated and outlined buttons get the filled button's padding, so buttons
+  side by side are the same height.
 
 ## 3. `app_report_ui` — the report screen
 
@@ -45,8 +39,8 @@ side effect of a refactor.
 `log_export.dart` / `log_preview.dart` are small and near-identical.
 
 Blocker: localization. Each app owns its `.arb` files, so the package needs
-either injected strings or l10n of its own — and the screen renders through the
-theme, so it wants `dash_ui` first. Worth doing second, not first.
+either injected strings or l10n of its own. The screen renders through the
+theme, which `dash_ui` now provides, so localization is the only blocker left.
 
 ## 4. `wear_ui` — the round-face layout
 
