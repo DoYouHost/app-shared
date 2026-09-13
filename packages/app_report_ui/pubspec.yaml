@@ -1,0 +1,49 @@
+name: app_report_ui
+description: >-
+  The screens of a bug report: the guided report flow, the recording bar that
+  follows the user around the app, and the review that decides where the log
+  goes.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # Siblings by git ref, at the refs the applications pin, for the reason
+  # `app_diagnostics` gives: an application naming one by git and getting it
+  # here by path would hand pub two sources for one package.
+  # `pubspec_overrides.yaml` points them at the checkout for this repo's tests.
+  app_diagnostics:
+    git:
+      url: https://github.com/DoYouHost/app-shared.git
+      ref: v0.3.0
+      path: packages/app_diagnostics
+  app_report_client:
+    git:
+      url: https://github.com/DoYouHost/app-shared.git
+      ref: v0.2.0
+      path: packages/app_report_client
+  dash_ui:
+    git:
+      url: https://github.com/DoYouHost/app-shared.git
+      ref: v0.4.0
+      path: packages/dash_ui
+  file_picker: ^8.3.0
+  flutter_riverpod: ^2.6.1
+  go_router: ^16.0.0
+  intl: ^0.20.2
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  dio: ^5.7.0
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  generate: true
