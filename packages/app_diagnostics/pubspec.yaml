@@ -3,7 +3,7 @@ description: >-
   The half of a bug report that produces it: the recording session, the log
   record and its file mirror, the merge across isolates, the review summary, and
   the probes that observe taps, routes, requests, errors and lifecycle.
-version: 0.1.0
+version: 0.2.0
 publish_to: none
 
 environment:
