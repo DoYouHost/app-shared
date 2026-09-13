@@ -488,7 +488,7 @@ class _ReviewViewState extends ConsumerState<_ReviewView> {
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(0, 48),
-                            foregroundColor: t.danger,
+                            foregroundColor: t.dangerInk,
                           ),
                           onPressed: () =>
                               _confirmDiscard(context, controller, l10n),
@@ -860,7 +860,7 @@ class _Failed extends StatelessWidget {
         kind.needsLog
             ? _failureText(ReportLocalizations.of(context), failure)
             : _requestFailureText(ReportLocalizations.of(context), failure),
-        style: t.labelSoft.copyWith(color: t.danger, height: 1.4),
+        style: t.labelSoft.copyWith(color: t.dangerInk, height: 1.4),
       ),
     );
   }
@@ -1117,7 +1117,7 @@ class _LineRowState extends State<_LineRow> {
     // Inks, not the vivid swatches: this feeds the line's header text as well
     // as its dot, and a 2.3:1 word is one nobody reads.
     final accent = line.isError
-        ? t.danger
+        ? t.dangerInk
         : line.isWarning
         ? t.accentOrangeInk
         : line.isMarker

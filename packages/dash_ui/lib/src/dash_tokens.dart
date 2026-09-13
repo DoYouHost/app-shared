@@ -36,6 +36,10 @@ class DashTokens extends ThemeExtension<DashTokens> {
       accentOrangeInk = const Color(0xFFFF9F5C),
       accentBlue = const Color(0xFF4FA6F7),
       danger = const Color(0xFFFF6B6B),
+      dangerInk = const Color(0xFFFF6B6B),
+      warning = const Color(0xFFE0A800),
+      warningInk = const Color(0xFFE0A800),
+      onDanger = const Color(0xFF10130E),
       gaugeTrack = const Color(0x10FFFFFF),
       hairline = const Color(0x14FFFFFF),
       dottedRule = const Color(0x24FFFFFF),
@@ -68,6 +72,10 @@ class DashTokens extends ThemeExtension<DashTokens> {
       accentOrangeInk = const Color(0xFFA05019),
       accentBlue = const Color(0xFF2C7FE0),
       danger = const Color(0xFFD64545),
+      dangerInk = const Color(0xFFBE2A2A),
+      warning = const Color(0xFFE0A800),
+      warningInk = const Color(0xFF7F5F00),
+      onDanger = const Color(0xFFFFFFFF),
       gaugeTrack = const Color(0x14000000),
       hairline = const Color(0x14000000),
       dottedRule = const Color(0x1F000000),
@@ -129,8 +137,26 @@ class DashTokens extends ThemeExtension<DashTokens> {
 
   final Color accentBlue;
 
-  /// Warning, low, error, delete.
+  /// Warning, low, error, delete — as a fill, a border or a dot.
   final Color danger;
+
+  /// The same red as text or an icon. The fill reads 3.7:1 on the light
+  /// background, which is under what a word owes, and an error message is the
+  /// one sentence a user most needs to read.
+  final Color dangerInk;
+
+  /// The label on a solid red fill, which is [dangerInk] rather than [danger]:
+  /// neither white nor a dark ink reaches 4.5:1 on the lighter red. See
+  /// `dashDangerButtonStyle`.
+  final Color onDanger;
+
+  /// A check that passed with reservations — between the accent's "fine" and
+  /// [danger]'s "failed" — as a fill or a mark.
+  final Color warning;
+
+  /// The same yellow as text or an icon: the swatch reads 1.8:1 on the light
+  /// background, where even an icon owes 3:1.
+  final Color warningInk;
 
   /// Background track of a gauge or progress bar.
   final Color gaugeTrack;

@@ -44,7 +44,7 @@ Future<bool> confirmDestructive(
           child: Text(l10n.reportCancel),
         ).tagged('$id.cancel'),
         FilledButton(
-          style: FilledButton.styleFrom(backgroundColor: t.danger),
+          style: dashDangerButtonStyle(t),
           onPressed: () => Navigator.pop(dialogContext, true),
           child: Text(confirmLabel),
         ).tagged('$id.confirm'),

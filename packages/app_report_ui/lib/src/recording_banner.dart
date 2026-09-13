@@ -314,7 +314,8 @@ class _RecordingLayerState extends ConsumerState<_RecordingLayer> {
               label: l10n.bugReportStop,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: t.danger,
+                  backgroundColor: t.dangerInk,
+                  foregroundColor: t.onDanger,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   minimumSize: const Size(0, 32),
                   textStyle: const TextStyle(

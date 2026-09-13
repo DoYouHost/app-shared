@@ -58,4 +58,45 @@ void main() {
       });
     }
   }
+
+  for (final brightness in Brightness.values) {
+    final t = DashTokens.resolve(brightness, green);
+
+    testWidgets('${brightness.name}: a destructive button is the readable red '
+        'with a label that reads on it', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildDashThemeData(brightness, brand: green),
+          home: Scaffold(
+            body: FilledButton(
+              style: dashDangerButtonStyle(t),
+              onPressed: () {},
+              child: const Text('delete'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final material = tester.widget<Material>(
+        find.descendant(
+          of: find.byType(FilledButton),
+          matching: find.byType(Material),
+        ),
+      );
+      expect(material.color, t.dangerInk);
+      expect(inkOf<FilledButton>(tester), t.onDanger);
+    });
+
+    // Material paints a field's error text with `colorScheme.error`, so the
+    // scheme carries the ink, not the fill.
+    test(
+      '${brightness.name}: the scheme\'s error colour is the readable red',
+      () {
+        final scheme = buildDashThemeData(brightness, brand: green).colorScheme;
+        expect(scheme.error, t.dangerInk);
+        expect(scheme.onError, t.onDanger);
+      },
+    );
+  }
 }

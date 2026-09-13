@@ -71,4 +71,18 @@ void main() {
       ['dark onAccent', 'light onAccent'],
     );
   });
+
+  // Why the red and the yellow are two tokens each: the fill is too pale to be
+  // read as a word on the light background, and the ink is the same hue
+  // darkened until it is.
+  test('a status fill is not readable text, and its ink is', () {
+    for (final brightness in Brightness.values) {
+      final t = DashTokens.resolve(brightness, green);
+      expect(dashWorstContrast(t.dangerInk, t), greaterThanOrEqualTo(4.5));
+      expect(dashWorstContrast(t.warningInk, t), greaterThanOrEqualTo(4.5));
+    }
+    const light = DashTokens.light(green);
+    expect(dashWorstContrast(light.danger, light), lessThan(4.5));
+    expect(dashWorstContrast(light.warning, light), lessThan(4.5));
+  });
 }

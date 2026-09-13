@@ -306,10 +306,24 @@ class BugReportController extends Notifier<BugReportState> {
 
   /// Hands the report to the sender. It goes to disk first, so from here it
   /// survives the screen closing, the app being backgrounded and the app dying.
+  ///
+  /// Busy before the first await, as [sendRequest] is: the sender says nothing
+  /// until the ticket has arrived and the report is on disk, and a second tap in
+  /// that window commits the report twice into the one outbox slot — both of
+  /// them reach the relay.
   Future<void> sendToIssue(String description) async {
     final log = state.log;
     if (log == null || log.isEmpty) return;
-    await _sender.submit(description: description, log: log);
+    if (state.send.phase == SendPhase.sending) return;
+    state = state.copyWith(send: const SendState.sending());
+    try {
+      await _sender.submit(description: description, log: log);
+    } on Object {
+      // Nothing is queued that could ever report the failure, and the button
+      // has to come back.
+      state = state.copyWith(send: const SendState.idle());
+      rethrow;
+    }
   }
 
   /// Backs out: the recording stops and the files go. A log the user decided

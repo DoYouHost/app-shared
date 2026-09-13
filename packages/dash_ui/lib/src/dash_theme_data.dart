@@ -24,8 +24,10 @@ ThemeData buildDashThemeData(
         primary: t.accentInk,
         onPrimary: t.onAccent,
         secondary: t.accentBlue,
-        error: t.danger,
-        onError: Colors.white,
+        // Material paints `errorText` and a destructive fill with these, so the
+        // readable red and the label that reads on it.
+        error: t.dangerInk,
+        onError: t.onDanger,
         surface: t.overlaySurface,
         onSurface: t.textPrimary,
         surfaceContainerHighest: t.overlaySurface,

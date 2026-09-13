@@ -3,7 +3,7 @@ description: >-
   The Dash design system: colour tokens resolved per brightness and brand, the
   type scale, the screen chrome, the Material theme built from them, and the
   contrast audit a brand has to pass.
-version: 0.1.0
+version: 0.2.0
 publish_to: none
 
 environment:

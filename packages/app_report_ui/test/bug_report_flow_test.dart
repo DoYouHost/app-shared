@@ -542,6 +542,49 @@ void main() {
       expect(relay.sends, 0);
     });
 
+    testWidgets('a second tap while the ticket is still coming sends once', (
+      tester,
+    ) async {
+      // The send tap waits for the ticket choosing GitHub asked for, then for
+      // the disk, and only then does the sender say anything — the whole time
+      // with the button still live. A queued report is a single slot, so two
+      // commits race each other into it and out to the relay.
+      final root = Directory.systemTemp.createTempSync('outbox');
+      addTearDown(() => root.deleteSync(recursive: true));
+      final gate = Completer<void>();
+      final relay = FakeRelay(issued: ticket(), gate: gate.future);
+      final container = await pumpReview(
+        tester,
+        rig: Rig(relay: relay, outboxRoot: root),
+      );
+
+      // Everything from the ticket onwards is real I/O, so it is started where
+      // real I/O completes.
+      await tester.runAsync(() => tester.tap(find.text('Zgłoś na GitHubie')));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'zgłoszone dwa razy');
+      // No frame between the taps: the button has not been rebuilt disabled
+      // yet, which is exactly the window a fast double tap lands in.
+      await tester.runAsync(() async {
+        await tester.tap(find.text('Zgłoś'));
+        await tester.tap(find.text('Zgłoś'));
+        gate.complete();
+      });
+      await settleAsyncUntil(
+        tester,
+        () async =>
+            container.read(bugReportProvider).send.phase == SendPhase.sent,
+      );
+      // Past the first send, so a second commit still in flight has had the
+      // real event loop it needs to reach the relay too.
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 300)),
+      );
+
+      expect(relay.challenges, 1);
+      expect(relay.sends, 1);
+    });
+
     testWidgets('sends the issue and offers the link back', (tester) async {
       final root = Directory.systemTemp.createTempSync('outbox');
       addTearDown(() => root.deleteSync(recursive: true));

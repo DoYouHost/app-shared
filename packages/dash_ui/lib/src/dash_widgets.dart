@@ -204,3 +204,19 @@ ButtonStyle dashPrimaryButtonStyle(DashTokens t) => FilledButton.styleFrom(
   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
 );
+
+/// A call to action that destroys something: [dashPrimaryButtonStyle] in red,
+/// with the fill and the label both chosen to read.
+ButtonStyle dashDangerButtonStyle(DashTokens t) =>
+    dashPrimaryButtonStyle(t).copyWith(
+      backgroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled)
+            ? t.dangerInk.withValues(alpha: 0.35)
+            : t.dangerInk,
+      ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled)
+            ? t.onDanger.withValues(alpha: 0.5)
+            : t.onDanger,
+      ),
+    );
