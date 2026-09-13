@@ -69,33 +69,42 @@ Blocker: there is no second watch app. This is a bet, and the value until it pay
 off is only that the next one does not start by rediscovering that `SafeArea`
 resolves to zero on a round display.
 
-## 5. Small utilities
+## 5. ~~Small utilities~~ — done in v0.6.0, as `app_util`
 
-No design decisions, all already tested, all in bambuddy and all absent or
-hand-rolled in lubelogger:
+One package, because each of these is too small to carry its own pubspec. Not
+everything in the list was the same in both apps once it was read closely, so
+the package took less than the table promised:
 
-| what | why it is worth sharing |
-|---|---|
-| `core/models/json_utils.dart` | tolerant JSON coercers; lubelogger hand-parses and has no equivalent |
-| `core/format/user_number.dart` | the decimal comma — `double.tryParse` refuses what a Polish keyboard produces |
-| `core/format/text_measure.dart` | measuring a label at the ambient `TextScaler`, which is the part that gets forgotten |
-| `core/platform/platform_query.dart` | one policy for "this host does not implement the channel" |
-| `features/common/format_bytes.dart`, `hex_color.dart` | small, exact, and copied by hand otherwise |
-| `core/demo/demo_http_adapter.dart` | already 61% identical |
-| `ServerProfile.normalizeBaseUrl` | the http/https/WS bug that a mocked adapter cannot catch |
-| the `mapDioException` core of `core/api/api_exceptions.dart` | the same error taxonomy, differently spelled |
+- **JSON.** The coercers, the tolerant list and object parsers, and the calendar
+  date moved. `dateTimeFromJson` and `instantToJson` stayed in bambuddy: they
+  read a zoneless timestamp as UTC, which is how bambuddy's server stores time
+  and not how LubeLogger's does. lubelogger dropped a `_toInt`/`_toDouble` pair
+  from each of nine models. Its list parser now also survives a record whose
+  factory throws, and logs `parse_drop` where it used to log `records_dropped`.
+- **The server address.** The scheme a bare host gets is a parameter
+  (`http` for bambuddy, `https` for lubelogger), and so is lubelogger's trailing
+  `/api`. `baseUrlFromReached` was identical and moved as it was.
+- **`mapDioException`.** Only the classification moved, as `DioFailure`. The
+  codes and exception classes are each app's own, so each app now has a switch
+  over the classification. The package names every `DioExceptionType`, so it
+  needs dio 5.10+, which moved bambuddy's lock from 5.9.2.
+- **The demo adapter.** It takes the backend's `handle` and, for lubelogger, an
+  `uploads` callback for multipart bodies. File responses came from bambuddy.
+- **Numbers, bytes, text measurement.** lubelogger's forms read numbers through
+  `parseUserDecimal`. That changes one thing on purpose: "1,000" is now refused
+  as ambiguous instead of stored as 1. The settings screen shows `formatBytes`
+  ("834 KB" where it said "834 kB"), and the dashboard measures with
+  `textWidth`, which follows the reading direction.
+- `PlatformQuery` and the hex colours have no lubelogger caller yet. They are
+  here because `wear_ui` (item 4) would need the first.
 
-Blocker: none, beyond deciding whether they belong in one `app_util` package or
-are split by subject. One package is probably right — each of these is too small
-to carry its own pubspec.
+## ~~A gap in this repository~~ — closed
 
-## A gap in this repository
+CI now runs `dart format --output=none --set-exit-if-changed lib test` in every
+package, next to analyze and test. `app_report_client` was reformatted in the
+same change, and `.git-blame-ignore-revs` lists that commit.
 
-There was no CI here until `app_diagnostics` landed; the workflow added with it
-runs `flutter pub get`, `flutter analyze` and `flutter test` for every directory
-under `packages/`. It deliberately does **not** gate `dart format`:
-`app_report_client` predates the formatter version the applications are on and
-would need an 844-line reformat to go green. That reformat is a decision about
-this repository's history — worth making, together with a
-`.git-blame-ignore-revs` entry, the way bambuddy did it — and the format gate
-should be added in the same commit.
+Adding the gate turned up an older bug in the same loop. `set -e` does not apply
+inside a subshell on the left of `||`, so each package's status was only its last
+command's, and a failing `flutter analyze` passed as long as the tests passed.
+Each step now records its own failure.

@@ -1,0 +1,38 @@
+name: app_util
+description: >-
+  Small things both applications need exactly the same way: tolerant JSON
+  coercion, reading a number a person typed, measuring a label, asking a
+  platform channel, byte sizes and hex colours, the demo-mode HTTP adapter, a
+  server address, and the classification of a failed request.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # A dropped JSON record is logged to the active recording. By git ref at the
+  # ref the applications pin, for the reason `app_diagnostics` gives;
+  # `pubspec_overrides.yaml` points it at the checkout for this repo's tests.
+  app_diagnostics:
+    git:
+      url: https://github.com/DoYouHost/app-shared.git
+      ref: v0.3.0
+      path: packages/app_diagnostics
+  # 5.10 is the first with `DioExceptionType.transformTimeout`, and the
+  # classification names every type so that the next one added is a compile
+  # error here rather than a silent default.
+  dio: ^5.10.0
+
+dev_dependencies:
+  # Only to build a recorder in the tests, whose redactor comes from here.
+  app_report_client:
+    git:
+      url: https://github.com/DoYouHost/app-shared.git
+      ref: v0.2.0
+      path: packages/app_report_client
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
