@@ -33,15 +33,18 @@ class _Answering implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
-ResponseBody _json(String body, int status, {Map<String, List<String>>? extra}) =>
-    ResponseBody.fromString(
-      body,
-      status,
-      headers: {
-        Headers.contentTypeHeader: [Headers.jsonContentType],
-        ...?extra,
-      },
-    );
+ResponseBody _json(
+  String body,
+  int status, {
+  Map<String, List<String>>? extra,
+}) => ResponseBody.fromString(
+  body,
+  status,
+  headers: {
+    Headers.contentTypeHeader: [Headers.jsonContentType],
+    ...?extra,
+  },
+);
 
 const base = 'https://relay.example/someapp';
 
@@ -62,7 +65,9 @@ void main() {
   RelayClient clientAnswering(Object Function(RequestOptions) reply) =>
       RelayClient(Dio()..httpClientAdapter = _Answering(reply), baseUrl: base);
 
-  Future<RelayFailure> failureOfSend(Object Function(RequestOptions) reply) async {
+  Future<RelayFailure> failureOfSend(
+    Object Function(RequestOptions) reply,
+  ) async {
     try {
       await clientAnswering(reply).send(
         installId: 'i',
@@ -122,9 +127,13 @@ void main() {
       // The relay has shut the door on this installation, or the global breaker
       // is down. Retrying soon does not help, and the header says when it might.
       final client = clientAnswering(
-        (_) => _json('{}', 503, extra: {
-          'retry-after': ['120'],
-        }),
+        (_) => _json(
+          '{}',
+          503,
+          extra: {
+            'retry-after': ['120'],
+          },
+        ),
       );
 
       await expectLater(
@@ -132,31 +141,43 @@ void main() {
         throwsA(
           isA<RelayException>()
               .having((e) => e.failure, 'failure', RelayFailure.refused)
-              .having((e) => e.retryAfter, 'retryAfter',
-                  const Duration(seconds: 120)),
+              .having(
+                (e) => e.retryAfter,
+                'retryAfter',
+                const Duration(seconds: 120),
+              ),
         ),
       );
     });
 
-    test('a 503 with no retry-after is still refused, just without a when',
-        () async {
-      final client = clientAnswering((_) => _json('{}', 503));
+    test(
+      'a 503 with no retry-after is still refused, just without a when',
+      () async {
+        final client = clientAnswering((_) => _json('{}', 503));
 
-      await expectLater(
-        client.challenge('i'),
-        throwsA(isA<RelayException>()
-            .having((e) => e.failure, 'failure', RelayFailure.refused)
-            .having((e) => e.retryAfter, 'retryAfter', isNull)),
-      );
-    });
+        await expectLater(
+          client.challenge('i'),
+          throwsA(
+            isA<RelayException>()
+                .having((e) => e.failure, 'failure', RelayFailure.refused)
+                .having((e) => e.retryAfter, 'retryAfter', isNull),
+          ),
+        );
+      },
+    );
 
     test('anything else the relay says is our bug, not the user\'s', () async {
       for (final status in [400, 401, 404, 500]) {
         final client = clientAnswering((_) => _json('{}', status));
         await expectLater(
           client.challenge('i'),
-          throwsA(isA<RelayException>()
-              .having((e) => e.failure, 'failure', RelayFailure.rejected)),
+          throwsA(
+            isA<RelayException>().having(
+              (e) => e.failure,
+              'failure',
+              RelayFailure.rejected,
+            ),
+          ),
           reason: 'status $status',
         );
       }
@@ -174,32 +195,39 @@ void main() {
 
       await expectLater(
         client.challenge('i'),
-        throwsA(isA<RelayException>()
-            .having((e) => e.failure, 'failure', RelayFailure.unreachable)),
+        throwsA(
+          isA<RelayException>().having(
+            (e) => e.failure,
+            'failure',
+            RelayFailure.unreachable,
+          ),
+        ),
       );
     });
   });
 
   group('sending the report', () {
-    test('a 201 hands back the issue URL, which is the one unrecoverable bit',
-        () async {
-      final client = clientAnswering(
-        (_) => _json('{"url":"https://github.example/issues/412"}', 201),
-      );
+    test(
+      'a 201 hands back the issue URL, which is the one unrecoverable bit',
+      () async {
+        final client = clientAnswering(
+          (_) => _json('{"url":"https://github.example/issues/412"}', 201),
+        );
 
-      expect(
-        await client.send(
-          installId: 'i',
-          ticket: usable(),
-          kind: ReportKind.bug,
-          description: 'd',
-          header: const {'app': '0.11.7'},
-          logSchema: 1,
-          log: 'line\n',
-        ),
-        'https://github.example/issues/412',
-      );
-    });
+        expect(
+          await client.send(
+            installId: 'i',
+            ticket: usable(),
+            kind: ReportKind.bug,
+            description: 'd',
+            header: const {'app': '0.11.7'},
+            logSchema: 1,
+            log: 'line\n',
+          ),
+          'https://github.example/issues/412',
+        );
+      },
+    );
 
     test('a 403 is "not yet", so the report is kept and retried', () async {
       // The ticket was not usable yet, or no longer. Reporting this as a failure
@@ -214,74 +242,109 @@ void main() {
       );
     });
 
-    test('a 502 is the tracker being down, not the envelope being wrong',
-        () async {
-      expect(
-        await failureOfSend((_) => _json('{}', 502)),
-        RelayFailure.unreachable,
-      );
-    });
+    test(
+      'a 502 is the tracker being down, not the envelope being wrong',
+      () async {
+        expect(
+          await failureOfSend((_) => _json('{}', 502)),
+          RelayFailure.unreachable,
+        );
+      },
+    );
 
     test('a 400 is our envelope, and no amount of retrying fixes it', () async {
-      expect(await failureOfSend((_) => _json('{}', 400)), RelayFailure.rejected);
-      expect(await failureOfSend((_) => _json('{}', 422)), RelayFailure.rejected);
-      expect(await failureOfSend((_) => _json('{}', 500)), RelayFailure.rejected);
+      expect(
+        await failureOfSend((_) => _json('{}', 400)),
+        RelayFailure.rejected,
+      );
+      expect(
+        await failureOfSend((_) => _json('{}', 422)),
+        RelayFailure.rejected,
+      );
+      expect(
+        await failureOfSend((_) => _json('{}', 500)),
+        RelayFailure.rejected,
+      );
     });
 
     test('a 200 is not a 201, and is treated as a rejection', () async {
       // The relay creates an issue or it does not; a 200 means it answered
       // something this client does not understand, and there is no URL in hand.
-      expect(await failureOfSend((_) => _json('{"url":"x"}', 200)),
-          RelayFailure.rejected);
-    });
-
-    test('a 503 while sending is worth waiting out, with its own delay',
-        () async {
-      final client = clientAnswering(
-        (_) => _json('{}', 503, extra: {
-          'retry-after': ['45'],
-        }),
-      );
-
-      await expectLater(
-        client.send(
-          installId: 'i',
-          ticket: usable(),
-          kind: ReportKind.feature,
-          description: 'd',
-          header: const {},
-        ),
-        throwsA(isA<RelayException>()
-            .having((e) => e.failure, 'failure', RelayFailure.notYet)
-            .having((e) => e.retryAfter, 'retryAfter',
-                const Duration(seconds: 45))),
+      expect(
+        await failureOfSend((_) => _json('{"url":"x"}', 200)),
+        RelayFailure.rejected,
       );
     });
 
-    test('a retry-after that is not a number is no retry-after at all',
-        () async {
-      // HTTP allows a date there. Parsing it as seconds would schedule the
-      // retry for whenever `int.tryParse` felt like, so it is dropped instead.
-      final client = clientAnswering(
-        (_) => _json('{}', 503, extra: {
-          'retry-after': ['Wed, 09 Aug 2026 12:00:00 GMT'],
-        }),
-      );
+    test(
+      'a 503 while sending is worth waiting out, with its own delay',
+      () async {
+        final client = clientAnswering(
+          (_) => _json(
+            '{}',
+            503,
+            extra: {
+              'retry-after': ['45'],
+            },
+          ),
+        );
 
-      await expectLater(
-        client.send(
-          installId: 'i',
-          ticket: usable(),
-          kind: ReportKind.bug,
-          description: 'd',
-          header: const {},
-          logSchema: 1,
-          log: 'x\n',
-        ),
-        throwsA(isA<RelayException>()
-            .having((e) => e.retryAfter, 'retryAfter', isNull)),
-      );
-    });
+        await expectLater(
+          client.send(
+            installId: 'i',
+            ticket: usable(),
+            kind: ReportKind.feature,
+            description: 'd',
+            header: const {},
+          ),
+          throwsA(
+            isA<RelayException>()
+                .having((e) => e.failure, 'failure', RelayFailure.notYet)
+                .having(
+                  (e) => e.retryAfter,
+                  'retryAfter',
+                  const Duration(seconds: 45),
+                ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'a retry-after that is not a number is no retry-after at all',
+      () async {
+        // HTTP allows a date there. Parsing it as seconds would schedule the
+        // retry for whenever `int.tryParse` felt like, so it is dropped instead.
+        final client = clientAnswering(
+          (_) => _json(
+            '{}',
+            503,
+            extra: {
+              'retry-after': ['Wed, 09 Aug 2026 12:00:00 GMT'],
+            },
+          ),
+        );
+
+        await expectLater(
+          client.send(
+            installId: 'i',
+            ticket: usable(),
+            kind: ReportKind.bug,
+            description: 'd',
+            header: const {},
+            logSchema: 1,
+            log: 'x\n',
+          ),
+          throwsA(
+            isA<RelayException>().having(
+              (e) => e.retryAfter,
+              'retryAfter',
+              isNull,
+            ),
+          ),
+        );
+      },
+    );
   });
 
   group('which failures the sender may retry', () {

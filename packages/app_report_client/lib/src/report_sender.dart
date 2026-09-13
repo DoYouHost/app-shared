@@ -22,13 +22,15 @@ class SendState {
 
   const SendState.idle() : this._(SendPhase.idle);
   const SendState.waiting(DateTime readyAt, {ReportKind kind = ReportKind.bug})
-      : this._(SendPhase.waiting, kind: kind, readyAt: readyAt);
+    : this._(SendPhase.waiting, kind: kind, readyAt: readyAt);
   const SendState.sending({ReportKind kind = ReportKind.bug})
-      : this._(SendPhase.sending, kind: kind);
+    : this._(SendPhase.sending, kind: kind);
   const SendState.sent(String url, {ReportKind kind = ReportKind.bug})
-      : this._(SendPhase.sent, kind: kind, issueUrl: url);
-  const SendState.failed(RelayFailure failure, {ReportKind kind = ReportKind.bug})
-      : this._(SendPhase.failed, kind: kind, failure: failure);
+    : this._(SendPhase.sent, kind: kind, issueUrl: url);
+  const SendState.failed(
+    RelayFailure failure, {
+    ReportKind kind = ReportKind.bug,
+  }) : this._(SendPhase.failed, kind: kind, failure: failure);
 
   final SendPhase phase;
 
@@ -144,10 +146,7 @@ class ReportSender {
   ///
   /// The header and the schema are not parameters: they are read out of [log]
   /// itself, so a caller cannot describe one recording while attaching another.
-  Future<void> submit({
-    required String description,
-    required String log,
-  }) =>
+  Future<void> submit({required String description, required String log}) =>
       _commit(
         kind: ReportKind.bug,
         description: description,
@@ -164,8 +163,7 @@ class ReportSender {
     required ReportKind kind,
     required String description,
     required ReportEnvelope envelope,
-  }) =>
-      _commit(kind: kind, description: description, envelope: envelope);
+  }) => _commit(kind: kind, description: description, envelope: envelope);
 
   Future<void> _commit({
     required ReportKind kind,
@@ -297,10 +295,7 @@ class ReportSender {
     } on RelayException catch (error) {
       if (error.retryable) {
         final delay = error.retryAfter ?? const Duration(minutes: 1);
-        _emit(SendState.waiting(
-          DateTime.now().add(delay),
-          kind: pending.kind,
-        ));
+        _emit(SendState.waiting(DateTime.now().add(delay), kind: pending.kind));
         _timer = Timer(delay, flush);
         return;
       }

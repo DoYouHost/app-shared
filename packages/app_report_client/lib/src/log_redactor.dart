@@ -52,14 +52,16 @@ class LogRedactor {
     r'((?:https?|wss?|rtsps?)://)([^@/\s]+@)?([^:/\s?#]+)(:\d+)?',
     caseSensitive: false,
   );
-  static final _jwt =
-      RegExp(r'\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*');
+  static final _jwt = RegExp(
+    r'\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*',
+  );
   static final _queryToken = RegExp(
     r'([?&](?:token|access_token|api_?key|key)=)[^&\s]+',
     caseSensitive: false,
   );
-  static final _email =
-      RegExp(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b');
+  static final _email = RegExp(
+    r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b',
+  );
 
   /// Leading-zero octets are rejected, so `01.09.01.00` stays a version.
   static final _ipv4 = RegExp(
@@ -103,8 +105,8 @@ class LogRedactor {
         e.key: _isSecretKey(e.key)
             ? _redacted(e.value)
             : _isOurs(e.key, e.value)
-                ? e.value
-                : scrub(e.value),
+            ? e.value
+            : scrub(e.value),
     };
   }
 
@@ -123,8 +125,8 @@ class LogRedactor {
           '${e.key}': _isSecretKey('${e.key}')
               ? _redacted(e.value)
               : _isOurs('${e.key}', e.value)
-                  ? e.value
-                  : scrub(e.value),
+              ? e.value
+              : scrub(e.value),
       };
     }
     if (value is List) return [for (final v in value) scrub(v)];
@@ -145,7 +147,8 @@ class LogRedactor {
     out = out
         .replaceAllMapped(
           _urlAuthority,
-          (m) => '${m[1]}${m[2] == null ? '' : '[CREDENTIALS]@'}'
+          (m) =>
+              '${m[1]}${m[2] == null ? '' : '[CREDENTIALS]@'}'
               '[HOST]${m[4] ?? ''}',
         )
         .replaceAll(_jwt, '[JWT]')
@@ -173,12 +176,14 @@ class LogRedactor {
     if (value is String) {
       if (value.isEmpty) return value;
       final field = key?.toLowerCase();
-      if (field != null && schemaKeys.contains(field)) return scrubString(value);
+      if (field != null && schemaKeys.contains(field)) {
+        return scrubString(value);
+      }
       return field != null && freeTextKeys.contains(field)
           ? '<str:${value.length}>'
           : _isTechnical(value)
-              ? scrubString(value)
-              : '<str:${value.length}>';
+          ? scrubString(value)
+          : '<str:${value.length}>';
     }
     if (value is Map) {
       return {

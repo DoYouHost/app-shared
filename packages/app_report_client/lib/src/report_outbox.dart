@@ -34,31 +34,32 @@ class PendingReport {
   bool get hasLog => logPath != null;
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'kind': kind.name,
-        'description': description,
-        'header': header,
-        'logSchema': ?logSchema,
-        'ticket': ticket.toJson(),
-        'logPath': ?logPath,
-      };
+    'id': id,
+    'kind': kind.name,
+    'description': description,
+    'header': header,
+    'logSchema': ?logSchema,
+    'ticket': ticket.toJson(),
+    'logPath': ?logPath,
+  };
 
   static PendingReport fromJson(Map<String, dynamic> json) => PendingReport(
-        id: json['id'] as String,
-        // Absent in a slot written by a build that only knew how to file bugs.
-        // It is the user's report and it is still sendable, so it is read as
-        // what it must have been rather than thrown away.
-        kind: ReportKind.values.firstWhere(
-          (k) => k.name == json['kind'],
-          orElse: () => ReportKind.bug,
-        ),
-        description: json['description'] as String,
-        header: (json['header'] as Map).cast<String, Object>(),
-        logSchema: json['logSchema'] as int?,
-        ticket:
-            RelayTicket.fromJson((json['ticket'] as Map).cast<String, dynamic>()),
-        logPath: json['logPath'] as String?,
-      );
+    id: json['id'] as String,
+    // Absent in a slot written by a build that only knew how to file bugs.
+    // It is the user's report and it is still sendable, so it is read as
+    // what it must have been rather than thrown away.
+    kind: ReportKind.values.firstWhere(
+      (k) => k.name == json['kind'],
+      orElse: () => ReportKind.bug,
+    ),
+    description: json['description'] as String,
+    header: (json['header'] as Map).cast<String, Object>(),
+    logSchema: json['logSchema'] as int?,
+    ticket: RelayTicket.fromJson(
+      (json['ticket'] as Map).cast<String, dynamic>(),
+    ),
+    logPath: json['logPath'] as String?,
+  );
 }
 
 /// Survives the app being closed while a report waits out its not-before delay.
@@ -114,7 +115,10 @@ class ReportOutbox {
       ticket: ticket,
       logPath: logFile?.path,
     );
-    await (await _slot()).writeAsString(jsonEncode(report.toJson()), flush: true);
+    await (await _slot()).writeAsString(
+      jsonEncode(report.toJson()),
+      flush: true,
+    );
     return report;
   }
 

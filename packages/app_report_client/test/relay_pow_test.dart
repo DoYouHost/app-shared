@@ -58,26 +58,31 @@ void main() {
     expect(solves(second.seed, 10, a) && solves(first.seed, 10, b), isFalse);
   });
 
-  test('zero bits is satisfied immediately, not by hashing to nothing', () async {
-    // What the suites use to avoid paying for hashing. It has to be a real
-    // answer, because the relay still checks it.
-    const challenge = PowChallenge(seed: 'anything', bits: 0);
+  test(
+    'zero bits is satisfied immediately, not by hashing to nothing',
+    () async {
+      // What the suites use to avoid paying for hashing. It has to be a real
+      // answer, because the relay still checks it.
+      const challenge = PowChallenge(seed: 'anything', bits: 0);
 
-    final nonce = await solvePow(challenge);
+      final nonce = await solvePow(challenge);
 
-    expect(solves('anything', 0, nonce), isTrue);
-  });
+      expect(solves('anything', 0, nonce), isTrue);
+    },
+  );
 
-  test('the same challenge solved twice gives an answer that still works',
-      () async {
-    // A report queued before the app was killed re-solves on the way out; the
-    // second answer has to be as good as the first.
-    const challenge = PowChallenge(seed: 'restart', bits: 8);
+  test(
+    'the same challenge solved twice gives an answer that still works',
+    () async {
+      // A report queued before the app was killed re-solves on the way out; the
+      // second answer has to be as good as the first.
+      const challenge = PowChallenge(seed: 'restart', bits: 8);
 
-    final first = await solvePow(challenge);
-    final second = await solvePow(challenge);
+      final first = await solvePow(challenge);
+      final second = await solvePow(challenge);
 
-    expect(first, second, reason: 'deterministic search from zero');
-    expect(solves('restart', 8, second), isTrue);
-  });
+      expect(first, second, reason: 'deterministic search from zero');
+      expect(solves('restart', 8, second), isTrue);
+    },
+  );
 }

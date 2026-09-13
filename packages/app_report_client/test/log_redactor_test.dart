@@ -10,7 +10,9 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   late LogRedactor redactor;
 
-  setUp(() => redactor = LogRedactor(ourKeys: {'id': RegExp(r'^\w+(\.\w+)*$')}));
+  setUp(
+    () => redactor = LogRedactor(ourKeys: {'id': RegExp(r'^\w+(\.\w+)*$')}),
+  );
 
   group('the baseline nobody has to configure', () {
     test('masks the host but keeps the scheme and the port', () {
@@ -19,7 +21,10 @@ void main() {
         redactor.scrubString('GET http://nas.example:8080/api/v1/queue/'),
         'GET http://[HOST]:8080/api/v1/queue/',
       );
-      expect(redactor.scrubString('wss://cam.lan/stream'), 'wss://[HOST]/stream');
+      expect(
+        redactor.scrubString('wss://cam.lan/stream'),
+        'wss://[HOST]/stream',
+      );
     });
 
     test('masks credentials in a URL rather than the whole URL', () {
@@ -146,14 +151,16 @@ void main() {
     });
 
     test('keeps the schema and measures the content', () {
-      final out = sampler.scrubSample({
-        'id': 7,
-        'status': 'printing',
-        'ratio': '0.35',
-        'created_at': '2026-08-09T12:00:00Z',
-        'title': 'Prezent dla Ani',
-        'ok': 'true',
-      })! as Map;
+      final out =
+          sampler.scrubSample({
+                'id': 7,
+                'status': 'printing',
+                'ratio': '0.35',
+                'created_at': '2026-08-09T12:00:00Z',
+                'title': 'Prezent dla Ani',
+                'ok': 'true',
+              })!
+              as Map;
 
       // Field names are the API's schema, not the user's data, so they all stay.
       expect(out.keys, containsAll(['id', 'status', 'title']));
@@ -170,25 +177,32 @@ void main() {
     test('an unmodelled free-text field is caught by shape, not by name', () {
       // The whole reason the rule is inverted: a denylist cannot name a field a
       // later server version invents, and this is what it would have missed.
-      final out = sampler.scrubSample({
-        'some_field_nobody_listed': 'Drukarka w sypialni Kasi',
-      })! as Map;
+      final out =
+          sampler.scrubSample({
+                'some_field_nobody_listed': 'Drukarka w sypialni Kasi',
+              })!
+              as Map;
 
       expect(out['some_field_nobody_listed'], '<str:24>');
     });
 
-    test('a one-word name is measured because the app said the field is free',
-        () {
-      // `Kuchnia` is the shape of an enum value, so shape alone would keep it.
-      expect(sampler.scrubSample('Kuchnia', key: 'name'), '<str:7>');
-      // And the same word under a field nobody declared is treated as a token.
-      expect(sampler.scrubSample('Kuchnia', key: 'state'), 'Kuchnia');
-    });
+    test(
+      'a one-word name is measured because the app said the field is free',
+      () {
+        // `Kuchnia` is the shape of an enum value, so shape alone would keep it.
+        expect(sampler.scrubSample('Kuchnia', key: 'name'), '<str:7>');
+        // And the same word under a field nobody declared is treated as a token.
+        expect(sampler.scrubSample('Kuchnia', key: 'state'), 'Kuchnia');
+      },
+    );
 
     test('a schema field keeps its exact formatting', () {
       // `MM/dd/yyyy` is not a date, not a number and not a word, so the shape
       // rule would measure away the one thing the report was about.
-      expect(sampler.scrubSample('MM/dd/yyyy', key: 'dateFormat'), 'MM/dd/yyyy');
+      expect(
+        sampler.scrubSample('MM/dd/yyyy', key: 'dateFormat'),
+        'MM/dd/yyyy',
+      );
     });
 
     test('a secret stays redacted rather than merely measured', () {
@@ -197,9 +211,11 @@ void main() {
     });
 
     test('only the head of a nested list, with the key travelling along', () {
-      final out = sampler.scrubSample({
-        'name': ['Ania', 'Basia', 'Celina', 'Dorota'],
-      })! as Map;
+      final out =
+          sampler.scrubSample({
+                'name': ['Ania', 'Basia', 'Celina', 'Dorota'],
+              })!
+              as Map;
 
       // Three entries: a fourth says nothing the first did not, and the field is
       // the user's whether it holds one of their words or ten.
