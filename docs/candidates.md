@@ -32,15 +32,26 @@ Running it on lubelogger's brand changed three things there, all on purpose:
 - its elevated and outlined buttons get the filled button's padding, so buttons
   side by side are the same height.
 
-## 3. `app_report_ui` — the report screen
+## 3. ~~`app_report_ui` — the report screen~~ — done in v0.5.0
 
-`bug_report_screen.dart` is 82% identical between the apps,
-`bug_report_controller.dart` 82%, `recording_banner.dart` 90%, and
-`log_export.dart` / `log_preview.dart` are small and near-identical.
+Localization went into the package: 89 of the 95 strings the apps shared were
+already word for word the same. The few that differed were claims about what
+each app's log contains, and those stay with the app as `ReportConsent`, along
+with the two entry-point labels. The rest of `ReportBindings` is the app's
+recorder and sender, its root navigator, where "home" is, and a log file
+prefix.
 
-Blocker: localization. Each app owns its `.arb` files, so the package needs
-either injected strings or l10n of its own. The screen renders through the
-theme, which `dash_ui` now provides, so localization is the only blocker left.
+The two copies had moved apart, so the package takes the better half of each.
+From bambuddy: a request's ticket is bought on the first keystroke, a send
+cannot be tapped twice while facts load, a salvaged session outlives `reset`,
+and small text and icons use ink colors rather than the vivid fills. From
+lubelogger: a countdown seen from another tab names its report, the review
+lists the session header's facts, a background isolate's records say so, and
+the screen is capped on a tablet.
+
+`app_diagnostics` has to be at v0.3.0 in any app that uses this package,
+because the package pins that ref. For bambuddy that brings request-body
+sampling, which stays off by default.
 
 ## 4. `wear_ui` — the round-face layout
 

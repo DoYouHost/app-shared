@@ -4,7 +4,10 @@ import 'package:app_report_client/app_report_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-RelayTicket ticket({Duration wait = Duration.zero, Duration life = const Duration(minutes: 30)}) {
+RelayTicket ticket({
+  Duration wait = Duration.zero,
+  Duration life = const Duration(minutes: 30),
+}) {
   final now = DateTime.now();
   return RelayTicket(
     ticket: 'signed.$wait',
@@ -18,7 +21,7 @@ RelayTicket ticket({Duration wait = Duration.zero, Duration life = const Duratio
 /// what matters here is how the app behaves around the wait it imposes.
 class FakeRelay extends RelayClient {
   FakeRelay({this.issued, this.onSend})
-      : super(Dio(), baseUrl: 'https://relay.example/someapp');
+    : super(Dio(), baseUrl: 'https://relay.example/someapp');
 
   RelayTicket? issued;
   Future<String> Function()? onSend;
@@ -70,12 +73,12 @@ void main() {
   tearDown(() => root.deleteSync(recursive: true));
 
   ReportSender senderWith(FakeRelay relay, {bool demo = false}) => ReportSender(
-        client: relay,
-        outbox: ReportOutbox(root: root),
-        installId: () async => 'install-1',
-        demoMode: () => demo,
-        formatVersion: 1,
-      );
+    client: relay,
+    outbox: ReportOutbox(root: root),
+    installId: () async => 'install-1',
+    demoMode: () => demo,
+    formatVersion: 1,
+  );
 
   Future<void> submit(ReportSender sender, {String description = 'it broke'}) =>
       sender.submit(
@@ -108,21 +111,24 @@ void main() {
       expect(await ReportOutbox(root: root).readLog(reopened), 'line\n');
     });
 
-    test('drops a slot whose log is gone rather than retrying it forever', () async {
-      final outbox = ReportOutbox(root: root);
-      final report = await outbox.put(
-        id: 'r2',
-        kind: ReportKind.bug,
-        description: 'it broke',
-        header: const {},
-        logSchema: 1,
-        ticket: ticket(),
-        log: 'line\n',
-      );
-      File(report.logPath!).deleteSync();
+    test(
+      'drops a slot whose log is gone rather than retrying it forever',
+      () async {
+        final outbox = ReportOutbox(root: root);
+        final report = await outbox.put(
+          id: 'r2',
+          kind: ReportKind.bug,
+          description: 'it broke',
+          header: const {},
+          logSchema: 1,
+          ticket: ticket(),
+          log: 'line\n',
+        );
+        File(report.logPath!).deleteSync();
 
-      expect(await outbox.peek(), isNull);
-    });
+        expect(await outbox.peek(), isNull);
+      },
+    );
   });
 
   group('sending', () {
@@ -139,21 +145,26 @@ void main() {
       expect(await ReportOutbox(root: root).peek(), isNull);
     });
 
-    test('queues rather than sends while the ticket is not yet valid', () async {
-      final relay = FakeRelay(issued: ticket(wait: const Duration(minutes: 5)));
-      final sender = senderWith(relay);
-      addTearDown(sender.dispose);
+    test(
+      'queues rather than sends while the ticket is not yet valid',
+      () async {
+        final relay = FakeRelay(
+          issued: ticket(wait: const Duration(minutes: 5)),
+        );
+        final sender = senderWith(relay);
+        addTearDown(sender.dispose);
 
-      await sender.prepare();
-      await submit(sender);
+        await sender.prepare();
+        await submit(sender);
 
-      expect(relay.sends, 0);
-      // The user tapped send, so the report is theirs now — it has to outlive
-      // the screen, the app being backgrounded and the app being killed.
-      final queued = await ReportOutbox(root: root).peek();
-      expect(queued, isNotNull);
-      expect(queued!.description, 'it broke');
-    });
+        expect(relay.sends, 0);
+        // The user tapped send, so the report is theirs now — it has to outlive
+        // the screen, the app being backgrounded and the app being killed.
+        final queued = await ReportOutbox(root: root).peek();
+        expect(queued, isNotNull);
+        expect(queued!.description, 'it broke');
+      },
+    );
 
     test('picks a report queued in an earlier run back up', () async {
       await ReportOutbox(root: root).put(
@@ -203,37 +214,44 @@ void main() {
       expect(relay.sends, 1);
     });
 
-    test('keeps nothing queued once the relay says the report is a duplicate', () async {
-      final relay = FakeRelay(
-        issued: ticket(),
-        onSend: () async => throw const RelayException(RelayFailure.duplicate),
-      );
-      final sender = senderWith(relay);
-      addTearDown(sender.dispose);
+    test(
+      'keeps nothing queued once the relay says the report is a duplicate',
+      () async {
+        final relay = FakeRelay(
+          issued: ticket(),
+          onSend: () async =>
+              throw const RelayException(RelayFailure.duplicate),
+        );
+        final sender = senderWith(relay);
+        addTearDown(sender.dispose);
 
-      await sender.prepare();
-      await submit(sender);
+        await sender.prepare();
+        await submit(sender);
 
-      // A dead end: retrying it forever would be worse than dropping it.
-      expect(await ReportOutbox(root: root).peek(), isNull);
-    });
+        // A dead end: retrying it forever would be worse than dropping it.
+        expect(await ReportOutbox(root: root).peek(), isNull);
+      },
+    );
 
-    test('holds on to the report when the relay is only temporarily unhappy', () async {
-      final relay = FakeRelay(
-        issued: ticket(),
-        onSend: () async => throw const RelayException(
-          RelayFailure.notYet,
-          retryAfter: Duration(minutes: 30),
-        ),
-      );
-      final sender = senderWith(relay);
-      addTearDown(sender.dispose);
+    test(
+      'holds on to the report when the relay is only temporarily unhappy',
+      () async {
+        final relay = FakeRelay(
+          issued: ticket(),
+          onSend: () async => throw const RelayException(
+            RelayFailure.notYet,
+            retryAfter: Duration(minutes: 30),
+          ),
+        );
+        final sender = senderWith(relay);
+        addTearDown(sender.dispose);
 
-      await sender.prepare();
-      await submit(sender);
+        await sender.prepare();
+        await submit(sender);
 
-      expect(await ReportOutbox(root: root).peek(), isNotNull);
-    });
+        expect(await ReportOutbox(root: root).peek(), isNotNull);
+      },
+    );
 
     test('a cancelled report leaves nothing behind on disk', () async {
       final relay = FakeRelay(issued: ticket(wait: const Duration(minutes: 5)));
@@ -268,17 +286,16 @@ void main() {
       ReportSender sender, {
       ReportKind kind = ReportKind.feature,
       String description = 'let it do the other thing',
-    }) =>
-        sender.submitRequest(
-          kind: kind,
-          description: description,
-          envelope: requestEnvelope(
-            formatVersion: 1,
-            app: '0.11.7+1107000',
-            server: '0.2.5b3',
-            locale: 'pl-PL',
-          ),
-        );
+    }) => sender.submitRequest(
+      kind: kind,
+      description: description,
+      envelope: requestEnvelope(
+        formatVersion: 1,
+        app: '0.11.7+1107000',
+        server: '0.2.5b3',
+        locale: 'pl-PL',
+      ),
+    );
 
     test('a request goes out with no log at all', () async {
       final relay = FakeRelay(issued: ticket());
@@ -398,10 +415,7 @@ void main() {
       expect(await ReportOutbox(root: root).peek(), isNull);
       // And the user is told why, rather than watching a send that never lands.
       await pumpEventQueue();
-      expect(
-        seen.map((s) => s.failure),
-        contains(RelayFailure.demo),
-      );
+      expect(seen.map((s) => s.failure), contains(RelayFailure.demo));
     });
 
     test('holds a report queued before demo instead of publishing it', () async {

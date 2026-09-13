@@ -35,16 +35,15 @@ void main() {
   Future<PendingReport> putBug({
     String id = 'r1',
     String log = '{"v":1,"app":"0.11.7"}\n{"t":1}\n',
-  }) =>
-      outbox.put(
-        id: id,
-        kind: ReportKind.bug,
-        description: 'kolejka pusta po wznowieniu',
-        header: const {'v': 1, 'app': '0.11.7+1107000'},
-        logSchema: 1,
-        ticket: ticket(),
-        log: log,
-      );
+  }) => outbox.put(
+    id: id,
+    kind: ReportKind.bug,
+    description: 'kolejka pusta po wznowieniu',
+    header: const {'v': 1, 'app': '0.11.7+1107000'},
+    logSchema: 1,
+    ticket: ticket(),
+    log: log,
+  );
 
   group('surviving the process', () {
     test('a queued bug report reads back whole from a cold instance', () async {
@@ -67,31 +66,36 @@ void main() {
       );
     });
 
-    test('the ticket survives with the not-before that makes it wait', () async {
-      final issued = ticket(wait: const Duration(minutes: 5), id: 'abc.def');
-      await outbox.put(
-        id: 'r2',
-        kind: ReportKind.bug,
-        description: 'x',
-        header: const {},
-        logSchema: 1,
-        ticket: issued,
-        log: 'line\n',
-      );
+    test(
+      'the ticket survives with the not-before that makes it wait',
+      () async {
+        final issued = ticket(wait: const Duration(minutes: 5), id: 'abc.def');
+        await outbox.put(
+          id: 'r2',
+          kind: ReportKind.bug,
+          description: 'x',
+          header: const {},
+          logSchema: 1,
+          ticket: issued,
+          log: 'line\n',
+        );
 
-      final back = (await ReportOutbox(root: root).peek())!.ticket;
+        final back = (await ReportOutbox(root: root).peek())!.ticket;
 
-      // Round-tripped through epoch milliseconds, so equality is to the
-      // millisecond rather than to the microsecond the clock had.
-      expect(back.ticket, 'abc.def');
-      expect(back.notBefore.millisecondsSinceEpoch,
-          issued.notBefore.millisecondsSinceEpoch);
-      expect(back.challenge.seed, 'seed');
-      expect(back.challenge.bits, 4);
-      expect(back.ready, isFalse);
-      expect(back.expired, isFalse);
-      expect(back.wait.inMinutes, closeTo(4, 1));
-    });
+        // Round-tripped through epoch milliseconds, so equality is to the
+        // millisecond rather than to the microsecond the clock had.
+        expect(back.ticket, 'abc.def');
+        expect(
+          back.notBefore.millisecondsSinceEpoch,
+          issued.notBefore.millisecondsSinceEpoch,
+        );
+        expect(back.challenge.seed, 'seed');
+        expect(back.challenge.bits, 4);
+        expect(back.ready, isFalse);
+        expect(back.expired, isFalse);
+        expect(back.wait.inMinutes, closeTo(4, 1));
+      },
+    );
 
     test('a solved proof of work is not re-solved after a restart', () async {
       // Solving is about a second of hashing. Losing it across a restart would
@@ -123,38 +127,45 @@ void main() {
       expect(await outbox.readLog(back), isNull);
       // Only the slot itself is on disk.
       expect(
-        Directory('${root.path}/outbox').listSync().map((e) => e.path.split('/').last),
+        Directory(
+          '${root.path}/outbox',
+        ).listSync().map((e) => e.path.split('/').last),
         ['pending.json'],
       );
     });
 
-    test('a twenty-megabyte log lives beside the slot, not inside it', () async {
-      // A recording reaches the size ceiling; a JSON blob that big would be
-      // parsed on every peek, including the one at app start.
-      final big = '${'x' * (1024 * 1024)}\n';
-      await putBug(log: big);
+    test(
+      'a twenty-megabyte log lives beside the slot, not inside it',
+      () async {
+        // A recording reaches the size ceiling; a JSON blob that big would be
+        // parsed on every peek, including the one at app start.
+        final big = '${'x' * (1024 * 1024)}\n';
+        await putBug(log: big);
 
-      expect(slot().lengthSync(), lessThan(2000));
-      expect(await outbox.readLog((await outbox.peek())!), big);
-    });
+        expect(slot().lengthSync(), lessThan(2000));
+        expect(await outbox.readLog((await outbox.peek())!), big);
+      },
+    );
   });
 
   group('one slot, deliberately', () {
-    test('a second report replaces the first rather than queueing behind it',
-        () async {
-      // A queue that can grow is a queue that can hold a stale log nobody
-      // remembers writing.
-      await putBug(id: 'first');
-      await outbox.put(
-        id: 'second',
-        kind: ReportKind.change,
-        description: 'nowsze',
-        header: const {},
-        ticket: ticket(),
-      );
+    test(
+      'a second report replaces the first rather than queueing behind it',
+      () async {
+        // A queue that can grow is a queue that can hold a stale log nobody
+        // remembers writing.
+        await putBug(id: 'first');
+        await outbox.put(
+          id: 'second',
+          kind: ReportKind.change,
+          description: 'nowsze',
+          header: const {},
+          ticket: ticket(),
+        );
 
-      expect((await outbox.peek())!.id, 'second');
-    });
+        expect((await outbox.peek())!.id, 'second');
+      },
+    );
 
     test('clearing takes the log file with it, not just the slot', () async {
       final report = await putBug();
@@ -169,27 +180,31 @@ void main() {
   });
 
   group('what a half-dead process leaves behind', () {
-    test('a slot pointing at a log that is gone is dropped, not retried',
-        () async {
-      // It would fail on every retry forever, and the failure the user sees
-      // says nothing about a file.
-      final report = await putBug();
-      File(report.logPath!).deleteSync();
+    test(
+      'a slot pointing at a log that is gone is dropped, not retried',
+      () async {
+        // It would fail on every retry forever, and the failure the user sees
+        // says nothing about a file.
+        final report = await putBug();
+        File(report.logPath!).deleteSync();
 
-      expect(await outbox.peek(), isNull);
-      // And the slot goes too, so the next start finds a clean outbox.
-      expect(slot().existsSync(), isFalse);
-    });
+        expect(await outbox.peek(), isNull);
+        // And the slot goes too, so the next start finds a clean outbox.
+        expect(slot().existsSync(), isFalse);
+      },
+    );
 
-    test('a slot half-written by a process that died mid-save is dropped',
-        () async {
-      await putBug();
-      final text = slot().readAsStringSync();
-      slot().writeAsStringSync(text.substring(0, text.length ~/ 2));
+    test(
+      'a slot half-written by a process that died mid-save is dropped',
+      () async {
+        await putBug();
+        final text = slot().readAsStringSync();
+        slot().writeAsStringSync(text.substring(0, text.length ~/ 2));
 
-      expect(await outbox.peek(), isNull);
-      expect(slot().existsSync(), isFalse);
-    });
+        expect(await outbox.peek(), isNull);
+        expect(slot().existsSync(), isFalse);
+      },
+    );
 
     test('an empty outbox directory is simply empty', () async {
       expect(await outbox.peek(), isNull);
@@ -200,43 +215,58 @@ void main() {
   });
 
   group('a slot written by an older build', () {
-    test('one with no kind at all is read as the bug it must have been',
-        () async {
-      // Exactly what an install upgrading mid-wait has sitting in its outbox:
-      // the report is the user's and still sendable, so it is read rather than
-      // thrown away.
-      final report = await putBug(id: 'old');
-      slot().writeAsStringSync(
-        slot().readAsStringSync().replaceFirst('"kind":"bug",', ''),
-      );
+    test(
+      'one with no kind at all is read as the bug it must have been',
+      () async {
+        // Exactly what an install upgrading mid-wait has sitting in its outbox:
+        // the report is the user's and still sendable, so it is read rather than
+        // thrown away.
+        final report = await putBug(id: 'old');
+        slot().writeAsStringSync(
+          slot().readAsStringSync().replaceFirst('"kind":"bug",', ''),
+        );
 
-      final back = (await ReportOutbox(root: root).peek())!;
-      expect(back.kind, ReportKind.bug);
-      expect(back.logPath, report.logPath);
-      expect(back.description, 'kolejka pusta po wznowieniu');
-    });
+        final back = (await ReportOutbox(root: root).peek())!;
+        expect(back.kind, ReportKind.bug);
+        expect(back.logPath, report.logPath);
+        expect(back.description, 'kolejka pusta po wznowieniu');
+      },
+    );
 
-    test('one naming a kind this build has never heard of is read as a bug',
-        () async {
-      // The other direction: a downgrade, or a build that shipped a kind later
-      // dropped. Guessing bug keeps the report; refusing it loses one.
-      await putBug(id: 'future');
-      slot().writeAsStringSync(
-        slot().readAsStringSync().replaceFirst('"kind":"bug"', '"kind":"rant"'),
-      );
+    test(
+      'one naming a kind this build has never heard of is read as a bug',
+      () async {
+        // The other direction: a downgrade, or a build that shipped a kind later
+        // dropped. Guessing bug keeps the report; refusing it loses one.
+        await putBug(id: 'future');
+        slot().writeAsStringSync(
+          slot().readAsStringSync().replaceFirst(
+            '"kind":"bug"',
+            '"kind":"rant"',
+          ),
+        );
 
-      expect((await ReportOutbox(root: root).peek())!.kind, ReportKind.bug);
-    });
+        expect((await ReportOutbox(root: root).peek())!.kind, ReportKind.bug);
+      },
+    );
 
     test('the slot on disk is the shape older builds already write', () async {
       // A rename here strands a queued report on every install that updates
       // mid-wait, and the failure is silent.
       await putBug(id: 'shape');
-      final json = jsonDecode(slot().readAsStringSync()) as Map<String, dynamic>;
+      final json =
+          jsonDecode(slot().readAsStringSync()) as Map<String, dynamic>;
 
       expect(
         json.keys,
-        containsAll(['id', 'kind', 'description', 'header', 'ticket', 'logPath']),
+        containsAll([
+          'id',
+          'kind',
+          'description',
+          'header',
+          'ticket',
+          'logPath',
+        ]),
       );
       expect(
         (json['ticket'] as Map).keys,
@@ -270,12 +300,15 @@ void main() {
       expect(await outbox.peek(), isNull);
     });
 
-    test('readLog on a missing log answers null, without a pre-check', () async {
-      final report = await putBug(id: 'logless');
-      File(report.logPath!).deleteSync();
+    test(
+      'readLog on a missing log answers null, without a pre-check',
+      () async {
+        final report = await putBug(id: 'logless');
+        File(report.logPath!).deleteSync();
 
-      expect(await outbox.readLog(report), isNull);
-    });
+        expect(await outbox.readLog(report), isNull);
+      },
+    );
 
     test('clearing twice at once is as harmless as clearing once', () async {
       await putBug(id: 'twice');

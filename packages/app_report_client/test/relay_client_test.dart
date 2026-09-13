@@ -59,11 +59,7 @@ void main() {
   Map<String, Object?> sentBody() =>
       (adapter.requests.single.data! as Map).cast<String, Object?>();
 
-  Future<void> send({
-    required ReportKind kind,
-    String? log,
-    int? logSchema,
-  }) =>
+  Future<void> send({required ReportKind kind, String? log, int? logSchema}) =>
       client.send(
         installId: '11111111-1111-4111-8111-111111111111',
         ticket: _ticket(),
@@ -92,32 +88,36 @@ void main() {
     expect(utf8.decode(gzip.decode(base64Decode(logGz))), 'line\n');
   });
 
-  test('a request omits the log fields rather than sending them empty',
-      () async {
-    await send(kind: ReportKind.feature);
+  test(
+    'a request omits the log fields rather than sending them empty',
+    () async {
+      await send(kind: ReportKind.feature);
 
-    final body = sentBody();
-    expect(body['kind'], 'feature');
-    // Absent, not null and not empty. The relay refuses a kind that carries no
-    // log but sends the keys anyway — "this kind carries no log" — so a null
-    // here would be rejected outright.
-    expect(body.keys, isNot(contains('logGz')));
-    expect(body.keys, isNot(contains('logSchema')));
-  });
+      final body = sentBody();
+      expect(body['kind'], 'feature');
+      // Absent, not null and not empty. The relay refuses a kind that carries no
+      // log but sends the keys anyway — "this kind carries no log" — so a null
+      // here would be rejected outright.
+      expect(body.keys, isNot(contains('logGz')));
+      expect(body.keys, isNot(contains('logSchema')));
+    },
+  );
 
   test('a change is its own kind, not a feature', () async {
     await send(kind: ReportKind.change);
     expect(sentBody()['kind'], 'change');
   });
 
-  test('the ticket and its solved proof of work travel with every kind',
-      () async {
-    await send(kind: ReportKind.change);
+  test(
+    'the ticket and its solved proof of work travel with every kind',
+    () async {
+      await send(kind: ReportKind.change);
 
-    final body = sentBody();
-    expect(body['ticket'], 'signed');
-    // Solved while the user was writing; a second of hashing on the send tap
-    // would read as the app having hung.
-    expect(body['powNonce'], '0');
-  });
+      final body = sentBody();
+      expect(body['ticket'], 'signed');
+      // Solved while the user was writing; a second of hashing on the send tap
+      // would read as the app having hung.
+      expect(body['powNonce'], '0');
+    },
+  );
 }

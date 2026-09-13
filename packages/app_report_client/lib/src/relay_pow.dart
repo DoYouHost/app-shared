@@ -34,7 +34,7 @@ Future<String> solvePow(PowChallenge challenge) async {
 String _solve(List<Object> args) {
   final seed = args[0] as String;
   final bits = args[1] as int;
-  for (var nonce = 0;; nonce++) {
+  for (var nonce = 0; ; nonce++) {
     final digest = sha256.convert(utf8.encode('$seed:$nonce')).bytes;
     if (_leadingZeroBits(digest) >= bits) return '$nonce';
   }

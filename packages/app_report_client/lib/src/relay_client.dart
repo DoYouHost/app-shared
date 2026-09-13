@@ -39,12 +39,12 @@ class RelayTicket {
   final String? powNonce;
 
   RelayTicket solved(String nonce) => RelayTicket(
-        ticket: ticket,
-        notBefore: notBefore,
-        expiresAt: expiresAt,
-        challenge: challenge,
-        powNonce: nonce,
-      );
+    ticket: ticket,
+    notBefore: notBefore,
+    expiresAt: expiresAt,
+    challenge: challenge,
+    powNonce: nonce,
+  );
 
   bool get ready => !DateTime.now().isBefore(notBefore);
   bool get expired => DateTime.now().isAfter(expiresAt);
@@ -54,26 +54,24 @@ class RelayTicket {
   }
 
   Map<String, dynamic> toJson() => {
-        'ticket': ticket,
-        'notBefore': notBefore.millisecondsSinceEpoch,
-        'expiresAt': expiresAt.millisecondsSinceEpoch,
-        'seed': challenge.seed,
-        'bits': challenge.bits,
-        if (powNonce != null) 'powNonce': powNonce,
-      };
+    'ticket': ticket,
+    'notBefore': notBefore.millisecondsSinceEpoch,
+    'expiresAt': expiresAt.millisecondsSinceEpoch,
+    'seed': challenge.seed,
+    'bits': challenge.bits,
+    if (powNonce != null) 'powNonce': powNonce,
+  };
 
   static RelayTicket fromJson(Map<String, dynamic> json) => RelayTicket(
-        ticket: json['ticket'] as String,
-        notBefore:
-            DateTime.fromMillisecondsSinceEpoch(json['notBefore'] as int),
-        expiresAt:
-            DateTime.fromMillisecondsSinceEpoch(json['expiresAt'] as int),
-        challenge: PowChallenge(
-          seed: json['seed'] as String,
-          bits: json['bits'] as int,
-        ),
-        powNonce: json['powNonce'] as String?,
-      );
+    ticket: json['ticket'] as String,
+    notBefore: DateTime.fromMillisecondsSinceEpoch(json['notBefore'] as int),
+    expiresAt: DateTime.fromMillisecondsSinceEpoch(json['expiresAt'] as int),
+    challenge: PowChallenge(
+      seed: json['seed'] as String,
+      bits: json['bits'] as int,
+    ),
+    powNonce: json['powNonce'] as String?,
+  );
 }
 
 /// Why a send did not produce an issue. The distinction the UI cares about is
@@ -191,8 +189,9 @@ class RelayClient {
     // Normally already solved while the user was writing; solving here is the
     // fallback for a report that outlived the process that queued it.
     final powNonce = ticket.powNonce ?? await solvePow(ticket.challenge);
-    final logGz =
-        log == null ? null : base64Encode(gzip.encode(utf8.encode(log)));
+    final logGz = log == null
+        ? null
+        : base64Encode(gzip.encode(utf8.encode(log)));
 
     final Response<dynamic> response;
     try {
@@ -219,7 +218,8 @@ class RelayClient {
 
     switch (response.statusCode) {
       case 201:
-        return ((response.data as Map).cast<String, dynamic>()['url']) as String;
+        return ((response.data as Map).cast<String, dynamic>()['url'])
+            as String;
       case 403:
         // The ticket was not usable yet, or no longer. Both are worth waiting
         // out with a fresh challenge rather than reporting as a failure.

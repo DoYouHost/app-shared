@@ -53,16 +53,15 @@ ReportEnvelope requestEnvelope({
   String? server,
   String? locale,
   DateTime? at,
-}) =>
-    ReportEnvelope(
-      header: {
-        'v': formatVersion,
-        'ts': (at ?? DateTime.now()).toUtc().toIso8601String(),
-        'app': app,
-        if (server case final String value) 'server': value,
-        if (locale case final String value) 'locale': value,
-      },
-    );
+}) => ReportEnvelope(
+  header: {
+    'v': formatVersion,
+    'ts': (at ?? DateTime.now()).toUtc().toIso8601String(),
+    'app': app,
+    if (server case final String value) 'server': value,
+    if (locale case final String value) 'locale': value,
+  },
+);
 
 /// Reads the envelope off the log's own first line.
 ///
@@ -130,6 +129,6 @@ Map<String, Object?> _headerFields(String log) {
 /// hold non-nullable values, and a header writer omits empty fields anyway, so
 /// a null here could only come from a hand-written file.
 Map<String, Object> _wireHeader(Map<String, Object?> fields) => {
-      for (final entry in fields.entries)
-        if (entry.value case final Object value) entry.key: value,
-    };
+  for (final entry in fields.entries)
+    if (entry.value case final Object value) entry.key: value,
+};

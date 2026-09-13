@@ -14,7 +14,10 @@ import 'package:flutter_test/flutter_test.dart';
 /// and asserted nowhere — every one of these was believed to hold before it was
 /// checked, and two of them did not.
 
-RelayTicket ticket({Duration wait = Duration.zero, Duration life = const Duration(minutes: 30)}) {
+RelayTicket ticket({
+  Duration wait = Duration.zero,
+  Duration life = const Duration(minutes: 30),
+}) {
   final now = DateTime.now();
   return RelayTicket(
     ticket: 'signed',
@@ -26,7 +29,7 @@ RelayTicket ticket({Duration wait = Duration.zero, Duration life = const Duratio
 
 class _Relay extends RelayClient {
   _Relay({this.issued, this.gate, this.onSend})
-      : super(Dio(), baseUrl: 'https://relay.example/someapp');
+    : super(Dio(), baseUrl: 'https://relay.example/someapp');
 
   RelayTicket? issued;
 
@@ -92,19 +95,18 @@ void main() {
     _Relay relay, {
     ReportOutbox? outbox,
     bool demo = false,
-  }) =>
-      ReportSender(
-        client: relay,
-        outbox: outbox ?? ReportOutbox(root: root),
-        installId: () async => 'install-1',
-        demoMode: () => demo,
-        formatVersion: 1,
-      );
+  }) => ReportSender(
+    client: relay,
+    outbox: outbox ?? ReportOutbox(root: root),
+    installId: () async => 'install-1',
+    demoMode: () => demo,
+    formatVersion: 1,
+  );
 
   Future<void> submitBug(ReportSender sender) => sender.submit(
-        description: 'kolejka pusta po wznowieniu',
-        log: '{"v":1,"app":"0.11.7"}\n{"t":1}\n',
-      );
+    description: 'kolejka pusta po wznowieniu',
+    log: '{"v":1,"app":"0.11.7"}\n{"t":1}\n',
+  );
 
   Future<void> submitRequest(ReportSender sender, ReportKind kind) =>
       sender.submitRequest(
@@ -135,18 +137,20 @@ void main() {
       expect(relay.challenges, 1);
     });
 
-    test('a call after the first finished reuses the ticket it bought',
-        () async {
-      final relay = _Relay(issued: ticket());
-      final sender = senderWith(relay);
-      addTearDown(sender.dispose);
+    test(
+      'a call after the first finished reuses the ticket it bought',
+      () async {
+        final relay = _Relay(issued: ticket());
+        final sender = senderWith(relay);
+        addTearDown(sender.dispose);
 
-      await sender.prepare();
-      await sender.prepare();
-      await sender.prepare();
+        await sender.prepare();
+        await sender.prepare();
+        await sender.prepare();
 
-      expect(relay.challenges, 1);
-    });
+        expect(relay.challenges, 1);
+      },
+    );
 
     test('a failed attempt does not poison the next one', () async {
       // The memo has to clear on failure too, or an unreachable relay at the
@@ -287,33 +291,35 @@ void main() {
       expect(await ReportOutbox(root: root).peek(), isNull);
     });
 
-    test('the same holds on the path where the ticket had also expired',
-        () async {
-      // The other branch, and the one that kept the slot until today: a report
-      // whose wait was outlived *and* whose log is gone.
-      await ReportOutbox(root: root).put(
-        id: 'stale',
-        kind: ReportKind.bug,
-        description: 'stale',
-        header: const {},
-        logSchema: 1,
-        ticket: ticket(life: const Duration(milliseconds: -1)),
-        log: 'line\n',
-      );
+    test(
+      'the same holds on the path where the ticket had also expired',
+      () async {
+        // The other branch, and the one that kept the slot until today: a report
+        // whose wait was outlived *and* whose log is gone.
+        await ReportOutbox(root: root).put(
+          id: 'stale',
+          kind: ReportKind.bug,
+          description: 'stale',
+          header: const {},
+          logSchema: 1,
+          ticket: ticket(life: const Duration(milliseconds: -1)),
+          log: 'line\n',
+        );
 
-      final relay = _Relay(issued: ticket());
-      final sender = senderWith(relay, outbox: _VanishingLog(root));
-      addTearDown(sender.dispose);
-      final seen = <SendState>[];
-      sender.states.listen(seen.add);
+        final relay = _Relay(issued: ticket());
+        final sender = senderWith(relay, outbox: _VanishingLog(root));
+        addTearDown(sender.dispose);
+        final seen = <SendState>[];
+        sender.states.listen(seen.add);
 
-      await sender.flush();
-      await pumpEventQueue();
+        await sender.flush();
+        await pumpEventQueue();
 
-      expect(relay.sends, 0);
-      expect(seen.last.failure, RelayFailure.rejected);
-      expect(await ReportOutbox(root: root).peek(), isNull);
-    });
+        expect(relay.sends, 0);
+        expect(seen.last.failure, RelayFailure.rejected);
+        expect(await ReportOutbox(root: root).peek(), isNull);
+      },
+    );
 
     test('a request has no log to lose, and is unaffected', () async {
       // `hasLog` is what tells "never had one" from "had one and lost it"; a
@@ -379,22 +385,24 @@ void main() {
   });
 
   group('an outbox that cannot be read at all', () {
-    test('app start survives a storage directory that will not resolve',
-        () async {
-      // `flush` runs at startup, in a future nobody awaits. A throw there takes
-      // out the recording bar that wraps every screen.
-      final relay = _Relay(issued: ticket());
-      final sender = senderWith(relay, outbox: _ThrowingOutbox());
-      addTearDown(sender.dispose);
-      final seen = <SendState>[];
-      sender.states.listen(seen.add);
+    test(
+      'app start survives a storage directory that will not resolve',
+      () async {
+        // `flush` runs at startup, in a future nobody awaits. A throw there takes
+        // out the recording bar that wraps every screen.
+        final relay = _Relay(issued: ticket());
+        final sender = senderWith(relay, outbox: _ThrowingOutbox());
+        addTearDown(sender.dispose);
+        final seen = <SendState>[];
+        sender.states.listen(seen.add);
 
-      await sender.flush();
-      await pumpEventQueue();
+        await sender.flush();
+        await pumpEventQueue();
 
-      expect(seen.last.phase, SendPhase.idle);
-      expect(relay.sends, 0);
-    });
+        expect(seen.last.phase, SendPhase.idle);
+        expect(relay.sends, 0);
+      },
+    );
   });
 }
 
@@ -404,5 +412,6 @@ class _ThrowingOutbox extends ReportOutbox {
   const _ThrowingOutbox();
 
   @override
-  Future<PendingReport?> peek() async => throw const FileSystemException('nope');
+  Future<PendingReport?> peek() async =>
+      throw const FileSystemException('nope');
 }

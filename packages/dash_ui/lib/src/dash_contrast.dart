@@ -37,11 +37,12 @@ class DashContrastIssue {
 /// package's tests already hold it, so in an app it can only fail after a
 /// dash_ui upgrade — and that is the upgrade worth stopping. It holds:
 ///
-/// * every ink that carries small text — the two muted inks, [DashTokens.accentInk]
-///   and [DashTokens.accentOrangeInk] — at WCAG AA's 4.5:1 on the worst surface
-///   the theme can put behind it;
-/// * [DashTokens.onAccent] at 4.5:1 on the accent fill, since a button label
-///   is text;
+/// * every ink that carries small text — the two muted inks, [DashTokens.accentInk],
+///   [DashTokens.accentOrangeInk], [DashTokens.dangerInk] and
+///   [DashTokens.warningInk] — at WCAG AA's
+///   4.5:1 on the worst surface the theme can put behind it;
+/// * [DashTokens.onAccent] on the accent fill and [DashTokens.onDanger] on the
+///   red one at 4.5:1, since a button label is text;
 /// * each ink within 8° of the hue of the fill it darkens — contrast measures
 ///   lightness alone, and an amber darkened far enough reads as brown;
 /// * the three text inks as a visible hierarchy.
@@ -61,6 +62,8 @@ List<DashContrastIssue> _audit(DashTokens t) {
     ('textTertiary', t.textTertiary),
     ('accentInk', t.accentInk),
     ('accentOrangeInk', t.accentOrangeInk),
+    ('dangerInk', t.dangerInk),
+    ('warningInk', t.warningInk),
   ]) {
     final (ratio, surface) = _worst(ink, surfaces);
     if (ratio < _smallText) {
@@ -68,14 +71,21 @@ List<DashContrastIssue> _audit(DashTokens t) {
     }
   }
 
-  final onFill = _ratio(_over(t.onAccent, t.accent), t.accent);
-  if (onFill < _smallText) {
-    fail('onAccent', 'is ${onFill.toStringAsFixed(2)}:1 on the accent fill');
+  for (final (token, label, fill) in [
+    ('onAccent', t.onAccent, t.accent),
+    ('onDanger', t.onDanger, t.dangerInk),
+  ]) {
+    final onFill = _ratio(_over(label, fill), fill);
+    if (onFill < _smallText) {
+      fail(token, 'is ${onFill.toStringAsFixed(2)}:1 on its fill');
+    }
   }
 
   for (final (token, fill, ink) in [
     ('accentInk', t.accent, t.accentInk),
     ('accentOrangeInk', t.accentOrange, t.accentOrangeInk),
+    ('dangerInk', t.danger, t.dangerInk),
+    ('warningInk', t.warning, t.warningInk),
   ]) {
     final drift = _hueDistance(fill, ink);
     if (drift >= _maxHueDrift) {
@@ -96,6 +106,11 @@ List<DashContrastIssue> _audit(DashTokens t) {
 
   return issues;
 }
+
+/// The worst contrast [ink] reaches on any surface [t] can put behind text,
+/// for an application's own colour that no token covers.
+double dashWorstContrast(Color ink, DashTokens t) =>
+    _worst(ink, _surfacesOf(t)).$1;
 
 const _smallText = 4.5;
 const _maxHueDrift = 8.0;

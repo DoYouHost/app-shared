@@ -25,76 +25,76 @@ import 'package:flutter_test/flutter_test.dart';
 /// longer has, which is a cheaper failure than the alternative — the package
 /// being tested only against rules invented to suit it.
 LogRedactor bambuddyLike() => LogRedactor(
-      ourKeys: {
-        'id': RegExp(r'^\w+(\.\w+)*$'),
-        'mat': RegExp(r'^[A-Z0-9]+(-[A-Z0-9]+)*$'),
-        'event': RegExp(r'^[a-zA-Z]+$'),
-        'reason': RegExp(r'^[a-zA-Z]+$'),
-        'limit': RegExp(r'^[a-z]+$'),
-      },
-      secretKeyPatterns: [
-        RegExp(
-          r'(access_?code|serial'
-          r'|(?:^|[^a-z0-9])entity|(?:^|[^a-z0-9])topic|headers'
-          r'|rest_\w*(?:url|body))',
-          caseSensitive: false,
-        ),
-      ],
-      valuePatterns: [
-        (RegExp(r'\bbb_[A-Za-z0-9_-]{8,}'), '[APIKEY]'),
-        (
-          RegExp(
-            r'\b(?:0[0-3][A-Z][A-Z0-9]{9,13}|\d{2}[A-Z][0-9A-Z]{12})\b',
-            caseSensitive: false,
-          ),
-          '[SERIAL]',
-        ),
-      ],
-      freeTextKeys: const {
-        'archive_name',
-        'description',
-        'file_name',
-        'library_file_name',
-        'location',
-        'name',
-        'notes',
-        'printer_name',
-        'target_location',
-        'target_model',
-      },
-      schemaKeys: const {
-        'locale',
-        'mqtt_energy_path',
-        'mqtt_power_path',
-        'mqtt_state_path',
-        'rest_power_path',
-        'rest_status_path',
-        'version',
-      },
-    );
+  ourKeys: {
+    'id': RegExp(r'^\w+(\.\w+)*$'),
+    'mat': RegExp(r'^[A-Z0-9]+(-[A-Z0-9]+)*$'),
+    'event': RegExp(r'^[a-zA-Z]+$'),
+    'reason': RegExp(r'^[a-zA-Z]+$'),
+    'limit': RegExp(r'^[a-z]+$'),
+  },
+  secretKeyPatterns: [
+    RegExp(
+      r'(access_?code|serial'
+      r'|(?:^|[^a-z0-9])entity|(?:^|[^a-z0-9])topic|headers'
+      r'|rest_\w*(?:url|body))',
+      caseSensitive: false,
+    ),
+  ],
+  valuePatterns: [
+    (RegExp(r'\bbb_[A-Za-z0-9_-]{8,}'), '[APIKEY]'),
+    (
+      RegExp(
+        r'\b(?:0[0-3][A-Z][A-Z0-9]{9,13}|\d{2}[A-Z][0-9A-Z]{12})\b',
+        caseSensitive: false,
+      ),
+      '[SERIAL]',
+    ),
+  ],
+  freeTextKeys: const {
+    'archive_name',
+    'description',
+    'file_name',
+    'library_file_name',
+    'location',
+    'name',
+    'notes',
+    'printer_name',
+    'target_location',
+    'target_model',
+  },
+  schemaKeys: const {
+    'locale',
+    'mqtt_energy_path',
+    'mqtt_power_path',
+    'mqtt_state_path',
+    'rest_power_path',
+    'rest_status_path',
+    'version',
+  },
+);
 
 /// What lubelogger passes, in the same spirit.
 LogRedactor lubeloggerLike() => LogRedactor(
-      ourKeys: {
-        'id': RegExp(r'^\w+(\.\w+)*$'),
-        'path': RegExp(r'^/[\w\-/.]*$'),
-        'method': RegExp(r'^[A-Z]+$'),
-      },
-      secretKeyPatterns: [RegExp('email', caseSensitive: false)],
-      freeTextKeys: const {
-        'description',
-        'identifier',
-        'imagelocation',
-        'licenseplate',
-        'make',
-        'model',
-        'name',
-        'notes',
-        'tags',
-        'value',
-      },
-      schemaKeys: const {'dateformat', 'currencysymbol'},
-    );
+  ourKeys: {
+    'id': RegExp(r'^\w+(\.\w+)*$'),
+    'path': RegExp(r'^/[\w\-/.]*$'),
+    'method': RegExp(r'^[A-Z]+$'),
+  },
+  secretKeyPatterns: [RegExp('email', caseSensitive: false)],
+  freeTextKeys: const {
+    'description',
+    'identifier',
+    'imagelocation',
+    'licenseplate',
+    'make',
+    'model',
+    'name',
+    'notes',
+    'tags',
+    'value',
+  },
+  schemaKeys: const {'dateformat', 'currencysymbol'},
+);
 
 void main() {
   group('bambuddy: an item off /api/v1/queue/', () {
@@ -140,7 +140,13 @@ void main() {
       expect(out['library_file_name'], isNot('<str:0>'));
 
       // And not one word of what the user typed.
-      for (final leaked in ['Kasi', 'Ani', 'Piotrka', 'szczoteczki', 'moje_modele']) {
+      for (final leaked in [
+        'Kasi',
+        'Ani',
+        'Piotrka',
+        'szczoteczki',
+        'moje_modele',
+      ]) {
         expect(text, isNot(contains(leaked)), reason: '$leaked is the user\'s');
       }
       expect(out['printer_serial'], '[REDACTED]');
@@ -150,11 +156,13 @@ void main() {
       // The trap the free-text list exists for: one word of letters is the shape
       // of `printing` and of a printer somebody called `Sypialnia`. Shape alone
       // keeps the second, which is why the field name gets a vote.
-      final out = bambuddyLike().scrubSample({
-        'status': 'printing',
-        'printer_name': 'Sypialnia',
-        'target_location': 'Garaz',
-      })! as Map;
+      final out =
+          bambuddyLike().scrubSample({
+                'status': 'printing',
+                'printer_name': 'Sypialnia',
+                'target_location': 'Garaz',
+              })!
+              as Map;
 
       expect(out['status'], 'printing');
       expect(out['printer_name'], '<str:9>');
@@ -164,10 +172,12 @@ void main() {
     test('a field the list has never heard of is caught by shape anyway', () {
       // A later server version adds a field nobody modelled. This is the case a
       // denylist can never win, and the reason the sample rule is an allowlist.
-      final out = bambuddyLike().scrubSample({
-        'gift_recipient_note': 'Dla Ani na urodziny',
-        'batch_label': 'Prezenty świąteczne 2026',
-      })! as Map;
+      final out =
+          bambuddyLike().scrubSample({
+                'gift_recipient_note': 'Dla Ani na urodziny',
+                'batch_label': 'Prezenty świąteczne 2026',
+              })!
+              as Map;
 
       expect(out['gift_recipient_note'], '<str:19>');
       expect(out['batch_label'], '<str:24>');
@@ -294,9 +304,11 @@ void main() {
     });
 
     test('only the head of a long list, because the tail repeats it', () {
-      final out = lubeloggerLike().scrubSample({
-        'tags': ['jeden', 'dwa', 'trzy', 'cztery', 'pięć'],
-      })! as Map;
+      final out =
+          lubeloggerLike().scrubSample({
+                'tags': ['jeden', 'dwa', 'trzy', 'cztery', 'pięć'],
+              })!
+              as Map;
 
       expect((out['tags']! as List), hasLength(3));
     });
@@ -364,22 +376,24 @@ void main() {
       expect(out['cover'], 'http://[HOST]:8080/img/x.png?token=[REDACTED]');
     });
 
-    test('a tap on a control keeps its identifier, whatever the server is called',
-        () {
-      // The demo server is `http://demo`, so `demo` is a remembered host — and
-      // without the vocabulary rule every `setup.demo` in the log would read
-      // `setup.[HOST]`.
-      final r = bambuddyLike()..rememberServerUrl('http://demo');
+    test(
+      'a tap on a control keeps its identifier, whatever the server is called',
+      () {
+        // The demo server is `http://demo`, so `demo` is a remembered host — and
+        // without the vocabulary rule every `setup.demo` in the log would read
+        // `setup.[HOST]`.
+        final r = bambuddyLike()..rememberServerUrl('http://demo');
 
-      expect(r.scrubFields({'id': 'setup.demo'})['id'], 'setup.demo');
-      expect(r.scrubFields({'id': 'archive.card'})['id'], 'archive.card');
-      // The shape is the guard: an identifier built out of somebody's file name
-      // is not the app's vocabulary and goes through the scrub after all.
-      expect(
-        r.scrubFields({'id': 'archive.card Prezent dla demo'})['id'],
-        'archive.card Prezent dla [HOST]',
-      );
-    });
+        expect(r.scrubFields({'id': 'setup.demo'})['id'], 'setup.demo');
+        expect(r.scrubFields({'id': 'archive.card'})['id'], 'archive.card');
+        // The shape is the guard: an identifier built out of somebody's file name
+        // is not the app's vocabulary and goes through the scrub after all.
+        expect(
+          r.scrubFields({'id': 'archive.card Prezent dla demo'})['id'],
+          'archive.card Prezent dla [HOST]',
+        );
+      },
+    );
 
     test('a material named like the server survives at every depth', () {
       // The WebSocket probe reports an AMS slot's material as a nested `mat`,
@@ -397,8 +411,9 @@ void main() {
         ],
       });
 
-      final tray = (((out['ams']! as List).single as Map)['trays']! as List)
-          .single as Map;
+      final tray =
+          (((out['ams']! as List).single as Map)['trays']! as List).single
+              as Map;
       expect(tray['mat'], 'PLA');
     });
   });
