@@ -22,6 +22,7 @@ class HttpProbeConfig {
     this.maxClippedChars = 1900,
     this.maxBodyChars = 300,
     this.redactSamples = true,
+    this.sampleRequests = false,
     this.fieldsOf,
     this.pathOf,
   });
@@ -47,6 +48,15 @@ class HttpProbeConfig {
   /// measured, compared or written. On unless the application can say why a
   /// route's payload holds nothing of anybody's.
   final bool redactSamples;
+
+  /// Whether a write's `request` record carries the body it sent, under the
+  /// same scrub and ceilings as a response sample. A multipart body is described
+  /// instead — part names, file count, bytes, extensions — because its parts are
+  /// the user's files.
+  ///
+  /// Off by default: it pays where the app formats its own wire values, so the
+  /// body is the suspect rather than the server's answer.
+  final bool sampleRequests;
 
   /// Fields to record on every request of this app's own — an entity id the
   /// reports keep turning on. Never anything the user typed.
@@ -87,8 +97,9 @@ class HttpProbe extends Interceptor {
     options.extra[_startedAtKey] = DateTime.now().millisecondsSinceEpoch;
     // "Did my save even leave the phone" has no other witness; a GET that never
     // returns shows up as a response missing from the polling around it.
-    if (!_isRead(options.method)) {
-      DiagnosticRecorder.active?.add(
+    final store = DiagnosticRecorder.active;
+    if (store != null && !_isRead(options.method)) {
+      store.add(
         LogSource.http,
         'request',
         lvl: LogLevel.debug,
@@ -96,10 +107,38 @@ class HttpProbe extends Interceptor {
           'method': options.method,
           'path': _pathOf(options),
           ..._fieldsOf(options),
+          if (config.sampleRequests)
+            'body': _requestSample(store, options.data),
         },
       );
     }
     handler.next(options);
+  }
+
+  Object? _requestSample(LogStore store, Object? data) {
+    if (data == null) return null;
+    if (data is FormData) return _uploadSummary(data);
+    final sample = config.redactSamples
+        ? store.redactor.scrubSample(data)
+        : data;
+    if (sample == null) return null;
+    final encoded = _encoded(sample);
+    return encoded.length > config.maxSampleChars
+        ? '${encoded.substring(0, config.maxClippedChars)}…'
+        : sample;
+  }
+
+  static Map<String, Object?> _uploadSummary(FormData data) => {
+    if (data.fields.isNotEmpty) 'fields': [for (final f in data.fields) f.key],
+    'files': data.files.length,
+    'bytes': data.files.fold<int>(0, (sum, f) => sum + f.value.length),
+    'exts': [for (final f in data.files) _extensionOf(f.value.filename) ?? '?'],
+  };
+
+  static String? _extensionOf(String? filename) {
+    final dot = filename?.lastIndexOf('.') ?? -1;
+    if (filename == null || dot < 0 || dot == filename.length - 1) return null;
+    return filename.substring(dot + 1).toLowerCase();
   }
 
   @override

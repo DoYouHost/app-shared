@@ -10,21 +10,11 @@ follows: a package takes what both applications mean identically, and requires
 everything they mean differently as a parameter. Where that parameter list would
 be longer than the code, the answer is no.
 
-## 1. lubelogger has not adopted `app_report_client` at all
+## 1. ~~lubelogger has not adopted `app_report_client` at all~~ — done in v0.3.0
 
-The largest deletion available, and it needs no design work: the package was
-extracted *from* this code.
-
-`lubelogger-mobile/lib/core/diagnostics/` still contains its own
-`relay_client.dart` (249), `relay_identity.dart` (33), `relay_pow.dart` (58),
-`report_envelope.dart` (126), `report_outbox.dart` (162), `report_sender.dart`
-(300) and `log_redactor.dart` (337) — 1265 lines — and its `pubspec.yaml` does
-not name `app_report_client`. `relay_client.dart` differs from the package's by
-about thirty lines.
-
-Blocker: none technical. It is a change in the other repository, and it should
-land together with that app's move onto `app_diagnostics`, since both touch the
-same directory.
+lubelogger-mobile moved onto both packages together. The one thing it recorded
+that `app_diagnostics` could not was a write's request body, which is now
+`HttpProbeConfig.sampleRequests` (off by default, so bambuddy is unaffected).
 
 ## 2. `dash_ui` — the design system
 

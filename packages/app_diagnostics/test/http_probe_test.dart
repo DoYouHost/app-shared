@@ -238,4 +238,86 @@ void main() {
       expect((await responseRecord())['status'], 200);
     });
   });
+
+  group('the body a write sends', () {
+    Future<Map<String, dynamic>> requestRecord() async =>
+        (await records()).firstWhere((r) => r['evt'] == 'request');
+
+    test('is left out unless the app opts in', () async {
+      final dio = dioWith(const HttpProbeConfig());
+
+      await dio.post<dynamic>('/api/records', data: {'odometer': '1000'});
+
+      expect((await requestRecord()).containsKey('body'), isFalse);
+    });
+
+    test('keeps the wire values and measures out the user text', () async {
+      final dio = dioWith(const HttpProbeConfig(sampleRequests: true));
+
+      await dio.post<dynamic>(
+        '/api/records',
+        data: {
+          'date': '01/15/2024',
+          'odometer': '148230',
+          'note': 'bought from a friend',
+        },
+      );
+
+      expect((await requestRecord())['body'], {
+        'date': '01/15/2024',
+        'odometer': '148230',
+        'note': '<str:20>',
+      });
+    });
+
+    test('past the ceiling is clipped rather than dropped', () async {
+      final dio = dioWith(
+        const HttpProbeConfig(
+          sampleRequests: true,
+          maxSampleChars: 60,
+          maxClippedChars: 20,
+        ),
+      );
+
+      await dio.post<dynamic>(
+        '/api/records',
+        data: {for (var i = 0; i < 40; i++) 'k$i': 'True'},
+      );
+
+      final body = (await requestRecord())['body'] as String;
+      expect(body, hasLength(21));
+      expect(body, endsWith('…'));
+    });
+
+    test('of an upload is described, never quoted', () async {
+      final dio = dioWith(const HttpProbeConfig(sampleRequests: true));
+      final form = FormData()
+        ..fields.add(const MapEntry('kind', 'receipt'))
+        ..files.add(
+          MapEntry(
+            'documents',
+            MultipartFile.fromBytes([1, 2, 3, 4], filename: 'Anna receipt.PDF'),
+          ),
+        );
+
+      await dio.post<dynamic>('/api/documents/upload', data: form);
+
+      final body = (await requestRecord())['body'] as Map<String, dynamic>;
+      expect(body, {
+        'fields': ['kind'],
+        'files': 1,
+        'bytes': 4,
+        'exts': ['pdf'],
+      });
+      expect(jsonEncode(body), isNot(contains('Anna')));
+    });
+
+    test('never reaches the response record', () async {
+      final dio = dioWith(const HttpProbeConfig(sampleRequests: true));
+
+      await dio.post<dynamic>('/api/records', data: {'odometer': '1000'});
+
+      expect((await responseRecord()).containsKey('body'), isFalse);
+    });
+  });
 }
