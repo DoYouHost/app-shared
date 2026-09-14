@@ -5,14 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Every control identifier in this package, read off the source.
 ///
-/// `confirmDestructive` builds its buttons' ids from the one its caller passes,
-/// so what counts there is the id at each call site, not the `$id` template.
+/// `confirmDialog` builds its buttons' ids from the one its caller passes, so
+/// what counts there is the id at each call site, not the `$id` template.
 List<String> _declaredTags() {
   final tagged = RegExp(r"""logTag\(\s*'([^']*)'|\.tagged\(\s*'([^']*)'""");
-  final dialog = RegExp(
-    r"confirmDestructive\([^;]*?id:\s*'([^']*)'",
-    dotAll: true,
-  );
+  final dialog = RegExp(r"confirmDialog\([^;]*?id:\s*'([^']*)'", dotAll: true);
   final comment = RegExp(r'^\s*//.*$', multiLine: true);
   final found = <String>[];
   for (final entity in Directory('lib/src').listSync(recursive: true)) {

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:app_report_client/app_report_client.dart';
-import 'package:dash_ui/dash_ui.dart';
+import 'package:dash_kit/dash_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,7 +13,6 @@ import 'bug_report_controller.dart';
 import 'log_export.dart';
 import 'log_preview.dart';
 import 'report_bindings.dart';
-import 'report_chrome.dart';
 
 /// Guided bug report: explain → record → review. Recording itself lives in
 /// [BugReportController] and keeps running while the user leaves this screen
@@ -248,7 +247,7 @@ class _IdleViewState extends ConsumerState<_IdleView> {
     final messenger = ScaffoldMessenger.of(context);
     final description = _description.text.trim();
     if (description.isEmpty) {
-      messenger.replaceSnack(l10n.bugReportRequestRequired);
+      messenger.snack(l10n.bugReportRequestRequired, replaceCurrent: true);
       return;
     }
     // False means the app could not even describe itself — nothing was queued,
@@ -256,7 +255,7 @@ class _IdleViewState extends ConsumerState<_IdleView> {
     if (await ref.read(bugReportProvider.notifier).sendRequest(description)) {
       return;
     }
-    messenger.replaceSnack(l10n.bugReportRequestNotPrepared);
+    messenger.snack(l10n.bugReportRequestNotPrepared, replaceCurrent: true);
   }
 
   /// Nothing to delete here — a request leaves no recording behind — so this
@@ -264,7 +263,9 @@ class _IdleViewState extends ConsumerState<_IdleView> {
   void _finishRequest() {
     final l10n = ReportLocalizations.of(context);
     final home = ref.read(reportBindingsProvider).homeLocation();
-    ScaffoldMessenger.of(context).replaceSnack(l10n.bugReportSent);
+    ScaffoldMessenger.of(
+      context,
+    ).snack(l10n.bugReportSent, replaceCurrent: true);
     _description.clear();
     ref.read(bugReportProvider.notifier).reset();
     GoRouter.of(context).go(home);
@@ -360,7 +361,9 @@ class _RecordingView extends ConsumerWidget {
             label: Text(l10n.bugReportMark),
             onPressed: () {
               ref.read(bugReportProvider.notifier).mark();
-              ScaffoldMessenger.of(context).replaceSnack(l10n.bugReportMarked);
+              ScaffoldMessenger.of(
+                context,
+              ).snack(l10n.bugReportMarked, replaceCurrent: true);
             },
           ),
         ),
@@ -531,7 +534,7 @@ class _ReviewViewState extends ConsumerState<_ReviewView> {
     final messenger = ScaffoldMessenger.of(context);
     final description = _description.text.trim();
     if (description.isEmpty) {
-      messenger.replaceSnack(l10n.bugReportDescriptionRequired);
+      messenger.snack(l10n.bugReportDescriptionRequired, replaceCurrent: true);
       return;
     }
     await ref.read(bugReportProvider.notifier).sendToIssue(description);
@@ -557,7 +560,7 @@ class _ReviewViewState extends ConsumerState<_ReviewView> {
       case LogSaveResult.cancelled:
         return;
       case LogSaveResult.failed:
-        messenger.replaceSnack(l10n.bugReportSaveFailed);
+        messenger.snack(l10n.bugReportSaveFailed, replaceCurrent: true);
       case LogSaveResult.saved:
         await _finish(messenger, l10n.bugReportSaved);
     }
@@ -572,7 +575,7 @@ class _ReviewViewState extends ConsumerState<_ReviewView> {
     final home = ref.read(reportBindingsProvider).homeLocation();
     final controller = ref.read(bugReportProvider.notifier);
     // Shown by the messenger above the routes, so it survives the trip back.
-    messenger.replaceSnack(message);
+    messenger.snack(message, replaceCurrent: true);
     await controller.discard();
     router.go(home);
   }
@@ -588,8 +591,9 @@ class _ReviewViewState extends ConsumerState<_ReviewView> {
       SendPhase.waiting || SendPhase.sending => true,
       _ => false,
     };
-    final confirmed = await confirmDestructive(
+    final confirmed = await confirmDialog(
       context,
+      destructive: true,
       id: 'bug_report.discard',
       title: l10n.bugReportDiscardQuestion,
       message: queued

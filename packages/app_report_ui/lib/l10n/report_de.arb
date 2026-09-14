@@ -89,6 +89,5 @@
   "bugReportRequestNotPrepared": "Die App konnte den Bericht nicht zusammenstellen. Es wurde nichts gesendet — versuche es erneut.",
   "bugReportQueuedBug": "Dieser Countdown gilt für den Fehlerbericht, den du bereits gesendet hast.",
   "bugReportQueuedChange": "Dieser Countdown gilt für den Änderungswunsch, den du bereits gesendet hast.",
-  "bugReportQueuedFeature": "Dieser Countdown gilt für den Funktionswunsch, den du bereits gesendet hast.",
-  "reportCancel": "Abbrechen"
+  "bugReportQueuedFeature": "Dieser Countdown gilt für den Funktionswunsch, den du bereits gesendet hast."
 }

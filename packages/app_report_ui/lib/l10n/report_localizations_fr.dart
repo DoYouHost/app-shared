@@ -330,7 +330,4 @@ class ReportLocalizationsFr extends ReportLocalizations {
   @override
   String get bugReportQueuedFeature =>
       'Ce compte à rebours concerne la demande de fonctionnalité que vous avez déjà envoyée.';
-
-  @override
-  String get reportCancel => 'Annuler';
 }

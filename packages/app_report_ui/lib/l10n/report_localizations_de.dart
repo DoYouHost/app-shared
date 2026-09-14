@@ -328,7 +328,4 @@ class ReportLocalizationsDe extends ReportLocalizations {
   @override
   String get bugReportQueuedFeature =>
       'Dieser Countdown gilt für den Funktionswunsch, den du bereits gesendet hast.';
-
-  @override
-  String get reportCancel => 'Abbrechen';
 }

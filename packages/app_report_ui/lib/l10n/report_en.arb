@@ -144,6 +144,5 @@
   "bugReportRequestNotPrepared": "The app could not put the report together. Nothing was sent — try again.",
   "bugReportQueuedBug": "This countdown is for the bug report you already sent.",
   "bugReportQueuedChange": "This countdown is for the change request you already sent.",
-  "bugReportQueuedFeature": "This countdown is for the feature request you already sent.",
-  "reportCancel": "Cancel"
+  "bugReportQueuedFeature": "This countdown is for the feature request you already sent."
 }

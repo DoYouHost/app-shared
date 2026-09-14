@@ -643,12 +643,6 @@ abstract class ReportLocalizations {
   /// In en, this message translates to:
   /// **'This countdown is for the feature request you already sent.'**
   String get bugReportQueuedFeature;
-
-  /// No description provided for @reportCancel.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get reportCancel;
 }
 
 class _ReportLocalizationsDelegate

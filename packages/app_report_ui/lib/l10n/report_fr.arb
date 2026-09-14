@@ -89,6 +89,5 @@
   "bugReportRequestNotPrepared": "L'application n'a pas pu préparer le signalement. Rien n'a été envoyé — réessayez.",
   "bugReportQueuedBug": "Ce compte à rebours concerne le rapport de bug que vous avez déjà envoyé.",
   "bugReportQueuedChange": "Ce compte à rebours concerne la demande de modification que vous avez déjà envoyée.",
-  "bugReportQueuedFeature": "Ce compte à rebours concerne la demande de fonctionnalité que vous avez déjà envoyée.",
-  "reportCancel": "Annuler"
+  "bugReportQueuedFeature": "Ce compte à rebours concerne la demande de fonctionnalité que vous avez déjà envoyée."
 }

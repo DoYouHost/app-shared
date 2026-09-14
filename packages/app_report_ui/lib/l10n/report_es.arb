@@ -89,6 +89,5 @@
   "bugReportRequestNotPrepared": "La app no pudo preparar la solicitud. No se envió nada — inténtalo de nuevo.",
   "bugReportQueuedBug": "Esta cuenta atrás es del informe de error que ya enviaste.",
   "bugReportQueuedChange": "Esta cuenta atrás es de la solicitud de cambio que ya enviaste.",
-  "bugReportQueuedFeature": "Esta cuenta atrás es de la solicitud de función que ya enviaste.",
-  "reportCancel": "Cancelar"
+  "bugReportQueuedFeature": "Esta cuenta atrás es de la solicitud de función que ya enviaste."
 }

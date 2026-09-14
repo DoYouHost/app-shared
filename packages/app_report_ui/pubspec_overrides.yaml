@@ -6,5 +6,9 @@ dependency_overrides:
     path: ../app_diagnostics
   app_report_client:
     path: ../app_report_client
+  app_util:
+    path: ../app_util
+  dash_kit:
+    path: ../dash_kit
   dash_ui:
     path: ../dash_ui

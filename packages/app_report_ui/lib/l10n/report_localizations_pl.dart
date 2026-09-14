@@ -325,7 +325,4 @@ class ReportLocalizationsPl extends ReportLocalizations {
   @override
   String get bugReportQueuedFeature =>
       'To odliczanie dotyczy wysłanej już prośby o funkcję.';
-
-  @override
-  String get reportCancel => 'Anuluj';
 }

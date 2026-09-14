@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:dash_ui/dash_ui.dart';
+import 'package:dash_kit/dash_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import '../l10n/report_localizations.dart';
 import 'bug_report_controller.dart';
 import 'report_bindings.dart';
-import 'report_chrome.dart';
 
 /// Gap kept between the bar and the edges of the screen.
 const _edgeMargin = 8.0;
@@ -56,12 +55,13 @@ class RecordingBannerScaffold extends ConsumerWidget {
     final l10n = ReportLocalizations.of(context);
     final bindings = ref.read(reportBindingsProvider);
     final recorder = bindings.recorder;
-    ScaffoldMessenger.of(context).replaceSnack(
+    ScaffoldMessenger.of(context).snack(
       limit == 'size'
           ? l10n.bugReportSizeLimitReached(
               recorder.sessionBytes ~/ (1024 * 1024),
             )
           : l10n.bugReportLimitReached(recorder.sessionDuration.inMinutes),
+      replaceCurrent: true,
       action: SnackBarAction(
         label: l10n.bugReportShow,
         onPressed: () {
@@ -302,7 +302,7 @@ class _RecordingLayerState extends ConsumerState<_RecordingLayer> {
                   ref.read(bugReportProvider.notifier).mark();
                   ScaffoldMessenger.of(
                     context,
-                  ).replaceSnack(l10n.bugReportMarked);
+                  ).snack(l10n.bugReportMarked, replaceCurrent: true);
                 },
               ),
             ),
