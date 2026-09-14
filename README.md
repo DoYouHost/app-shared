@@ -15,6 +15,13 @@ is not — the same rule the OpenTofu modules follow.
 | [`dash_kit`](packages/dash_kit) | the Dash widgets that name themselves in the diagnostic log — the confirmation dialog, the load-error and empty views, the bottom sheet, the snack bar, the width cap, the spinners, the button pair and the logged app bar |
 | [`app_util`](packages/app_util) | small things both apps need the same way — tolerant JSON coercion, user-typed numbers, text measurement, platform-channel queries, byte sizes and hex colours, the demo-mode HTTP adapter, the server address, and the classification of a failed request |
 
+Besides the packages, [`.github/workflows`](.github/workflows) holds the two
+workflows both applications call rather than copy: the GitHub Pages deploy and
+the `@claude` job with its permission gate. Each application keeps its own
+trigger and passes in what differs. They are called at `@master` rather than at
+a tag — nothing about them resolves through pub, so a fix here should reach both
+applications without waiting for a release.
+
 [`docs/candidates.md`](docs/candidates.md) lists what else was measured as
 shareable, with the blocker on each.
 

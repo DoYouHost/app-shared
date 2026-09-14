@@ -291,22 +291,40 @@ weight) in lubelogger, 2.304 with ttfautohint (274 KB) in bambuddy; Manrope is
 4.504 in both. One OFL text covers either version, so nothing here is blocked on
 it, but the two apps render code in different metrics.
 
-## 10. Tooling and CI
+## 10. ~~Tooling and CI~~ — done, and not versioned
 
-Not a Dart package, and so a question of whether this repository should hold
-anything else.
+`pages.yml` and `claude.yml` are called now rather than copied: the bodies live
+in this repository's [`.github/workflows`](../.github/workflows), and each
+application keeps only its trigger — the default branch differs — its
+concurrency group, and what it alone grants. A called workflow's
+`actions/checkout` and every `github.*` expression in it name the *calling*
+repository, which is what lets one copy of the permission gate, the runner setup
+and the tool allowlist serve both. `claude.yml` takes the server reference as
+two inputs, one extra `--allowedTools` line, and the OAuth token as a secret,
+since the two applications hold that token under different names. bambuddy's
+retried, time-capped clone of the server reference is the version both now run.
+
+They are pinned at `@master`, not at a tag. Nothing here resolves through pub,
+so there is no version solving to break, and a tag would have to be moved for
+every workflow fix — the ref churn §9 describes, for no gain.
+
+lubelogger's `ci.yml` caught up with bambuddy's two fixes. The path filter is
+decided in a step rather than by `paths-ignore`, so a docs-only pull request
+reports the required status instead of waiting for a check that can never
+arrive. The formatting gate comes with the one-off `dart format` of the tree —
+102 of 142 files, this project predating the tall style — and a
+`.git-blame-ignore-revs` naming that commit, the same pair bambuddy landed.
+
+Not moved:
 
 - `tool/check_l10n_sync.py` (495 lines) and `tool/aab_versions.py` (109) are
-  byte-identical in both applications.
-- `pages.yml` differs only in names and the default branch. `claude.yml` differs
-  in the server repository it clones and a few allowed tools. Both fit a
-  reusable workflow (`workflow_call`).
-- The `justfile`s share 27 recipes (release, emulator, purge). `just` imports
-  only a local path, so sharing them would need a submodule. Probably not worth
-  it.
-- lubelogger's `ci.yml` lacks two fixes bambuddy's has: the path filter decided
-  in a step rather than by `paths-ignore`, which leaves a required status
-  waiting forever on a docs-only pull request, and the formatting gate.
+  byte-identical, and stay duplicated. Both are run from the `justfile`, locally
+  and offline, so a reusable workflow cannot deliver them; a submodule, a
+  fetch-on-demand recipe or a CI drift check each cost something in every clone
+  or every run, against a drift that has not happened yet — the copies have kept
+  themselves identical.
+- The `justfile`s, for the same reason: `just` imports only a local path, so
+  sharing the 27 common recipes means the same submodule.
 
 ## Not worth it, or blocked
 

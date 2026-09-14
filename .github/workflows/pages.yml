@@ -1,0 +1,31 @@
+name: Pages
+
+# Called by bambuddy-mobile and lubelogger-mobile. Each keeps its own trigger,
+# because the default branch differs, and passes nothing: both publish `site/`
+# as it stands. `actions/checkout` in a called workflow takes the *calling*
+# repository at the commit that triggered it, which is what makes one copy work
+# for both.
+#
+# Each app serves its privacy policy from the result, and that URL is registered
+# in the Play Console — a failure here is a live-listing problem, not a docs one.
+
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v5
