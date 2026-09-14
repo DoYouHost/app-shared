@@ -108,3 +108,162 @@ Adding the gate turned up an older bug in the same loop. `set -e` does not apply
 inside a subshell on the left of `||`, so each package's status was only its last
 command's, and a failing `flutter analyze` passed as long as the tests passed.
 Each step now records its own failure.
+
+# Round two
+
+Measured on 14 September 2026, after `app_util` v0.7.1, against bambuddy-mobile
+and lubelogger-mobile on their `dev` branches. Nothing below is started. The
+rule is the same as in round one.
+
+Suggested order: item 6, then item 7. Items 9 and the ports under item 8 are
+small fixes inside the applications and can go alongside either.
+
+## 6. `dash_kit` — the widgets that carry log tags
+
+The same small widgets exist in three copies, not two, because `app_report_ui`
+grew its own while it was extracted:
+
+| what | lubelogger | bambuddy | `app_report_ui` |
+|---|---|---|---|
+| snack bar | calls `showSnackBar` directly (28 sites) | `DashSnack.snack()` | `ReportSnack.replaceSnack()` |
+| destructive confirm | `TextButton` in `dangerInk` | `FilledButton` in `scheme.error` | `FilledButton` with `dashDangerButtonStyle` |
+| content width cap | `ContentConstraint`, `kContentMaxWidth` | none | `MaxContentWidth` |
+| bottom sheet | `showModalBottomSheet`, `kBottomSheetMaxWidth` (640) repeated at every call, which is Material 3's own default | `dashSheet`: a bottom `SafeArea` for Android 15 edge-to-edge | none |
+| error and empty views | log `error_view` / `empty_view` records | `tonal`, `scrollable`, optional icon, `error.retry` tag | none |
+
+So a user sees three different delete confirmations, and each application has
+the better half of the error and empty views. bambuddy also has what lubelogger
+lacks entirely: `DashLoading` / `DashSpinner`, `ButtonPair` (already on
+`app_util`'s `textWidth`), `withSystemNavInset`, `SectionHeading`, and the
+log-tagged `dashAppBar` / `dashSaveAction` that round one left in the app.
+
+Why a new package and not `dash_ui`: `dash_ui` stays a leaf on purpose, so that
+`app_diagnostics` is not forced to one ref through it. That argument is weaker
+than it was. `app_report_ui` already depends on both, and both applications pin
+the same refs. A `dash_kit` depending on `dash_ui` and `app_diagnostics` keeps
+`dash_ui` a leaf, and `app_report_ui` drops `report_chrome.dart` for it.
+
+The parameters stay short. The cancel label is
+`MaterialLocalizations.cancelButtonLabel`, so the package needs no localization
+of its own. The retry label is an argument. A sheet takes no width: Material 3
+already caps it at 640 dp.
+
+A render of lubelogger's record form in its sheet, with a 48 dp navigation bar
+drawn edge to edge, puts Cancel and Save under the bar: `RecordFormScaffold`
+pads for the keyboard (`viewInsets`) but not for the navigation bar. Its sheets
+that are not forms carry their own `SafeArea`. Confirm it on a device with
+gesture navigation (about 24 dp) before treating it as a shipped bug.
+
+### Built, not yet tagged or adopted
+
+`packages/dash_kit` exists with the decisions taken on rendered screens:
+
+- **The confirmation** is one `confirmDialog`: both answers are filled buttons
+  of equal width, dismiss on the left in a new `dashNeutralButtonStyle`, confirm
+  on the right in `dashDangerButtonStyle` (or the accent when `destructive` is
+  false). Both stretch to the taller one when a label wraps. `id` is required,
+  and the answer is recorded as lubelogger's `confirm` record. All three current
+  confirmations change look; bambuddy's and `app_report_ui`'s keep their red.
+- **The error view** is centred as in bambuddy, and with `scrollable: true` it
+  can still be pulled, as in lubelogger. lubelogger's screens move their message
+  from the upper part of the screen to the middle. `scrollable` stays off by
+  default.
+- **The sheet** is bambuddy's `dashSheet`; lubelogger's forms moving onto it is
+  the fix above.
+- `dashNeutralButtonStyle` lives in `dash_kit` for now, because `dash_kit`
+  depends on `dash_ui` by tag. It belongs in `dash_ui` at its next release.
+
+Adopting it takes a tag first. Then, in each application: `dash_theme.dart`
+exports `dash_kit` in place of `dash_ui`, the local copies go, and
+`confirmDelete` / `confirmRisky` / `confirmDialog` call sites pass an `id`.
+bambuddy's redactor adds `surface` to `ourKeys`, which lubelogger already has:
+without it, a server whose host is a word like `queue` masks that screen's name
+in the error and empty records.
+`app_report_ui` drops `report_chrome.dart` at its next release.
+
+## 7. `app_diagnostics`: device facts and the session store
+
+- **`deviceEnvironment()` and `AppStart`**, about 100 lines in lubelogger's
+  `core/diagnostics/session_facts.dart`. They add the UTC offset, the screen size
+  and density, the text scale, dark mode, the device, SDK and emulator flag, and
+  uptime to the session header. None of it is about vehicles, and bambuddy's
+  header has none of it. The cost is `device_info_plus`, which bambuddy does not
+  depend on today. It could be taken behind a callback instead. bambuddy's
+  `readAppVersion()` (`version+buildNumber`) belongs next to it.
+- **`SettingsSessionStore`** is the same class in both applications, over the
+  same preferences key, `diagnostics_session`. The package can ship a
+  `SharedPreferences` store that calls `reload()` before reading, which
+  bambuddy's comment asks every caller to remember. One difference to settle:
+  lubelogger reads an empty id as null, bambuddy does not.
+
+## 8. ~~An API error package~~ — ports instead
+
+`AppApiException`, `guard` and `guardOrNull` have the same skeleton in both
+applications, and the classification under them is already `DioFailure`. The
+codes are closed enums with different members (10 in lubelogger, 17 in
+bambuddy), so sharing the rest needs generics and a parameter list longer than
+the code. The answer is no.
+
+The comparison did turn up gaps worth porting:
+
+- **to lubelogger:** `method` and `path` on the exception, so a failure names
+  the request it belongs to;
+- **to bambuddy:** the `degraded` record in `guardOrNull`, without which a
+  swallowed failure leaves no trace;
+- **to bambuddy:** skip the demo host in `sessionSecrets`, as lubelogger does.
+  `LogRedactor` replaces a known value as a substring, so in demo mode every
+  `demo` outside a key protected by `ourKeys` becomes `[HOST]`. Low impact: demo
+  mode is for store review only.
+
+## 9. Font licences in `dash_ui`
+
+The font families stay declared by the applications, for the reason `dash_ui`
+gives. The OFL texts can still move into `dash_ui` as package assets, with a
+`registerDashFontLicenses()` that both applications call. That does not touch
+the families.
+
+Two things were wrong on the way:
+
+- **bambuddy never registers the OFL licences.** Its `showLicensePage` lists
+  neither Manrope nor JetBrains Mono, and the repository has no
+  `assets/licenses`. The OFL requires the licence to travel with the fonts.
+- **JetBrains Mono differs:** 2.211 (115 KB per weight) in lubelogger, 2.304 with
+  ttfautohint (274 KB) in bambuddy. Manrope is 4.504 in both.
+
+## 10. Tooling and CI
+
+Not a Dart package, and so a question of whether this repository should hold
+anything else.
+
+- `tool/check_l10n_sync.py` (495 lines) and `tool/aab_versions.py` (109) are
+  byte-identical in both applications.
+- `pages.yml` differs only in names and the default branch. `claude.yml` differs
+  in the server repository it clones and a few allowed tools. Both fit a
+  reusable workflow (`workflow_call`).
+- The `justfile`s share 27 recipes (release, emulator, purge). `just` imports
+  only a local path, so sharing them would need a submodule. Probably not worth
+  it.
+- lubelogger's `ci.yml` lacks two fixes bambuddy's has: the path filter decided
+  in a step rather than by `paths-ignore`, which leaves a required status
+  waiting forever on a docs-only pull request, and the formatting gate.
+
+## Not worth it, or blocked
+
+- **`demo_config`, `report_wiring`, `report_config`, `dash_theme`.** These are
+  already the application's half of a shared contract: constants and nothing
+  else.
+- **`NotificationService`.** Blocked on versions first:
+  `flutter_local_notifications` is ^22 in lubelogger and ^18 in bambuddy. The
+  models differ too: reminders from WorkManager against a foreground service.
+  `package_info_plus` has drifted the same way (^9 against ^8).
+- **Server version.** lubelogger compares dotted versions in 30 lines. bambuddy's
+  `ServerVersion` reads `-daily` builds and carries a feature table. Different
+  meanings.
+- **The offline cache, write queue and `RetryInterceptor`** (about 700 lines in
+  lubelogger). Generic, but there is no second consumer. It is the same bet as
+  `wear_ui`. `RetryInterceptor` is the closest to moving, since bambuddy never
+  retries a failed GET, but it reads lubelogger's `OfflineStatus`.
+- **Charts.** bambuddy draws with `fl_chart`, lubelogger paints its own.
+- **Localizations outside the widget tree.** One line either way, but
+  lubelogger matches only `languageCode` and ignores the second preferred
+  language. Port bambuddy's `basicLocaleListResolution`.

@@ -12,6 +12,7 @@ is not — the same rule the OpenTofu modules follow.
 | [`app_diagnostics`](packages/app_diagnostics) | the other half — the recording session, the log record and its file mirror, the cross-isolate merge, the review summary, and the probes over taps, routes, requests, errors and lifecycle |
 | [`app_report_ui`](packages/app_report_ui) | the report screens — the guided flow, the recording bar that follows the user around the app, and the review that decides where the log goes |
 | [`dash_ui`](packages/dash_ui) | the design system — tokens resolved per brightness and brand, the type scale, the screen chrome, the Material theme, and the contrast audit each app runs on its brand |
+| [`dash_kit`](packages/dash_kit) | the Dash widgets that name themselves in the diagnostic log — the confirmation dialog, the load-error and empty views, the bottom sheet, the snack bar, the width cap, the spinners, the button pair and the logged app bar |
 | [`app_util`](packages/app_util) | small things both apps need the same way — tolerant JSON coercion, user-typed numbers, text measurement, platform-channel queries, byte sizes and hex colours, the demo-mode HTTP adapter, the server address, and the classification of a failed request |
 
 [`docs/candidates.md`](docs/candidates.md) lists what else was measured as

@@ -1,0 +1,47 @@
+name: dash_kit
+description: >-
+  The Dash widgets that name themselves in the diagnostic log: the confirmation
+  dialog, the load-error and empty views, the bottom sheet, the snack bar, the
+  width cap, the spinners, the button pair and the logged app bar.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Siblings by git ref, at the refs the applications pin, for the reason
+  # `app_diagnostics` gives: an application naming one by git and getting it
+  # here by path would hand pub two sources for one package.
+  # `pubspec_overrides.yaml` points them at the checkout for this repo's tests.
+  app_diagnostics:
+    git:
+      url: https://github.com/DoYouHost/app-shared.git
+      ref: v0.3.0
+      path: packages/app_diagnostics
+  # `ButtonPair` measures its labels with `textWidth`.
+  app_util:
+    git:
+      url: https://github.com/DoYouHost/app-shared.git
+      ref: v0.7.1
+      path: packages/app_util
+  dash_ui:
+    git:
+      url: https://github.com/DoYouHost/app-shared.git
+      ref: v0.5.0
+      path: packages/dash_ui
+
+dev_dependencies:
+  # Only to build a recorder in the tests, whose redactor comes from here.
+  app_report_client:
+    git:
+      url: https://github.com/DoYouHost/app-shared.git
+      ref: v0.2.0
+      path: packages/app_report_client
+  flutter_localizations:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
