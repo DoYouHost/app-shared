@@ -112,13 +112,13 @@ Each step now records its own failure.
 # Round two
 
 Measured on 14 September 2026, after `app_util` v0.7.1, against bambuddy-mobile
-and lubelogger-mobile on their `dev` branches. Nothing below is started. The
-rule is the same as in round one.
+and lubelogger-mobile on their `dev` branches. The rule is the same as in round
+one.
 
-Suggested order: item 6, then item 7. Items 9 and the ports under item 8 are
-small fixes inside the applications and can go alongside either.
+Item 6 is done. Item 7 is the next one worth doing; item 9 and the ports under
+item 8 are small fixes inside the applications and can go alongside it.
 
-## 6. `dash_kit` — the widgets that carry log tags
+## 6. ~~`dash_kit` — the widgets that carry log tags~~ — done in v0.8.0
 
 The same small widgets exist in three copies, not two, because `app_report_ui`
 grew its own while it was extracted:
@@ -154,7 +154,7 @@ pads for the keyboard (`viewInsets`) but not for the navigation bar. Its sheets
 that are not forms carry their own `SafeArea`. Confirm it on a device with
 gesture navigation (about 24 dp) before treating it as a shipped bug.
 
-### Built and adopted in both applications; waiting on a tag
+### What it became
 
 `packages/dash_kit` exists with the decisions taken on rendered screens:
 
@@ -177,15 +177,11 @@ gesture navigation (about 24 dp) before treating it as a shipped bug.
 - `dashNeutralButtonStyle` lives in `dash_kit` for now, because `dash_kit`
   depends on `dash_ui` by tag. It belongs in `dash_ui` at its next release.
 
-Both applications now name `dash_kit` in `pubspec.yaml` at **ref v0.8.0, which
-does not exist yet**, and carry a gitignored `pubspec_overrides.yaml` pointing at
-the checkout so they resolve locally. Nothing over there builds on CI until that
-tag is pushed, and both override files go when it is.
-
-In each application `dash_theme.dart` re-exports `dash_kit` in place of
-`dash_ui`, and the local copies are gone: bambuddy's eight widget files and both
-applications' error, empty and confirmation views. What did not survive a
-straight swap:
+Both applications pin `dash_kit` at v0.8.0, and `dash_ui` is theirs only
+transitively now. In each of them `dash_theme.dart` re-exports `dash_kit` in
+place of `dash_ui`, and the local copies are gone: bambuddy's eight widget
+files, and the error, empty and confirmation views in both. What did not
+survive a straight swap:
 
 - **lubelogger, error views.** Its `AsyncErrorView` was always a list, and three
   sit directly under a `RefreshIndicator`: `garage_screen.dart`,
