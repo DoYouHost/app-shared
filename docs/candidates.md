@@ -115,8 +115,8 @@ Measured on 14 September 2026, after `app_util` v0.7.1, against bambuddy-mobile
 and lubelogger-mobile on their `dev` branches. The rule is the same as in round
 one.
 
-Item 6 is done. Item 7 is the next one worth doing; item 9 and the ports under
-item 8 are small fixes inside the applications and can go alongside it.
+Items 6, 7, 9 and 10 are done. What is left is the three ports under item 8,
+and the two package moves item 6 deferred to a release after v0.9.0.
 
 ## 6. ~~`dash_kit` — the widgets that carry log tags~~ — done in v0.8.0
 
@@ -215,7 +215,7 @@ Still open: `EmptyStateView` sits 48 dp under the app bar, as it did in both
 apps, while the error view is now centred. Whether the empty view should centre
 too is a design call that has not been made.
 
-## 7. ~~`app_diagnostics`: device facts and the session store~~ — built, waiting on the v0.9.0 tag
+## 7. ~~`app_diagnostics`: device facts and the session store~~ — done in v0.9.0
 
 - **`deviceEnvironment()` and `AppStart`** moved out of lubelogger, so bambuddy's
   header carries the UTC offset, the screen and its density, the text scale, dark
@@ -253,18 +253,23 @@ codes are closed enums with different members (10 in lubelogger, 17 in
 bambuddy), so sharing the rest needs generics and a parameter list longer than
 the code. The answer is no.
 
-The comparison did turn up gaps worth porting:
+The comparison did turn up gaps worth porting, and all three are ported:
 
 - **to lubelogger:** `method` and `path` on the exception, so a failure names
-  the request it belongs to;
+  the request it belongs to. They reach the log through the `degraded` record,
+  which already carried the cause and the status and now says which call the
+  screen carried on without.
 - **to bambuddy:** the `degraded` record in `guardOrNull`, without which a
-  swallowed failure leaves no trace;
-- **to bambuddy:** skip the demo host in `sessionSecrets`, as lubelogger does.
-  `LogRedactor` replaces a known value as a substring, so in demo mode every
-  `demo` outside a key protected by `ourKeys` becomes `[HOST]`. Low impact: demo
-  mode is for store review only.
+  swallowed failure left no trace. `guardOrNullAllowingForbidden` writes it too,
+  and `docs/diagnostics-log.md` describes it next to `action_failed` — the two
+  are mirror images, one for a failure somebody was told about and one for a
+  failure nobody was.
+- **to bambuddy:** the demo host is skipped in `sessionSecrets`, as lubelogger
+  does. `LogRedactor` replaces a known value as a substring, so in demo mode
+  every `demo` outside a key protected by `ourKeys` became `[HOST]`. Low impact:
+  demo mode is for store review only.
 
-## 9. ~~Font licences in `dash_ui`~~ — built, waiting on the v0.9.0 tag
+## 9. ~~Font licences in `dash_ui`~~ — done in v0.9.0
 
 The font families stay declared by the applications, for the reason `dash_ui`
 gives. The OFL texts moved into `dash_ui` as package assets, behind
@@ -282,14 +287,16 @@ The ref churn this cost, because a package pinned by tag cannot be bumped
 alone: `dash_ui` 0.3.0 is released by **v0.9.0**, and `dash_kit` (0.1.1) and
 `app_report_ui` (0.1.1) both move their `dash_ui` ref to it — two refs for one
 package in a resolution is a version-solving error, not a warning. Both
-applications then move `dash_kit` and `app_report_ui` to v0.9.0 as well. Until
-that tag is pushed they resolve through a gitignored `pubspec_overrides.yaml`,
-and their `pubspec.lock` must not be committed before it is.
+applications then move `dash_kit` and `app_report_ui` to v0.9.0 as well. Both
+resolved through a gitignored `pubspec_overrides.yaml` until the tag existed;
+their locks name v0.9.0 now and the overrides are gone.
 
-Still open: **JetBrains Mono differs between the apps** — 2.211 (115 KB per
-weight) in lubelogger, 2.304 with ttfautohint (274 KB) in bambuddy; Manrope is
-4.504 in both. One OFL text covers either version, so nothing here is blocked on
-it, but the two apps render code in different metrics.
+**JetBrains Mono is the same build in both now.** lubelogger was on 2.211 (115
+KB per weight) and bambuddy on 2.304 (274 KB); both carry 2.304 today, taken
+from the upstream release and byte-identical to it — 2.304 is the newest there
+has been since January 2023, and the ttfautohint in its name table is
+JetBrains' own build step, not a local one. It costs lubelogger about 640 KB of
+assets. Manrope is 4.504 in both and was never in question.
 
 ## 10. ~~Tooling and CI~~ — done, and not versioned
 
@@ -343,6 +350,8 @@ Not moved:
   `wear_ui`. `RetryInterceptor` is the closest to moving, since bambuddy never
   retries a failed GET, but it reads lubelogger's `OfflineStatus`.
 - **Charts.** bambuddy draws with `fl_chart`, lubelogger paints its own.
-- **Localizations outside the widget tree.** One line either way, but
-  lubelogger matches only `languageCode` and ignores the second preferred
-  language. Port bambuddy's `basicLocaleListResolution`.
+- **~~Localizations outside the widget tree~~** — ported, not shared.
+  lubelogger's `loadAppLocalizations` matched on `languageCode` alone, so a
+  phone set to Italian then Polish got English notifications. It now resolves
+  through `basicLocaleListResolution` behind a `resolveAppLocale` the tests can
+  reach, as in bambuddy, and carries bambuddy's suite adapted to `en`/`pl`.
