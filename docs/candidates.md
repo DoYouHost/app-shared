@@ -154,7 +154,7 @@ pads for the keyboard (`viewInsets`) but not for the navigation bar. Its sheets
 that are not forms carry their own `SafeArea`. Confirm it on a device with
 gesture navigation (about 24 dp) before treating it as a shipped bug.
 
-### Built, not yet tagged or adopted
+### Built and adopted in both applications; waiting on a tag
 
 `packages/dash_kit` exists with the decisions taken on rendered screens:
 
@@ -177,28 +177,43 @@ gesture navigation (about 24 dp) before treating it as a shipped bug.
 - `dashNeutralButtonStyle` lives in `dash_kit` for now, because `dash_kit`
   depends on `dash_ui` by tag. It belongs in `dash_ui` at its next release.
 
-Adopting it takes a tag first. Then, in each application, `dash_theme.dart`
-exports `dash_kit` in place of `dash_ui` and the local copies go. Beyond that,
-the call sites that do not survive a straight swap:
+Both applications now name `dash_kit` in `pubspec.yaml` at **ref v0.8.0, which
+does not exist yet**, and carry a gitignored `pubspec_overrides.yaml` pointing at
+the checkout so they resolve locally. Nothing over there builds on CI until that
+tag is pushed, and both override files go when it is.
+
+In each application `dash_theme.dart` re-exports `dash_kit` in place of
+`dash_ui`, and the local copies are gone: bambuddy's eight widget files and both
+applications' error, empty and confirmation views. What did not survive a
+straight swap:
 
 - **lubelogger, error views.** Its `AsyncErrorView` was always a list, and three
   sit directly under a `RefreshIndicator`: `garage_screen.dart`,
   `dashboard_screen.dart` and `vehicle/widgets/record_list.dart`. Each passes
-  `scrollable: true`, or pull-to-refresh stops working on the error screen with
-  no compile error to say so.
-- **lubelogger, confirmations.** `confirmDelete(what: x)` and
-  `confirmRisky(what: x)` become `confirmDialog(id: 'confirm.x', …)`, with
-  `destructive: true` for the first. The ids stay what they were, so logs
-  already attached to issues still match.
-- **lubelogger, width cap.** `ContentConstraint` defaulted to `kContentMaxWidth`;
-  `MaxContentWidth` takes the width explicitly.
-- **bambuddy, confirmations.** Nothing to do: all 39 `confirmDialog` calls
-  already pass an `id`.
-- **bambuddy, redactor.** `surface` goes into `ourKeys`, which lubelogger already
-  has: without it, a server whose host is a word like `queue` masks that screen's
+  `scrollable: true` — without it pull-to-refresh stops working on the error
+  screen, and nothing fails to compile to say so.
+- **lubelogger, confirmations.** `confirmDelete` and `confirmRisky` stayed, as
+  four-line wrappers that hand `confirmDialog` this app's title, message and
+  labels, and `confirm.$what` as the id. Their call sites are untouched, and the
+  ids are what they were, so logs already attached to issues still match.
+- **lubelogger, sheets.** All nine `showModalBottomSheet` calls became
+  `dashSheet`, which is what puts a form's buttons above the navigation bar.
+  `kBottomSheetMaxWidth` went with them, being Material 3's own default.
+- **lubelogger, width cap.** `ContentConstraint` is `MaxContentWidth`, which
+  takes the width rather than defaulting to it.
+- **bambuddy, confirmations.** Nothing: all 39 `confirmDialog` calls already
+  pass an `id`.
+- **bambuddy, redactor.** `surface` went into `ourKeys`, which lubelogger already
+  had: without it, a server whose host is a word like `queue` masks that screen's
   name in the error and empty records.
+- **Tests.** Four widget suites moved into `dash_kit` and one shrank to the
+  `SheetSurface` cases that stay bambuddy's. Four dialog taps across the two
+  applications now look for a `FilledButton`, which is what both answers are;
+  lubelogger's tag-shape guard learned to read the id handed to `confirmDialog`,
+  so `confirm.$what` is still checked where it is now written.
 
-`app_report_ui` drops `report_chrome.dart` at its next release.
+`app_report_ui` drops `report_chrome.dart` at its next release: it can only
+depend on `dash_kit` by tag.
 
 Still open: `EmptyStateView` sits 48 dp under the app bar, as it did in both
 apps, while the error view is now centred. Whether the empty view should centre
