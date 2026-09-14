@@ -18,6 +18,9 @@ const _dashFontLicenses = {
 /// which the OFL does not allow, since the licence has to be distributed with
 /// the font. Call it from `main`, before `runApp`; the registry reads the
 /// entries lazily, so it costs nothing until someone opens the page.
+///
+/// Once per process: the registry does not deduplicate collectors, so a second
+/// call lists both faces twice.
 void registerDashFontLicenses() {
   LicenseRegistry.addLicense(() async* {
     for (final MapEntry(key: family, value: path)

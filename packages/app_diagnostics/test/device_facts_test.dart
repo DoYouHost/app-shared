@@ -3,17 +3,33 @@ import 'package:flutter/widgets.dart' show Brightness, Size;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  tearDown(() => AppStart.at = null);
+  late _WoundStopwatch elapsed;
+
+  setUp(() {
+    // A fresh one per stamp, as `Stopwatch.new` would hand over.
+    AppStart.newStopwatch = () => elapsed = _WoundStopwatch();
+  });
+
+  tearDown(() {
+    AppStart.at = null;
+    AppStart.newStopwatch = Stopwatch.new;
+  });
 
   test('uptime is null until main stamps the start', () {
     expect(AppStart.uptimeSeconds, isNull);
 
-    AppStart.at = DateTime.now().subtract(const Duration(minutes: 3));
-    expect(AppStart.uptimeSeconds, closeTo(180, 2));
+    AppStart.at = DateTime.now();
+    elapsed.wind(const Duration(minutes: 3));
+
+    expect(AppStart.uptimeSeconds, 180);
   });
 
-  test('a clock moved backwards reads as zero, never as negative', () {
-    AppStart.at = DateTime.now().add(const Duration(minutes: 5));
+  test('the clock is monotonic, so moving the system one does not count', () {
+    // The whole reason it is a stopwatch: an NTP correction of two hours would
+    // otherwise report an app opened a minute ago as having run all morning.
+    AppStart.at = DateTime.now();
+    elapsed.wind(const Duration(seconds: 60));
+    AppStart.at = DateTime.now().subtract(const Duration(hours: 2));
 
     expect(AppStart.uptimeSeconds, 0);
   });
@@ -63,4 +79,39 @@ void main() {
     expect(facts['text_scale'], 1.3);
     expect(facts['dark'], isTrue);
   });
+}
+
+/// A [Stopwatch] the test winds by hand.
+class _WoundStopwatch implements Stopwatch {
+  Duration _elapsed = Duration.zero;
+  bool _running = false;
+
+  void wind(Duration by) => _elapsed += by;
+
+  @override
+  Duration get elapsed => _elapsed;
+
+  @override
+  void start() => _running = true;
+
+  @override
+  void stop() => _running = false;
+
+  @override
+  void reset() => _elapsed = Duration.zero;
+
+  @override
+  bool get isRunning => _running;
+
+  @override
+  int get elapsedTicks => _elapsed.inMicroseconds;
+
+  @override
+  int get elapsedMicroseconds => _elapsed.inMicroseconds;
+
+  @override
+  int get elapsedMilliseconds => _elapsed.inMilliseconds;
+
+  @override
+  int get frequency => Duration.microsecondsPerSecond;
 }

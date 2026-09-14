@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' show Brightness;
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/widgets.dart' show MediaQueryData, WidgetsBinding;
 
 /// When the process started, stamped by `main()`.
@@ -12,14 +13,26 @@ import 'package:flutter/widgets.dart' show MediaQueryData, WidgetsBinding;
 /// ago, because a list cached by a provider lives as long as the run does.
 /// "Have you tried restarting the app" stops being a question.
 abstract final class AppStart {
-  static DateTime? at;
+  static DateTime? _at;
+  static Stopwatch? _running;
 
-  static int? get uptimeSeconds {
-    final started = at;
-    if (started == null) return null;
-    final seconds = DateTime.now().difference(started).inSeconds;
-    return seconds < 0 ? 0 : seconds;
+  /// When `main` ran, or null before it has said so.
+  static DateTime? get at => _at;
+
+  static set at(DateTime? value) {
+    _at = value;
+    _running = value == null ? null : (newStopwatch()..start());
   }
+
+  /// The elapsed clock, so a test can hand over one it controls: a real
+  /// [Stopwatch] cannot be wound forward, and waiting for one is not a test.
+  @visibleForTesting
+  static Stopwatch Function() newStopwatch = Stopwatch.new;
+
+  /// Seconds since [at] was stamped, off a monotonic clock rather than the
+  /// wall one: an NTP correction or a user setting the clock forward would
+  /// otherwise report an app opened a minute ago as having run for hours.
+  static int? get uptimeSeconds => _running?.elapsed.inSeconds;
 }
 
 /// The device, the screen and the clock — everything that is true of the phone
@@ -99,10 +112,3 @@ Future<Map<String, Object?>> _deviceFacts() async {
     return const {};
   }
 }
-
-/// The exact values a session's redactor must never let through.
-///
-/// Split out of [loadSessionFacts] for the background isolate: it inherits the
-/// UI stream's header off disk, so it needs none of the facts — but it does need
-/// these, and with an empty redactor the first records it writes are the ones
-/// that carry secrets. A `SocketException` reads "Failed host lookup:
