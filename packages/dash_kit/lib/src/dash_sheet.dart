@@ -16,7 +16,8 @@ const Color dashSheetBarrier = Color(0xB3000000);
 /// The width needs no argument: Material 3 already caps a sheet at 640 dp.
 ///
 /// [scrollControlled] lets the sheet grow past 9/16 of the screen; pass false
-/// for a short list of actions.
+/// for a short list of actions. [dismissible] false holds the sheet open against
+/// the barrier and a drag alike, and drops the handle that would invite one.
 Future<T?> dashSheet<T>(
   BuildContext context, {
   required WidgetBuilder builder,
@@ -25,8 +26,9 @@ Future<T?> dashSheet<T>(
 }) => showModalBottomSheet<T>(
   context: context,
   isScrollControlled: scrollControlled,
-  showDragHandle: true,
+  showDragHandle: dismissible,
   isDismissible: dismissible,
+  enableDrag: dismissible,
   // Covers the top for a sheet that reaches full height; the bottom is the
   // SafeArea below.
   useSafeArea: true,
@@ -49,5 +51,6 @@ Future<T?> dashSurfaceSheet<T>(
   backgroundColor: Colors.transparent,
   barrierColor: barrierColor,
   isDismissible: dismissible,
+  enableDrag: dismissible,
   builder: builder,
 );

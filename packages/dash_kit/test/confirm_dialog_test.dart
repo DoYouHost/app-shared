@@ -16,6 +16,8 @@ void main() {
     String? cancelLabel,
     bool destructive = true,
     Locale locale = const Locale('en'),
+    double textScale = 1,
+    String message = "This can't be undone.",
   }) async {
     // A fresh navigator, so a dialog opened earlier in the test is gone.
     await tester.pumpWidget(const SizedBox());
@@ -25,6 +27,12 @@ void main() {
         locale: locale,
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: const [Locale('en'), Locale('pl')],
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child!,
+        ),
         home: Builder(
           builder: (context) {
             screen = context;
@@ -37,7 +45,7 @@ void main() {
       screen,
       id: 'confirm.record',
       title: 'Delete this record?',
-      message: "This can't be undone.",
+      message: message,
       confirmLabel: confirmLabel,
       cancelLabel: cancelLabel,
       destructive: destructive,
@@ -114,6 +122,53 @@ void main() {
       final delete = buttonRect(tester, 'Delete the vehicle and every record');
       expect(delete.height, greaterThan(singleLine));
       expect(cancel.height, delete.height);
+    });
+
+    testWidgets('a word too long for its half stacks the pair', (tester) async {
+      // On a phone in Manrope, "Wiederherstellen" alone rendered as
+      // "Wiederher|stellen". The test font is far wider, so the word here has
+      // to outgrow a half of the default 800 dp test screen.
+      const word = 'Donaudampfschifffahrtsgesellschaft';
+      await open(tester, confirmLabel: word);
+
+      final cancel = buttonRect(tester, 'Cancel');
+      final confirm = buttonRect(tester, word);
+      expect(cancel.left, confirm.left);
+      expect(cancel.width, confirm.width);
+      expect(cancel.bottom, lessThan(confirm.top), reason: 'dismiss above');
+    });
+
+    testWidgets('a larger system font stacks a pair that fitted', (
+      tester,
+    ) async {
+      await open(tester);
+      expect(
+        buttonRect(tester, 'Cancel').top,
+        buttonRect(tester, 'Delete').top,
+      );
+
+      // A phone in Manrope stacks "Cancel" near 2x; the wider test font on an
+      // 800 dp screen needs more.
+      await open(tester, textScale: 4);
+      expect(
+        buttonRect(tester, 'Cancel').bottom,
+        lessThan(buttonRect(tester, 'Delete').top),
+      );
+    });
+
+    testWidgets('text taller than the screen scrolls instead of clipping', (
+      tester,
+    ) async {
+      await open(tester, textScale: 3, message: 'All values go back. ' * 12);
+
+      expect(tester.takeException(), isNull);
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(SingleChildScrollView),
+        ),
+        findsWidgets,
+      );
     });
 
     testWidgets('cancel falls back to the platform word for it', (

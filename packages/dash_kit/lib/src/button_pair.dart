@@ -112,6 +112,7 @@ class ButtonPair extends StatelessWidget {
           );
         }
         return Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(width: double.infinity, child: primary),
             const SizedBox(height: 8),

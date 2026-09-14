@@ -139,4 +139,41 @@ void main() {
 
     expect(rectOf(tester, 'Add').left, rectOf(tester, long).left);
   });
+
+  testWidgets('stacked in a tall slot, the pair keeps to its buttons', (
+    tester,
+  ) async {
+    await pumpPhone(
+      tester,
+      Scaffold(
+        body: Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 200,
+            height: 500,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ButtonPair(
+                primaryLabel: 'Add',
+                secondaryLabel: 'Restore',
+                primary: FilledButton.icon(
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add'),
+                  onPressed: () {},
+                ),
+                secondary: OutlinedButton.icon(
+                  icon: const Icon(Icons.restart_alt),
+                  label: const Text('Restore'),
+                  onPressed: () {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byType(ButtonPair)).height, lessThan(200));
+    expect(rectOf(tester, 'Restore').bottom, 500, reason: 'pinned where put');
+  });
 }

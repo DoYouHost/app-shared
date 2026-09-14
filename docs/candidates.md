@@ -161,9 +161,13 @@ gesture navigation (about 24 dp) before treating it as a shipped bug.
 - **The confirmation** is one `confirmDialog`: both answers are filled buttons
   of equal width, dismiss on the left in a new `dashNeutralButtonStyle`, confirm
   on the right in `dashDangerButtonStyle` (or the accent when `destructive` is
-  false). Both stretch to the taller one when a label wraps. `id` is required,
-  and the answer is recorded as lubelogger's `confirm` record. All three current
-  confirmations change look; bambuddy's and `app_report_ui`'s keep their red.
+  false). Both stretch to the taller one when a label wraps. When a single word
+  cannot fit its half, the pair stacks full-width, dismiss above confirm:
+  side by side, "Wiederherstellen" broke as "Wiederher|stellen" at normal text
+  size on a 360 dp phone, and at a large system font every label broke. `id` is
+  required, and the answer is recorded as lubelogger's `confirm` record. All
+  three current confirmations change look; bambuddy's and `app_report_ui`'s
+  keep their red.
 - **The error view** is centred as in bambuddy, and with `scrollable: true` it
   can still be pulled, as in lubelogger. lubelogger's screens move their message
   from the upper part of the screen to the middle. `scrollable` stays off by
@@ -173,13 +177,32 @@ gesture navigation (about 24 dp) before treating it as a shipped bug.
 - `dashNeutralButtonStyle` lives in `dash_kit` for now, because `dash_kit`
   depends on `dash_ui` by tag. It belongs in `dash_ui` at its next release.
 
-Adopting it takes a tag first. Then, in each application: `dash_theme.dart`
-exports `dash_kit` in place of `dash_ui`, the local copies go, and
-`confirmDelete` / `confirmRisky` / `confirmDialog` call sites pass an `id`.
-bambuddy's redactor adds `surface` to `ourKeys`, which lubelogger already has:
-without it, a server whose host is a word like `queue` masks that screen's name
-in the error and empty records.
+Adopting it takes a tag first. Then, in each application, `dash_theme.dart`
+exports `dash_kit` in place of `dash_ui` and the local copies go. Beyond that,
+the call sites that do not survive a straight swap:
+
+- **lubelogger, error views.** Its `AsyncErrorView` was always a list, and three
+  sit directly under a `RefreshIndicator`: `garage_screen.dart`,
+  `dashboard_screen.dart` and `vehicle/widgets/record_list.dart`. Each passes
+  `scrollable: true`, or pull-to-refresh stops working on the error screen with
+  no compile error to say so.
+- **lubelogger, confirmations.** `confirmDelete(what: x)` and
+  `confirmRisky(what: x)` become `confirmDialog(id: 'confirm.x', …)`, with
+  `destructive: true` for the first. The ids stay what they were, so logs
+  already attached to issues still match.
+- **lubelogger, width cap.** `ContentConstraint` defaulted to `kContentMaxWidth`;
+  `MaxContentWidth` takes the width explicitly.
+- **bambuddy, confirmations.** Nothing to do: all 39 `confirmDialog` calls
+  already pass an `id`.
+- **bambuddy, redactor.** `surface` goes into `ourKeys`, which lubelogger already
+  has: without it, a server whose host is a word like `queue` masks that screen's
+  name in the error and empty records.
+
 `app_report_ui` drops `report_chrome.dart` at its next release.
+
+Still open: `EmptyStateView` sits 48 dp under the app bar, as it did in both
+apps, while the error view is now centred. Whether the empty view should centre
+too is a design call that has not been made.
 
 ## 7. `app_diagnostics`: device facts and the session store
 
