@@ -207,6 +207,24 @@ ButtonStyle dashPrimaryButtonStyle(DashTokens t) => FilledButton.styleFrom(
 
 /// A call to action that destroys something: [dashPrimaryButtonStyle] in red,
 /// with the fill and the label both chosen to read.
+/// The answer that backs out: [dashPrimaryButtonStyle]'s shape and padding, so
+/// it stands the same height as the button beside it, on a quiet fill of the
+/// text colour.
+ButtonStyle dashNeutralButtonStyle(
+  DashTokens t,
+) => dashPrimaryButtonStyle(t).copyWith(
+  backgroundColor: WidgetStateProperty.resolveWith(
+    (states) => t.textPrimary.withValues(
+      alpha: states.contains(WidgetState.disabled) ? 0.04 : 0.09,
+    ),
+  ),
+  foregroundColor: WidgetStateProperty.resolveWith(
+    (states) =>
+        states.contains(WidgetState.disabled) ? t.textTertiary : t.textPrimary,
+  ),
+  overlayColor: WidgetStatePropertyAll(t.textPrimary.withValues(alpha: 0.06)),
+);
+
 ButtonStyle dashDangerButtonStyle(DashTokens t) =>
     dashPrimaryButtonStyle(t).copyWith(
       backgroundColor: WidgetStateProperty.resolveWith(

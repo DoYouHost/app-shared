@@ -224,21 +224,3 @@ class _RenderAnswerPair extends RenderBox
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
       defaultHitTestChildren(result, position: position);
 }
-
-/// The answer that backs out: [dashPrimaryButtonStyle]'s shape and padding, so
-/// it stands the same height as the button beside it, on a quiet fill of the
-/// text colour.
-ButtonStyle dashNeutralButtonStyle(
-  DashTokens t,
-) => dashPrimaryButtonStyle(t).copyWith(
-  backgroundColor: WidgetStateProperty.resolveWith(
-    (states) => t.textPrimary.withValues(
-      alpha: states.contains(WidgetState.disabled) ? 0.04 : 0.09,
-    ),
-  ),
-  foregroundColor: WidgetStateProperty.resolveWith(
-    (states) =>
-        states.contains(WidgetState.disabled) ? t.textTertiary : t.textPrimary,
-  ),
-  overlayColor: WidgetStatePropertyAll(t.textPrimary.withValues(alpha: 0.06)),
-);
