@@ -174,8 +174,9 @@ gesture navigation (about 24 dp) before treating it as a shipped bug.
   default.
 - **The sheet** is bambuddy's `dashSheet`; lubelogger's forms moving onto it is
   the fix above.
-- `dashNeutralButtonStyle` lives in `dash_kit` for now, because `dash_kit`
-  depends on `dash_ui` by tag. It belongs in `dash_ui` at its next release.
+- `dashNeutralButtonStyle` lived in `dash_kit` at first, because `dash_kit`
+  depends on `dash_ui` by tag. It sits beside `dashDangerButtonStyle` in
+  `dash_ui` 0.3.1 now, where the rest of the button styles are.
 
 Both applications pin `dash_kit` at v0.8.0, and `dash_ui` is theirs only
 transitively now. In each of them `dash_theme.dart` re-exports `dash_kit` in
@@ -208,8 +209,22 @@ survive a straight swap:
   lubelogger's tag-shape guard learned to read the id handed to `confirmDialog`,
   so `confirm.$what` is still checked where it is now written.
 
-`app_report_ui` drops `report_chrome.dart` at its next release: it can only
-depend on `dash_kit` by tag.
+### What the v0.9.0 tag unblocked
+
+`app_report_ui` could only reach `dash_kit` by tag, so `report_chrome.dart`
+outlived the package that replaced it. It is gone in 0.1.2: `replaceSnack` is
+`DashSnack.snack(replaceCurrent: true)`, `MaxContentWidth` is `dash_kit`'s own,
+and `confirmDestructive` is `confirmDialog(destructive: true)` — which changes
+three things in the report flow on purpose. Both answers are filled buttons of
+equal width rather than a text cancel beside a filled confirm, the cancel label
+comes from `MaterialLocalizations` (so the package's own `reportCancel` is gone
+from five `.arb` files), and the answer is written to the log as a `confirm`
+record, which the report screen's dialog never wrote before.
+
+The refs this moves, all inside v0.10.0: `dash_kit` 0.1.2 names `dash_ui`
+0.3.1, `app_report_ui` 0.1.2 names `dash_kit` and no longer names `dash_ui` at
+all. Both applications then move their `dash_kit` and `app_report_ui` refs to
+v0.10.0; everything else stays where it is.
 
 Still open: `EmptyStateView` sits 48 dp under the app bar, as it did in both
 apps, while the error view is now centred. Whether the empty view should centre
