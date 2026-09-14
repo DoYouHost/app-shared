@@ -3,7 +3,7 @@ description: >-
   The half of a bug report that produces it: the recording session, the log
   record and its file mirror, the merge across isolates, the review summary, and
   the probes that observe taps, routes, requests, errors and lifecycle.
-version: 0.2.0
+version: 0.3.0
 publish_to: none
 
 environment:
@@ -24,12 +24,21 @@ dependencies:
       path: packages/app_report_client
   # Wall-clock reads go through the ambient clock so a test can move time.
   clock: ^1.1.2
+  # The make, model and API level in the session header. Whether a background
+  # task survives is the OEM battery manager's decision, so "notifications never
+  # arrive" is answered by the make of the phone more often than by the code.
+  device_info_plus: ^12.4.0
   # HttpProbe is a Dio interceptor.
   dio: ^5.7.0
   # NavigationProbe observes a GoRouter.
   go_router: ^16.0.0
+  # `version+buildNumber` for the header. A range rather than a caret: the two
+  # applications are a major apart and both spellings of the plugin work here.
+  package_info_plus: '>=8.0.0 <10.0.0'
   # Session files live in the application support directory.
   path_provider: ^2.1.5
+  # The running session's id, which both isolates read.
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:

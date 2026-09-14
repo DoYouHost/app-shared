@@ -215,20 +215,35 @@ Still open: `EmptyStateView` sits 48 dp under the app bar, as it did in both
 apps, while the error view is now centred. Whether the empty view should centre
 too is a design call that has not been made.
 
-## 7. `app_diagnostics`: device facts and the session store
+## 7. ~~`app_diagnostics`: device facts and the session store~~ — built, waiting on the v0.9.0 tag
 
-- **`deviceEnvironment()` and `AppStart`**, about 100 lines in lubelogger's
-  `core/diagnostics/session_facts.dart`. They add the UTC offset, the screen size
-  and density, the text scale, dark mode, the device, SDK and emulator flag, and
-  uptime to the session header. None of it is about vehicles, and bambuddy's
-  header has none of it. The cost is `device_info_plus`, which bambuddy does not
-  depend on today. It could be taken behind a callback instead. bambuddy's
-  `readAppVersion()` (`version+buildNumber`) belongs next to it.
-- **`SettingsSessionStore`** is the same class in both applications, over the
-  same preferences key, `diagnostics_session`. The package can ship a
-  `SharedPreferences` store that calls `reload()` before reading, which
-  bambuddy's comment asks every caller to remember. One difference to settle:
-  lubelogger reads an empty id as null, bambuddy does not.
+- **`deviceEnvironment()` and `AppStart`** moved out of lubelogger, so bambuddy's
+  header carries the UTC offset, the screen and its density, the text scale, dark
+  mode, the device, SDK and emulator flag, and the uptime — none of which it had.
+  The cost is `device_info_plus`, which the package now declares and bambuddy
+  gains transitively. Two changes on the way: the screen is read through
+  `WidgetsBinding.instance.platformDispatcher` rather than
+  `PlatformDispatcher.instance` — the same view in the app, and the one a test
+  can resize — and `uptime_s` is left out entirely until `main` stamps
+  `AppStart.at`, rather than written as null. bambuddy's `main` now stamps it.
+- **`readAppVersion()`** moved with them, since the header needs it. bambuddy's
+  copy is gone; `package_info_plus` is declared as `>=8.0.0 <10.0.0`, because
+  the two applications are a major apart and either spelling works.
+- **`SharedPreferencesSessionStore`** replaces the adapter both applications had
+  written over their own settings repository, and owns the
+  `diagnostics_session` key and the rule that an empty id is no session.
+  `loadSession` stays synchronous, as the port requires, so it still cannot
+  refresh the snapshot itself: an isolate that did not write the id reloads its
+  preferences first. Each repository keeps `loadDiagnosticsSession` for its
+  other callers, now one line over `diagnosticsSessions`.
+
+bambuddy's header contract test grew the three new keys, with the note that they
+are additions a reader may ignore while the old ones must not move.
+
+This goes out with the same **v0.9.0** as item 9, as `app_diagnostics` 0.3.0.
+Everything that pins it moves too — `app_util` 0.2.2, `dash_kit` 0.1.1,
+`app_report_ui` 0.1.1 and both applications — because one package resolved from
+two refs is a version-solving error. Only `app_report_client` stays at v0.2.0.
 
 ## 8. ~~An API error package~~ — ports instead
 
@@ -249,20 +264,32 @@ The comparison did turn up gaps worth porting:
   `demo` outside a key protected by `ourKeys` becomes `[HOST]`. Low impact: demo
   mode is for store review only.
 
-## 9. Font licences in `dash_ui`
+## 9. ~~Font licences in `dash_ui`~~ — built, waiting on the v0.9.0 tag
 
 The font families stay declared by the applications, for the reason `dash_ui`
-gives. The OFL texts can still move into `dash_ui` as package assets, with a
-`registerDashFontLicenses()` that both applications call. That does not touch
-the families.
+gives. The OFL texts moved into `dash_ui` as package assets, behind
+`registerDashFontLicenses()`, which each application calls from `main` before
+`runApp`. The registry reads them lazily, so it costs nothing until someone
+opens the licence page.
 
-Two things were wrong on the way:
+What it fixed: **bambuddy never registered the OFL licences at all.** Its
+`showLicensePage` listed neither Manrope nor JetBrains Mono, and the repository
+had no `assets/licenses` — while the OFL requires the licence to travel with the
+font it ships. lubelogger had the registration and the two text files; the files
+are gone from there now, since the package carries them.
 
-- **bambuddy never registers the OFL licences.** Its `showLicensePage` lists
-  neither Manrope nor JetBrains Mono, and the repository has no
-  `assets/licenses`. The OFL requires the licence to travel with the fonts.
-- **JetBrains Mono differs:** 2.211 (115 KB per weight) in lubelogger, 2.304 with
-  ttfautohint (274 KB) in bambuddy. Manrope is 4.504 in both.
+The ref churn this cost, because a package pinned by tag cannot be bumped
+alone: `dash_ui` 0.3.0 is released by **v0.9.0**, and `dash_kit` (0.1.1) and
+`app_report_ui` (0.1.1) both move their `dash_ui` ref to it — two refs for one
+package in a resolution is a version-solving error, not a warning. Both
+applications then move `dash_kit` and `app_report_ui` to v0.9.0 as well. Until
+that tag is pushed they resolve through a gitignored `pubspec_overrides.yaml`,
+and their `pubspec.lock` must not be committed before it is.
+
+Still open: **JetBrains Mono differs between the apps** — 2.211 (115 KB per
+weight) in lubelogger, 2.304 with ttfautohint (274 KB) in bambuddy; Manrope is
+4.504 in both. One OFL text covers either version, so nothing here is blocked on
+it, but the two apps render code in different metrics.
 
 ## 10. Tooling and CI
 

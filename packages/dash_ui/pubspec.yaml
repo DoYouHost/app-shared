@@ -3,7 +3,7 @@ description: >-
   The Dash design system: colour tokens resolved per brightness and brand, the
   type scale, the screen chrome, the Material theme built from them, and the
   contrast audit a brand has to pass.
-version: 0.2.0
+version: 0.3.0
 publish_to: none
 
 environment:
@@ -17,3 +17,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+flutter:
+  # The OFL texts of the two families the type scale names. The faces themselves
+  # stay in the application's pubspec; see `registerDashFontLicenses`.
+  assets:
+    - assets/licenses/OFL-Manrope.txt
+    - assets/licenses/OFL-JetBrainsMono.txt

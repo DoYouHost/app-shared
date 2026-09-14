@@ -28,6 +28,9 @@
 /// package emit; adding a value is a change here, on purpose.
 library;
 
+export 'src/app_version.dart';
+export 'src/device_facts.dart';
+export 'src/session_store.dart';
 export 'src/diagnostic_recorder.dart';
 export 'src/error_probe.dart';
 export 'src/http_probe.dart';

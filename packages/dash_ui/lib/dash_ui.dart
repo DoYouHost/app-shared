@@ -13,11 +13,14 @@
 /// The font families [DashTokens.fontUi] and [DashTokens.fontMono] are declared
 /// by the application's pubspec, not bundled here: a package font would be
 /// addressed as `packages/dash_ui/…` and every literal family in the apps would
-/// stop matching it.
+/// stop matching it. Their licences do ship here, through
+/// [registerDashFontLicenses]: a bundled font that reaches nobody's licence
+/// page is the one thing about them the OFL has an opinion on.
 library;
 
 export 'src/dash_brand.dart';
 export 'src/dash_contrast.dart';
+export 'src/dash_fonts.dart';
 export 'src/dash_text.dart';
 export 'src/dash_theme_data.dart';
 export 'src/dash_tokens.dart';
