@@ -83,10 +83,22 @@ class ModalObserver extends NavigatorObserver {
   // didReplace and didRemove are left alone: go_router's screens are
   // [NavigationProbe]'s job, and nothing here replaces or removes a dialog.
 
+  /// Which routes this observer family has already reported as open. Since
+  /// go_router 17 a push onto a shell branch notifies the root observer too, so
+  /// one `showModalBottomSheet` inside a tab arrives at two observers with the
+  /// same `Route` — and a log saying the user opened two sheets is a log that
+  /// lies. Weak by construction, so a route that is never popped is not held.
+  static final _reported = Expando<bool>('ModalObserver.reported');
+
   void _log(String evt, Route<dynamic> route) {
     // go_router builds every screen as a `Page` and those are reported by the
     // location instead. What is left was pushed by hand.
     if (route.settings is Page) return;
+    final opening = evt == 'open';
+    // The mark is kept whether or not a recording is running, so a sheet opened
+    // before the recorder started still has its `close` recorded.
+    if (opening == (_reported[route] ?? false)) return;
+    _reported[route] = opening;
     DiagnosticRecorder.active?.add(
       LogSource.ui,
       evt,
