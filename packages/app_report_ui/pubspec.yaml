@@ -3,7 +3,7 @@ description: >-
   The screens of a bug report: the guided report flow, the recording bar that
   follows the user around the app, and the review that decides where the log
   goes.
-version: 0.1.2
+version: 0.1.3
 publish_to: none
 
 environment:
@@ -21,7 +21,7 @@ dependencies:
   app_diagnostics:
     git:
       url: https://github.com/DoYouHost/app-shared.git
-      ref: v0.9.0
+      ref: v0.11.0
       path: packages/app_diagnostics
   app_report_client:
     git:
@@ -35,11 +35,16 @@ dependencies:
   dash_kit:
     git:
       url: https://github.com/DoYouHost/app-shared.git
-      ref: v0.10.0
+      ref: v0.11.0
       path: packages/dash_kit
-  file_picker: ^8.3.0
+  # Only `saveFile` is called here. The upper bound stops before 11, which
+  # replaced `FilePicker.platform.x()` with static methods and, in 13, dropped
+  # `withData` — a call-site rewrite in both applications, not a version bump.
+  file_picker: '>=8.3.0 <11.0.0'
+  # Held at 2 on purpose: Riverpod 3 changes provider and notifier APIs across
+  # every screen of both applications, so moving it is a migration of its own.
   flutter_riverpod: ^2.6.1
-  go_router: ^16.0.0
+  go_router: '>=16.0.0 <18.0.0'
   intl: ^0.20.2
   url_launcher: ^6.3.0
 
