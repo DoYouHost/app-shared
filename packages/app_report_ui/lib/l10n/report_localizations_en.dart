@@ -177,8 +177,9 @@ class ReportLocalizationsEn extends ReportLocalizations {
       'What were you doing, what did you expect, what happened instead.';
 
   @override
-  String get bugReportDescriptionRequired =>
-      'Say what went wrong — a log with no description is nearly unusable.';
+  String bugReportDescriptionRequired(int min) {
+    return 'Say what went wrong in at least $min characters — a log with no description is nearly unusable.';
+  }
 
   @override
   String get bugReportSend => 'Report';
@@ -288,8 +289,9 @@ class ReportLocalizationsEn extends ReportLocalizations {
       'It becomes a public issue on GitHub — anyone can read it, and it stays.';
 
   @override
-  String get bugReportRequestRequired =>
-      'Write what you are asking for — an empty request cannot be acted on.';
+  String bugReportRequestRequired(int min) {
+    return 'Write what you are asking for in at least $min characters — a request that short cannot be acted on.';
+  }
 
   @override
   String get bugReportRequestSentBody => 'Thank you. The issue is open.';

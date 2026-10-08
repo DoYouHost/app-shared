@@ -177,8 +177,9 @@ class ReportLocalizationsPl extends ReportLocalizations {
       'Co robiłeś, czego się spodziewałeś, co stało się zamiast tego.';
 
   @override
-  String get bugReportDescriptionRequired =>
-      'Napisz, co poszło nie tak — log bez opisu jest prawie bezużyteczny.';
+  String bugReportDescriptionRequired(int min) {
+    return 'Napisz, co poszło nie tak — co najmniej $min znaków. Log bez opisu jest prawie bezużyteczny.';
+  }
 
   @override
   String get bugReportSend => 'Zgłoś';
@@ -286,8 +287,9 @@ class ReportLocalizationsPl extends ReportLocalizations {
       'Powstaje publiczne zgłoszenie na GitHubie — każdy może je przeczytać i zostaje na stałe.';
 
   @override
-  String get bugReportRequestRequired =>
-      'Napisz, o co prosisz — z pustego zgłoszenia nic nie wynika.';
+  String bugReportRequestRequired(int min) {
+    return 'Napisz, o co prosisz — co najmniej $min znaków. Z tak krótkiego zgłoszenia nic nie wynika.';
+  }
 
   @override
   String get bugReportRequestSentBody => 'Dzięki. Zgłoszenie jest otwarte.';

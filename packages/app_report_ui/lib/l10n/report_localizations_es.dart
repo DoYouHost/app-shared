@@ -178,8 +178,9 @@ class ReportLocalizationsEs extends ReportLocalizations {
       'Qué estabas haciendo, qué esperabas y qué ocurrió en su lugar.';
 
   @override
-  String get bugReportDescriptionRequired =>
-      'Explica qué salió mal — un registro sin descripción es prácticamente inservible.';
+  String bugReportDescriptionRequired(int min) {
+    return 'Explica qué salió mal — al menos $min caracteres. Un registro sin descripción es prácticamente inservible.';
+  }
 
   @override
   String get bugReportSend => 'Enviar';
@@ -287,8 +288,9 @@ class ReportLocalizationsEs extends ReportLocalizations {
       'Se convertirá en una incidencia pública en GitHub — cualquiera podrá leerla y quedará guardada permanentemente.';
 
   @override
-  String get bugReportRequestRequired =>
-      'Escribe lo que solicitas — una petición vacía no se puede tramitar.';
+  String bugReportRequestRequired(int min) {
+    return 'Escribe lo que solicitas — al menos $min caracteres. Una petición tan corta no se puede tramitar.';
+  }
 
   @override
   String get bugReportRequestSentBody => 'Gracias. La incidencia está abierta.';

@@ -178,8 +178,9 @@ class ReportLocalizationsFr extends ReportLocalizations {
       'Ce que vous faisiez, ce que vous attendiez et ce qui s\'est passé à la place.';
 
   @override
-  String get bugReportDescriptionRequired =>
-      'Décrivez le problème — un journal sans description est presque inutilisable.';
+  String bugReportDescriptionRequired(int min) {
+    return 'Décrivez le problème — au moins $min caractères. Un journal sans description est presque inutilisable.';
+  }
 
   @override
   String get bugReportSend => 'Signaler';
@@ -290,8 +291,9 @@ class ReportLocalizationsFr extends ReportLocalizations {
       'La demande devient un ticket public sur GitHub — tout le monde peut la lire, et elle restera définitivement.';
 
   @override
-  String get bugReportRequestRequired =>
-      'Précisez votre demande — une requête vide ne peut pas être traitée.';
+  String bugReportRequestRequired(int min) {
+    return 'Précisez votre demande — au moins $min caractères. Une requête si courte ne peut pas être traitée.';
+  }
 
   @override
   String get bugReportRequestSentBody => 'Merci. Le ticket est ouvert.';

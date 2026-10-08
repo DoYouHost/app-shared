@@ -178,8 +178,9 @@ class ReportLocalizationsDe extends ReportLocalizations {
       'Was hast du getan, was hast du erwartet und was ist stattdessen passiert.';
 
   @override
-  String get bugReportDescriptionRequired =>
-      'Beschreibe, was schiefgelaufen ist — ein Log ohne Beschreibung ist kaum brauchbar.';
+  String bugReportDescriptionRequired(int min) {
+    return 'Beschreibe, was schiefgelaufen ist — mindestens $min Zeichen. Ein Log ohne Beschreibung ist kaum brauchbar.';
+  }
 
   @override
   String get bugReportSend => 'Melden';
@@ -288,8 +289,9 @@ class ReportLocalizationsDe extends ReportLocalizations {
       'Es wird ein öffentliches Issue auf GitHub — jeder kann es lesen und es bleibt dauerhaft bestehen.';
 
   @override
-  String get bugReportRequestRequired =>
-      'Beschreibe dein Anliegen — ein leeres Anliegen kann nicht bearbeitet werden.';
+  String bugReportRequestRequired(int min) {
+    return 'Beschreibe dein Anliegen — mindestens $min Zeichen. Ein so kurzes Anliegen kann nicht bearbeitet werden.';
+  }
 
   @override
   String get bugReportRequestSentBody => 'Vielen Dank. Das Issue ist eröffnet.';

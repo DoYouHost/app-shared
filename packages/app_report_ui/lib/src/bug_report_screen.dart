@@ -14,6 +14,10 @@ import 'log_export.dart';
 import 'log_preview.dart';
 import 'report_bindings.dart';
 
+/// Mirrors the relay's own minimum, which is the check that holds; this one only
+/// lets the form say why before the round trip instead of after it.
+const int _minDescriptionChars = 20;
+
 /// Guided bug report: explain → record → review. Recording itself lives in
 /// [BugReportController] and keeps running while the user leaves this screen
 /// to reproduce the problem; the recording bar is what follows them there.
@@ -240,14 +244,17 @@ class _IdleViewState extends ConsumerState<_IdleView> {
     ];
   }
 
-  /// Refuses an empty request rather than disabling the button, for the same
+  /// Refuses a too-short request rather than disabling the button, for the same
   /// reason the bug flow does: a dead button explains nothing.
   Future<void> _sendRequest() async {
     final l10n = ReportLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final description = _description.text.trim();
-    if (description.isEmpty) {
-      messenger.snack(l10n.bugReportRequestRequired, replaceCurrent: true);
+    if (description.length < _minDescriptionChars) {
+      messenger.snack(
+        l10n.bugReportRequestRequired(_minDescriptionChars),
+        replaceCurrent: true,
+      );
       return;
     }
     // False means the app could not even describe itself — nothing was queued,
@@ -526,15 +533,18 @@ class _ReviewViewState extends ConsumerState<_ReviewView> {
     );
   }
 
-  /// Refuses an empty description rather than disabling the button: a disabled
+  /// Refuses a too-short description rather than disabling the button: a disabled
   /// button with no explanation is a dead end, and the reason only matters at
   /// the moment somebody tries.
   Future<void> _send() async {
     final l10n = ReportLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final description = _description.text.trim();
-    if (description.isEmpty) {
-      messenger.snack(l10n.bugReportDescriptionRequired, replaceCurrent: true);
+    if (description.length < _minDescriptionChars) {
+      messenger.snack(
+        l10n.bugReportDescriptionRequired(_minDescriptionChars),
+        replaceCurrent: true,
+      );
       return;
     }
     await ref.read(bugReportProvider.notifier).sendToIssue(description);

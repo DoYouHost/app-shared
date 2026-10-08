@@ -3,7 +3,7 @@ description: >-
   The screens of a bug report: the guided report flow, the recording bar that
   follows the user around the app, and the review that decides where the log
   goes.
-version: 0.1.3
+version: 0.1.4
 publish_to: none
 
 environment:

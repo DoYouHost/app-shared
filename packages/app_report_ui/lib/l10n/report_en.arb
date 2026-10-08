@@ -95,7 +95,14 @@
   "bugReportDestinationIssueBody": "The log and your description are posted as a public issue on GitHub, where anyone can read them and they stay for good. Go through the log below first.",
   "bugReportDescriptionLabel": "What went wrong?",
   "bugReportDescriptionHint": "What were you doing, what did you expect, what happened instead.",
-  "bugReportDescriptionRequired": "Say what went wrong — a log with no description is nearly unusable.",
+  "bugReportDescriptionRequired": "Say what went wrong in at least {min} characters — a log with no description is nearly unusable.",
+  "@bugReportDescriptionRequired": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
   "bugReportSend": "Report",
   "bugReportSending": "Sending…",
   "bugReportSendWaiting": "Sending in {clock}",
@@ -134,7 +141,14 @@
   "bugReportRequestVersions": "App and server version",
   "bugReportRequestNoLog": "No log, no recording",
   "bugReportRequestPublic": "It becomes a public issue on GitHub — anyone can read it, and it stays.",
-  "bugReportRequestRequired": "Write what you are asking for — an empty request cannot be acted on.",
+  "bugReportRequestRequired": "Write what you are asking for in at least {min} characters — a request that short cannot be acted on.",
+  "@bugReportRequestRequired": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
   "bugReportRequestSentBody": "Thank you. The issue is open.",
   "bugReportCancelSend": "Cancel sending",
   "bugReportRequestFailedNotYet": "The relay is not accepting reports right now. Try again later.",

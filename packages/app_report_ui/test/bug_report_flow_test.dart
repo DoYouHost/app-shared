@@ -542,6 +542,27 @@ void main() {
       expect(relay.sends, 0);
     });
 
+    testWidgets('refuses to send an issue with a one-word description', (
+      tester,
+    ) async {
+      final root = Directory.systemTemp.createTempSync('outbox');
+      addTearDown(() => root.deleteSync(recursive: true));
+      final relay = FakeRelay(issued: ticket());
+      await pumpReview(
+        tester,
+        rig: Rig(relay: relay, outboxRoot: root),
+      );
+
+      await tester.tap(find.text('Zgłoś na GitHubie'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'demo');
+      await tester.tap(find.text('Zgłoś'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('co najmniej 20 znaków'), findsOneWidget);
+      expect(relay.sends, 0);
+    });
+
     testWidgets('a second tap while the ticket is still coming sends once', (
       tester,
     ) async {
@@ -562,7 +583,10 @@ void main() {
       // real I/O completes.
       await tester.runAsync(() => tester.tap(find.text('Zgłoś na GitHubie')));
       await tester.pumpAndSettle();
-      await tester.enterText(find.byType(TextField), 'zgłoszone dwa razy');
+      await tester.enterText(
+        find.byType(TextField),
+        'zgłoszone dwa razy pod rząd',
+      );
       // No frame between the taps: the button has not been rebuilt disabled
       // yet, which is exactly the window a fast double tap lands in.
       await tester.runAsync(() async {
@@ -632,7 +656,10 @@ void main() {
 
       await tester.tap(find.text('Zgłoś na GitHubie'));
       await tester.pumpAndSettle();
-      await tester.enterText(find.byType(TextField), 'coś się zepsuło');
+      await tester.enterText(
+        find.byType(TextField),
+        'coś się zepsuło po aktualizacji',
+      );
       // The countdown and the dead text field are both built off the phase, not
       // off the file.
       await tapAndSettleAsync(
@@ -1230,7 +1257,10 @@ void main() {
       await pumpIdle(tester, rig: Rig(relay: relay));
 
       await choose(tester, 'Funkcję');
-      await tester.enterText(find.byType(TextField), 'niech to robi tamto');
+      await tester.enterText(
+        find.byType(TextField),
+        'niech to robi tamto, nie owo',
+      );
       await tester.pumpAndSettle();
       await choose(tester, 'Zmianę');
       await choose(tester, 'Błąd');
@@ -1240,6 +1270,27 @@ void main() {
       // user's next wait, for a decision they were entitled to change. The text
       // survives the flip, so the second description is the first one.
       expect(relay.challenges, 1);
+    });
+
+    testWidgets('refuses a request shorter than the relay accepts', (
+      tester,
+    ) async {
+      final root = Directory.systemTemp.createTempSync('outbox');
+      addTearDown(() => root.deleteSync(recursive: true));
+      final relay = FakeRelay(issued: ticket());
+      await pumpIdle(
+        tester,
+        rig: Rig(relay: relay, outboxRoot: root),
+      );
+
+      await choose(tester, 'Funkcję');
+      await tester.enterText(find.byType(TextField), 'demo');
+      await scrollToActions(tester);
+      await tester.tap(find.text('Zgłoś'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('co najmniej 20 znaków'), findsOneWidget);
+      expect(relay.sends, 0);
     });
 
     testWidgets('refuses to send an empty request', (tester) async {
@@ -1311,7 +1362,10 @@ void main() {
       );
 
       await choose(tester, 'Zmianę');
-      await tester.enterText(find.byType(TextField), 'inaczej to ułóż');
+      await tester.enterText(
+        find.byType(TextField),
+        'inaczej to ułóż na ekranie',
+      );
       await scrollToActions(tester);
       await tapAndSettleAsync(
         tester,
@@ -1354,7 +1408,10 @@ void main() {
       );
 
       await choose(tester, 'Zmianę');
-      await tester.enterText(find.byType(TextField), 'inaczej to ułóż');
+      await tester.enterText(
+        find.byType(TextField),
+        'inaczej to ułóż na ekranie',
+      );
       await scrollToActions(tester);
       await tapAndSettleAsync(
         tester,
@@ -1403,7 +1460,10 @@ void main() {
       );
 
       await choose(tester, 'Funkcję');
-      await tester.enterText(find.byType(TextField), 'coś nowego');
+      await tester.enterText(
+        find.byType(TextField),
+        'coś nowego na ekranie głównym',
+      );
       await scrollToActions(tester);
       await tester.tap(find.text('Zgłoś'));
       await tester.pumpAndSettle();
@@ -1425,7 +1485,10 @@ void main() {
       final container = await pumpIdle(tester, rig: Rig(outboxRoot: root));
 
       await choose(tester, 'Funkcję');
-      await tester.enterText(find.byType(TextField), 'coś nowego');
+      await tester.enterText(
+        find.byType(TextField),
+        'coś nowego na ekranie głównym',
+      );
       await scrollToActions(tester);
       await tapAndSettleAsync(
         tester,

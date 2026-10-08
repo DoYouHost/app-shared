@@ -389,8 +389,8 @@ abstract class ReportLocalizations {
   /// No description provided for @bugReportDescriptionRequired.
   ///
   /// In en, this message translates to:
-  /// **'Say what went wrong — a log with no description is nearly unusable.'**
-  String get bugReportDescriptionRequired;
+  /// **'Say what went wrong in at least {min} characters — a log with no description is nearly unusable.'**
+  String bugReportDescriptionRequired(int min);
 
   /// No description provided for @bugReportSend.
   ///
@@ -581,8 +581,8 @@ abstract class ReportLocalizations {
   /// No description provided for @bugReportRequestRequired.
   ///
   /// In en, this message translates to:
-  /// **'Write what you are asking for — an empty request cannot be acted on.'**
-  String get bugReportRequestRequired;
+  /// **'Write what you are asking for in at least {min} characters — a request that short cannot be acted on.'**
+  String bugReportRequestRequired(int min);
 
   /// No description provided for @bugReportRequestSentBody.
   ///
