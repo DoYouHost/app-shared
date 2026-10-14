@@ -36,9 +36,13 @@ jobs:
         with:
           fetch-depth: 1
 
+      # Pinned to what the apps' self-hosted runners carry (TofuSadurkiV2,
+      # `flutter_version`): `dart format` changes between releases, so a floating
+      # "stable" turns this run red on code the apps' CI still accepts.
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.47.7
 
       # Which SDK actually ran matters when a failure reproduces nowhere else.
       - name: Toolchain

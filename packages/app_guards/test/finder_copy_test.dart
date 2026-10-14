@@ -89,11 +89,9 @@ void main() {
 
     test('reads the second argument of widgetWithText', () {
       expect(texts("find.widgetWithText(FilledButton, 'Zapisz')"), ['Zapisz']);
-      expect(
-        texts("find.widgetWithText(List<int>, 'x')"),
-        ['x'],
-        reason: 'a comma inside generics is not the argument separator',
-      );
+      // A comma inside generics is not the argument separator.
+      final generic = texts("find.widgetWithText(List<int>, 'x')");
+      expect(generic, ['x']);
     });
 
     test('decodes escapes and joins adjacent literals', () {
