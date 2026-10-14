@@ -7,13 +7,17 @@
 /// application's own switch over what this package classified.
 library;
 
+export 'src/backoff.dart';
+export 'src/currency.dart';
 export 'src/demo_http_adapter.dart';
 export 'src/dio_failure.dart';
 export 'src/format_bytes.dart';
 export 'src/hex_color.dart';
 export 'src/json_coerce.dart';
 export 'src/platform_query.dart';
+export 'src/reachability.dart';
 export 'src/server_url.dart';
 export 'src/text_measure.dart';
+export 'src/text_order.dart';
 export 'src/user_number.dart';
 export 'src/web_link.dart';

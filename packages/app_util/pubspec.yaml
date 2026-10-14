@@ -27,6 +27,7 @@ dependencies:
   dio: ^5.10.0
 
 dev_dependencies:
+  http_mock_adapter: ^0.6.1
   # Only to build a recorder in the tests, whose redactor comes from here.
   app_report_client:
     git:

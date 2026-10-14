@@ -34,6 +34,7 @@ export 'src/section_heading.dart';
 export 'src/seg_toggle.dart';
 export 'src/settings_entry_tile.dart';
 export 'src/settings_rows.dart';
+export 'src/sheet_surface.dart';
 export 'src/sliver_search_bar.dart';
 export 'src/state_views.dart';
 export 'src/system_insets.dart';

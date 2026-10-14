@@ -31,6 +31,7 @@ void main() {
       'check_l10n_language.py',
       'aab_versions.py',
       'log_coverage.py',
+      'play_internal.py',
       'commit-msg',
     ]) {
       expect(File('tool/$script').existsSync(), isTrue, reason: script);

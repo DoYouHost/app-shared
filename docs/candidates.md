@@ -525,3 +525,29 @@ the media and thumbnail widgets (bambuddy's errors and server), the queue
 form's section card and option rows (its tones are the form's sections), and the
 watch harness (`expectOnGlass`, `pumpWear`), which waits for `wear_ui`.
 
+## Round four, second half
+
+- **`app_util`**: `JitterBackoff` (was bambuddy's `WsBackoff`: full-jitter
+  exponential, capped, reset only by the caller once a link holds),
+  `ServerReachability` and its `ReachabilityProbe` interceptor (one answer for
+  the whole app on whether the server is there, fed by every request), the
+  currency symbols with `formatMoney`, `compareIgnoringCase` and
+  `stableDigest`.
+- **`dash_kit`**: the sheet surfaces (`SheetSurface`, the fitted and draggable
+  variants), which round two had left in bambuddy.
+- **`app_guards`**: `play` (`play_internal.py`), Google Play publishing — list
+  the tracks, release bundles to internal testing in one edit — configured by
+  `tool/play.toml`: the applicationId, the key's path, and the versionCode
+  bands that pick the track. Runs through `uv`, as before.
+
+Not moved: bambuddy's `CachedTokenService`. Its TTL and single flight are
+generic, but the rest is bambuddy's wire — a mint that 404s or 405s latches
+"no such route" instead of caching — and splitting the two would rewrite code
+that works for a utility with no other caller.
+
+Still optional, if an application wants them: the file pickers and exports
+(`file_picker`, `flutter_file_dialog`, `share_plus`) and the QR scanner
+(`mobile_scanner`) as packages of their own, so only an application that asks
+gets the plugins; and the date and duration formats, which would need the
+package to carry its own `.arb` files.
+

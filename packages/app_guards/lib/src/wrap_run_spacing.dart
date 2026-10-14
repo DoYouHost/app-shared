@@ -1,4 +1,5 @@
 import 'source_files.dart';
+import 'source_mask.dart';
 
 final _wrap = RegExp(r'\bWrap\(');
 
@@ -11,18 +12,21 @@ List<String> wrapsWithoutRunSpacing({String root = 'lib'}) {
   final offenders = <String>[];
   for (final file in dartFiles(root)) {
     final source = file.readAsStringSync();
-    for (final match in _wrap.allMatches(source)) {
+    // Matched on code only: a parenthesis in a string ("Filter (active)") or an
+    // apostrophe in a comment ("doesn't") would otherwise end the call early.
+    final code = maskCommentsAndStrings(source);
+    for (final match in _wrap.allMatches(code)) {
       var depth = 0;
       var i = match.end - 1;
-      for (; i < source.length; i++) {
-        depth += switch (source[i]) {
+      for (; i < code.length; i++) {
+        depth += switch (code[i]) {
           '(' => 1,
           ')' => -1,
           _ => 0,
         };
         if (depth == 0) break;
       }
-      final arguments = source.substring(match.end, i);
+      final arguments = code.substring(match.end, i.clamp(0, code.length));
       if (arguments.contains('spacing:') &&
           !arguments.contains('runSpacing:')) {
         offenders.add('${file.path}:${lineOf(source, match.start)}');
