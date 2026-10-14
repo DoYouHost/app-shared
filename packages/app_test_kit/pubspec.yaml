@@ -1,0 +1,35 @@
+name: app_test_kit
+description: >-
+  The test harness pieces both applications need the same way: a request log to
+  assert on instead of a mock handler, a mock server that matches bodies exactly,
+  a scripted adapter, a clock and a timer the test drives, the diagnostic-id
+  finders, a phone-shaped window, a session store in memory and fixtures read
+  from test/fixtures.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.2
+
+# A test library: everything here is a regular dependency of this package, and
+# the application takes the package as a dev_dependency.
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  # `MemorySessionStore` implements its port. By git ref at the ref the
+  # applications pin, for the reason `app_diagnostics` gives;
+  # `pubspec_overrides.yaml` points it at the checkout for this repo's tests.
+  app_diagnostics:
+    git:
+      url: https://github.com/DoYouHost/app-shared.git
+      ref: v0.11.0
+      path: packages/app_diagnostics
+  clock: ^1.1.2
+  dio: ^5.10.0
+  http_mock_adapter: ^0.6.1
+  path_provider_platform_interface: ^2.1.2
+
+dev_dependencies:
+  flutter_lints: ^6.0.0

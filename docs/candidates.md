@@ -490,3 +490,38 @@ id now, and the scan reports none.
 Not worth it: `detachFrom`, `web_link`, `tappable_card` (each a few dozen lines
 at most), and `showApiFailure`, `settings_rows`, `print_thumbnail` (each tied to
 the application's model or errors).
+
+# Round four
+
+14 October 2026. The rule changed for this round: not "both applications need
+it today" but "any application built on this stack would". What moved has no
+caller in lubelogger yet, and is shared so the next screen — in either app, or a
+third one — starts from it instead of a copy.
+
+- **`dash_kit` grew fifteen widgets** out of bambuddy's `features/common`:
+  `InlineNote`, `DashProgressBar`, `DashStepper`, `DashedLine`, `TappableCard`,
+  `ThumbnailPlaceholder`, `DashIconTile`, `DashSearchField`,
+  `DashSliverSearchBar`, `RefreshWhenShown`, `FilterButton`, the settings rows
+  (`SettingsCard`, `SettingsSwitchRow`, `SettingsSlider`, …),
+  `SettingsEntryTile`, `promptName`, and the queue form's segmented toggle as
+  `DashSegToggle`. Each was already free of bambuddy's model; what changed on
+  the way was the accent's name (`accentGreen` → `accent`) and `promptName`'s
+  buttons, which take their labels from `MaterialLocalizations`.
+  `screenListPadding` came along.
+- **`dash_ui` took the token recipes**: `cardBox`, `accentSeries` and the chart
+  `seriesPalette`, as `DashTokenRecipes` on `DashTokens`.
+- **`app_util` took `webLinkOrNull`**, the filter that lets only an http(s)
+  address with a host leave the app. Opening the link stays in the application:
+  `url_launcher` is a plugin, and a package would put it in every app's build.
+- **`app_test_kit` is new**: the half of bambuddy's `test/helpers.dart` that is
+  not about bambuddy — `RequestLog` and `captureRequests`, the exact-body
+  `mockServer`, `ScriptedAdapter`, `FakeTimer`, `testWithClock`, `byLogId`,
+  `identifiersIn`, `settle`, `usePhoneWindow`, `scrollSheetDown`,
+  `MemorySessionStore`, `TempDirProvider` and the fixture readers, with the
+  tests that hold them to what they promise. `helpers.dart` re-exports it.
+
+Left in bambuddy on purpose: `openWebLink` (the plugin), `showApiFailure` and
+the media and thumbnail widgets (bambuddy's errors and server), the queue
+form's section card and option rows (its tones are the form's sections), and the
+watch harness (`expectOnGlass`, `pumpWear`), which waits for `wear_ui`.
+

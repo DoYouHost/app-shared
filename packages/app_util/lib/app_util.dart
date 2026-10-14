@@ -16,3 +16,4 @@ export 'src/platform_query.dart';
 export 'src/server_url.dart';
 export 'src/text_measure.dart';
 export 'src/user_number.dart';
+export 'src/web_link.dart';
