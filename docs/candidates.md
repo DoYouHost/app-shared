@@ -455,12 +455,24 @@ both `justfile`s already assumed. Each application's `.githooks/commit-msg` is
 now one `exec dart run app_guards:commit_msg "$1"`, and lubelogger gained the
 hook and the `just hooks` recipe it never had.
 
-Not moved, and why: `check_l10n_language.py` carries bambuddy's own list of
-accepted words and LanguageTool rules (brand names, the French UI's spellings),
-and `log_coverage.py` reads bambuddy's widget vocabulary. Both would need a
-per-application configuration file before they could be shared, and lubelogger
-has neither need today — it has `log_tag_shape_test` and no LanguageTool
-habit. Decide that before porting either.
+`check_l10n_language.py` (`l10n_language`) and `log_coverage.py`
+(`log_coverage`) moved too, with what was bambuddy's own in them taken out into
+a TOML file each application keeps in `tool/`, commented as the constants were:
+`l10n_language.toml` holds the files with their languages and plural arms, the
+rules the app's copy overrules, its known words and placeholder values;
+`log_coverage.toml` the functions and extension methods that tag a widget, the
+wrappers that tag their arguments, and the directories left out by default
+(`--all-dirs` takes them in, replacing bambuddy's `--wear`). On bambuddy both
+reproduce the old output exactly, the coverage scan byte for byte in either
+mode. Python 3.11 is the floor now, for `tomllib`.
+
+lubelogger got its own two files. Its first full LanguageTool sweep found 85
+things: 73 were the label-takes-no-full-stop rule bambuddy also turns off, five
+more were rules that misread a label, an abbreviation or the inflected product
+name, and three were real and are fixed in its copy ("litres" in otherwise US
+English, a missing comma, a passive sentence). Its coverage scan reports 20
+controls nothing names, mostly in the settings screen; naming them is
+lubelogger work, not this package's.
 
 ## Waiting for a second caller
 

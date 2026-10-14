@@ -28,7 +28,9 @@ void main() {
   test('every script an entry point names ships in tool/', () {
     for (final script in [
       'check_l10n_sync.py',
+      'check_l10n_language.py',
       'aab_versions.py',
+      'log_coverage.py',
       'commit-msg',
     ]) {
       expect(File('tool/$script').existsSync(), isTrue, reason: script);
