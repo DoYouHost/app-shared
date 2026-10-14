@@ -33,13 +33,10 @@ dependencies:
   # HttpProbe is a Dio interceptor.
   dio: ^5.7.0
   # NavigationProbe observes a GoRouter. A range rather than a caret: the probe
-  # reads `GoRouterDelegate` and `GoRouterState.uri`, which 17 left alone, so
-  # pinning a major here would decide the router version for every application
-  # that consumes this package. The bound stops below 18, which moved onto the
-  # `material_ui`/`cupertino_ui` packages — those annotate with
-  # `@awaitNotRequired`, which the `meta` bundled with Flutter 3.44 does not
-  # have, so 18 fails to compile on the SDK both applications build with.
-  go_router: '>=16.0.0 <18.0.0'
+  # reads `GoRouterDelegate` and `GoRouterState.uri`, which 17 and 18 left
+  # alone, so pinning a major here would decide the router version for every
+  # application that consumes this package.
+  go_router: '>=16.0.0 <19.0.0'
   # `version+buildNumber` for the header. A range rather than a caret: the two
   # applications are a major apart and both spellings of the plugin work here.
   package_info_plus: '>=8.0.0 <11.0.0'
