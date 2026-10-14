@@ -5,3 +5,6 @@ build/
 # pin the CI job.
 pubspec.lock
 .flutter-plugins-dependencies
+
+# Python bytecode from running the bundled scripts.
+__pycache__/

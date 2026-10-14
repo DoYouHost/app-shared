@@ -1,0 +1,18 @@
+name: app_guards
+description: >-
+  Source scans that hold an application to the Dash standards, as plain
+  functions its own tests assert on: spacing from DashSpace, a Wrap that sets
+  runSpacing, no one-letter word at a line end, and no finder spelling out the
+  application's copy. Plus the tool that glues the one-letter words.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.2
+
+# Pure Dart on purpose: an application takes this as a dev_dependency, and a
+# scan of source text needs nothing from Flutter.
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter

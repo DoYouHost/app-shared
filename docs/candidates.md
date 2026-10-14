@@ -395,6 +395,30 @@ of the `clear` record the caller already passes.
 `DashSpace`, the spacing scale the first of these guards, moved from bambuddy
 into `dash_ui` first, so a guard has a scale to point both applications at.
 
+### What it became
+
+`packages/app_guards`, pure Dart and taken as a `dev_dependency`: `rawSpacing`,
+`wrapsWithoutRunSpacing`, `unGluedShortWords` and `finderCopy` return their
+offenders, and each application keeps a test of a few lines that asserts on
+them with its own wording and its own exceptions (bambuddy's `notAppCopy`).
+`finderCopy` takes the locale the tests render in and, optionally, the marks
+only that locale's copy carries — the Polish diacritics for bambuddy, nothing
+for lubelogger, whose tests render in English. `glue_short_words` moved with
+`unGluedShortWords` as a Dart executable, so `just l10n-glue` runs
+`dart run app_guards:glue_short_words`. It glues exactly the strings the Python
+tool did, on both applications' files, but rewrites only those strings in place
+rather than the whole file — lubelogger lays its `.arb` out by hand, and a
+re-serialized file would have been a 400-line diff. The Python tool is gone
+from bambuddy.
+
+lubelogger adopted all four. It had 240 spacing literals: 142 already on the
+scale became `DashSpace` as they were, and the rest moved to the nearest step,
+a tie going up — bambuddy's rule ("a screen that looks better at 10 gets 12").
+The common moves were 14 → 16 (60 times), 6 → 8, 10 → 12, 20 → 24 and 2 → 4,
+so lubelogger's screens are a little looser than they were. 49 finders now read
+`en.<key>`, 41 strings were glued (10 English, 31 Polish), and the one `Wrap`
+got its `runSpacing`.
+
 bambuddy keeps its standards with four tests that read `lib/`: spacing only from
 `DashSpace` (`spacing_scale_test`, 46 lines), a `Wrap` with `spacing` also sets
 `runSpacing` (56), no line ends on a one-letter word (`short_words_test`, 44,
@@ -417,6 +441,26 @@ fetched by `pub get` like any other and run offline as
 `dart run app_tools:<name>` from each `justfile`. The price is porting the
 Python to Dart, or a package whose executables shell out to it — the largest
 item here.
+
+### What it became
+
+The executables went into `app_guards` rather than a package of their own: one
+`dev_dependency` per application. `glue_short_words` is Dart (item 12). The
+rest ship as the scripts they were, in `app_guards/tool/`, behind Dart entry
+points that run them from the caller's directory — `l10n_sync`
+(`check_l10n_sync.py`), `aab_versions` (`aab_versions.py`) and `commit_msg` (the
+POSIX hook). Porting them would have been a second implementation to keep in
+step; a shell-out keeps one copy and costs a `python3` on the machine, which
+both `justfile`s already assumed. Each application's `.githooks/commit-msg` is
+now one `exec dart run app_guards:commit_msg "$1"`, and lubelogger gained the
+hook and the `just hooks` recipe it never had.
+
+Not moved, and why: `check_l10n_language.py` carries bambuddy's own list of
+accepted words and LanguageTool rules (brand names, the French UI's spellings),
+and `log_coverage.py` reads bambuddy's widget vocabulary. Both would need a
+per-application configuration file before they could be shared, and lubelogger
+has neither need today — it has `log_tag_shape_test` and no LanguageTool
+habit. Decide that before porting either.
 
 ## Waiting for a second caller
 
