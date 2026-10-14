@@ -164,7 +164,9 @@ Widget dashPickerField(
   IconData trailingIcon = Icons.arrow_drop_down,
   ({String id, String tooltip, VoidCallback onPressed})? clear,
   TextStyle? valueStyle,
-  EdgeInsetsGeometry padding = const EdgeInsets.symmetric(vertical: _gap),
+  EdgeInsetsGeometry padding = const EdgeInsets.symmetric(
+    vertical: DashSpace.sm,
+  ),
 }) => _DashPickerField(
   id: id,
   label: label,
@@ -179,10 +181,6 @@ Widget dashPickerField(
   valueStyle: valueStyle,
   padding: padding,
 );
-
-/// The picker field's vertical inset and the gap after its leading widget —
-/// bambuddy's `DashSpace.sm`; the spacing scale is the application's.
-const _gap = 8.0;
 
 /// Stateful only to carry the focus flag: an [InputDecorator] paints the
 /// theme's focused border when it is told it has focus, and it cannot tell on
@@ -262,7 +260,10 @@ class _DashPickerFieldState extends State<_DashPickerField> {
           ),
           child: Row(
             children: [
-              if (leading != null) ...[leading, const SizedBox(width: _gap)],
+              if (leading != null) ...[
+                leading,
+                const SizedBox(width: DashSpace.sm),
+              ],
               Expanded(
                 child: Text(
                   unset ? widget.placeholder : value,

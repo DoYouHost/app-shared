@@ -392,6 +392,9 @@ of the `clear` record the caller already passes.
 
 ## 12. Guard tests, as a shared test library
 
+`DashSpace`, the spacing scale the first of these guards, moved from bambuddy
+into `dash_ui` first, so a guard has a scale to point both applications at.
+
 bambuddy keeps its standards with four tests that read `lib/`: spacing only from
 `DashSpace` (`spacing_scale_test`, 46 lines), a `Wrap` with `spacing` also sets
 `runSpacing` (56), no line ends on a one-letter word (`short_words_test`, 44,

@@ -21,6 +21,7 @@ library;
 export 'src/dash_brand.dart';
 export 'src/dash_contrast.dart';
 export 'src/dash_fonts.dart';
+export 'src/dash_space.dart';
 export 'src/dash_text.dart';
 export 'src/dash_theme_data.dart';
 export 'src/dash_tokens.dart';
