@@ -2,8 +2,8 @@ name: dash_kit
 description: >-
   The Dash widgets that name themselves in the diagnostic log: the confirmation
   dialog, the load-error and empty views, the bottom sheet, the snack bar, the
-  width cap, the spinners, the button pair, the logged app bar and the form
-  fields (select, filter select and picker field).
+  width cap, the spinners, the button pair, the logged app bar, the form
+  fields (select, filter select and picker field) and the date pickers.
 version: 0.1.4
 publish_to: none
 
@@ -13,6 +13,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # `pickDateTime` reads the time through it, so a test can fix "now".
+  clock: ^1.1.2
   # Siblings by git ref, at the refs the applications pin, for the reason
   # `app_diagnostics` gives: an application naming one by git and getting it
   # here by path would hand pub two sources for one package.

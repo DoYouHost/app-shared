@@ -470,14 +470,17 @@ lubelogger got its own two files. Its first full LanguageTool sweep found 85
 things: 73 were the label-takes-no-full-stop rule bambuddy also turns off, five
 more were rules that misread a label, an abbreviation or the inflected product
 name, and three were real and are fixed in its copy ("litres" in otherwise US
-English, a missing comma, a passive sentence). Its coverage scan reports 20
-controls nothing names, mostly in the settings screen; naming them is
-lubelogger work, not this package's.
+English, a missing comma, a passive sentence). Its coverage scan reported 20
+controls nothing named, eleven of them in the settings screen; all 20 carry an
+id now, and the scan reports none.
 
 ## Waiting for a second caller
 
-- `date_time_picker.dart` (71 lines): lubelogger calls `showDatePicker` from six
-  forms. Worth it alongside item 11, not alone.
+- ~~`date_time_picker.dart`~~ — moved into `dash_kit` as `pickDate` and
+  `pickDateTime`, with `clock` as a new dependency. lubelogger's six
+  `showDatePicker` calls go through `pickDate` now, which opens on the nearest
+  end of the range instead of asserting: an extra field holding a date before
+  1900 used to throw when tapped, and a test pins that it opens.
 - `InlineNote`, `DashProgressBar`, `DashStepper` (74, 39, 82): generic, and
   nowhere in lubelogger to put them.
 - The queue form's segmented toggle: lubelogger has one `SegmentedButton`.
