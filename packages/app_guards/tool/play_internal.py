@@ -196,7 +196,12 @@ def main():
             if args.command == "tracks":
                 list_tracks(edits, edit_id)
             elif release_internal(edits, edit_id, bundles, args.dry_run):
-                edits.commit(packageName=PACKAGE, editId=edit_id).execute(num_retries=RETRIES)
+                # Never sent for review from here: once the app has changes awaiting
+                # review (a rejected Wear build did it), a plain commit is refused
+                # with a 400 — and sending is the developer's click in the Console.
+                edits.commit(
+                    packageName=PACKAGE, editId=edit_id, changesNotSentForReview=True
+                ).execute(num_retries=RETRIES)
                 committed = True
                 print("Released to internal testing.")
         finally:
