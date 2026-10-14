@@ -6,13 +6,15 @@ import 'package:dash_kit/dash_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _brand = DashBrand(
+/// The brand the tests theme with: bambuddy's green, as the tokens need one.
+const testBrand = DashBrand(
   dark: DashAccent(fill: Color(0xFF5FE08A), ink: Color(0xFF5FE08A)),
   light: DashAccent(fill: Color(0xFF34C46E), ink: Color(0xFF18733D)),
   onAccent: Color(0xFF0A0C08),
 );
 
-ThemeData get testTheme => buildDashThemeData(Brightness.light, brand: _brand);
+ThemeData get testTheme =>
+    buildDashThemeData(Brightness.light, brand: testBrand);
 
 /// [child] as the home of an app themed the way both applications are, so a
 /// measurement that depends on button padding measures the real one.

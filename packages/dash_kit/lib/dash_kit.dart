@@ -14,6 +14,7 @@ export 'package:dash_ui/dash_ui.dart' hide dashAppBar;
 export 'src/button_pair.dart';
 export 'src/confirm_dialog.dart';
 export 'src/dash_app_bar.dart';
+export 'src/dash_input.dart';
 export 'src/dash_sheet.dart';
 export 'src/dash_snack.dart';
 export 'src/max_content_width.dart';

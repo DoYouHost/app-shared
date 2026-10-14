@@ -370,3 +370,61 @@ Not moved:
   phone set to Italian then Polish got English notifications. It now resolves
   through `basicLocaleListResolution` behind a `resolveAppLocale` the tests can
   reach, as in bambuddy, and carries bambuddy's suite adapted to `en`/`pl`.
+
+# Round three
+
+Measured on 14 October 2026 against bambuddy-mobile `dev` (after the queue bulk
+edit) and lubelogger-mobile `dev` (unchanged since v0.10.0). Items 11–13 are
+worth doing, in that order; the rest waits for a second caller. Wear, the
+notification service and `RetryInterceptor` stand as round one left them.
+
+## 11. The form fields, into `dash_kit`
+
+bambuddy's `dash_input.dart` (286 lines): `dashCombo` (an M3 `DropdownMenu` in
+the field chrome, tagged, with a 320 dp menu and the select arrow boxed to keep
+the field 48 dp tall), `dashAnyOrOne` (null is the "any" row), `dashDecoration`,
+`dashInputTheme` and `dashPickerField`. lubelogger still builds five selects
+with `DropdownButtonFormField` — `add_vehicle_form`, `add_plan_form` (three) and
+`add_reminder_form` — the full-screen overlay bambuddy has none of left.
+
+The one tie to the application is the clear button's tooltip, which becomes part
+of the `clear` record the caller already passes.
+
+## 12. Guard tests, as a shared test library
+
+bambuddy keeps its standards with four tests that read `lib/`: spacing only from
+`DashSpace` (`spacing_scale_test`, 46 lines), a `Wrap` with `spacing` also sets
+`runSpacing` (56), no line ends on a one-letter word (`short_words_test`, 44,
+with `tool/glue_short_words.py`), and a finder never spells out the app's copy
+(`finder_strings_test`, 412, partly bambuddy's own exceptions). lubelogger has
+none, and would fail three of them today: 66 hand-typed insets and no
+`DashSpace` use at all, 31 Polish strings with an unglued one-letter word, and
+one `Wrap` without `runSpacing` (`settings_screen.dart`). The library is small;
+the cost is the hundred fixes in lubelogger.
+
+## 13. The tools, as a Dart package with executables
+
+lubelogger has none of `tool/check_l10n_language.py` (410 lines, LanguageTool on
+the strings a branch changed), `tool/glue_short_words.py` (61),
+`.claude/skills/log-coverage/log_coverage.py` (529) or `.githooks/commit-msg`
+(58), and `check_l10n_sync.py` (495) and `aab_versions.py` (109) are still two
+identical copies. Round two turned sharing them down because a submodule costs
+every clone. A package with `bin/` entries does not: it is a `dev_dependency`,
+fetched by `pub get` like any other and run offline as
+`dart run app_tools:<name>` from each `justfile`. The price is porting the
+Python to Dart, or a package whose executables shell out to it — the largest
+item here.
+
+## Waiting for a second caller
+
+- `date_time_picker.dart` (71 lines): lubelogger calls `showDatePicker` from six
+  forms. Worth it alongside item 11, not alone.
+- `InlineNote`, `DashProgressBar`, `DashStepper` (74, 39, 82): generic, and
+  nowhere in lubelogger to put them.
+- The queue form's segmented toggle: lubelogger has one `SegmentedButton`.
+- `RefreshWhenShown` (116): lubelogger's `SyncHost` also acts on resume, but it
+  syncs an offline store; it does not refresh a screen.
+
+Not worth it: `detachFrom`, `web_link`, `tappable_card` (each a few dozen lines
+at most), and `showApiFailure`, `settings_rows`, `print_thumbnail` (each tied to
+the application's model or errors).
