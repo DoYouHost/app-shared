@@ -169,6 +169,25 @@ def release_internal(edits, edit_id, bundles, dry_run):
     return changed
 
 
+def commit_edit(edits, edit_id):
+    """Commits in whichever of Play's two states the Console is in.
+
+    Each state refuses the other's commit with a 400: while changes sit unsent
+    (a rejected Wear build left them there) only a held commit is accepted, and
+    while they are in review the flag "must not be set". The held one goes
+    first, so unsent changes are never sent from here; the plain one carries
+    only internal tracks, which Google publishes without a review.
+    """
+    try:
+        edits.commit(
+            packageName=PACKAGE, editId=edit_id, changesNotSentForReview=True
+        ).execute(num_retries=RETRIES)
+    except HttpError as e:
+        if e.status_code != 400 or "must not be set" not in str(e.reason):
+            raise
+        edits.commit(packageName=PACKAGE, editId=edit_id).execute(num_retries=RETRIES)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Google Play publishing.")
     parser.add_argument("--config", default="tool/play.toml",
@@ -196,12 +215,7 @@ def main():
             if args.command == "tracks":
                 list_tracks(edits, edit_id)
             elif release_internal(edits, edit_id, bundles, args.dry_run):
-                # Never sent for review from here: once the app has changes awaiting
-                # review (a rejected Wear build did it), a plain commit is refused
-                # with a 400 — and sending is the developer's click in the Console.
-                edits.commit(
-                    packageName=PACKAGE, editId=edit_id, changesNotSentForReview=True
-                ).execute(num_retries=RETRIES)
+                commit_edit(edits, edit_id)
                 committed = True
                 print("Released to internal testing.")
         finally:

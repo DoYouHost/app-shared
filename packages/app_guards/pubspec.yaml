@@ -4,7 +4,7 @@ description: >-
   functions its own tests assert on: spacing from DashSpace, a Wrap that sets
   runSpacing, no one-letter word at a line end, and no finder spelling out the
   application's copy. Plus the tool that glues the one-letter words.
-version: 0.1.1
+version: 0.1.2
 publish_to: none
 
 environment:
