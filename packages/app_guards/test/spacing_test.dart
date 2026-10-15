@@ -19,10 +19,14 @@ final w = Wrap(spacing: 4, runSpacing: 4);
     expect(hits.first, endsWith('a.dart:1  EdgeInsets.all(12)'));
   });
 
-  test('the scale, zero and a size are not spacing', () {
+  test('either scale, zero and a size are not spacing', () {
     final root = tree({
       'a.dart': '''
 const p = EdgeInsets.all(DashSpace.lg);
+const b = EdgeInsets.symmetric(
+  horizontal: WearSpace.buttonHorizontal,
+  vertical: WearSpace.buttonVertical,
+);
 const z = EdgeInsets.zero;
 const n = EdgeInsets.only(left: 0);
 const box = SizedBox(width: double.infinity);

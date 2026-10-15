@@ -9,8 +9,9 @@ final _literal = RegExp(
 final _number = RegExp(r'(?<![\w.])(\d+(?:\.\d+)?)(?![\w.])');
 
 /// Every padding, margin and gap under [root] typed as a number rather than
-/// taken from `DashSpace`. Zero is allowed: it is the absence of spacing, not a
-/// value on the scale. Generated localizations are skipped.
+/// taken from a scale: `DashSpace` on a phone, `WearSpace` — Wear Material 3's
+/// own values — on a watch. Zero is allowed: it is the absence of spacing, not
+/// a value on a scale. Generated localizations are skipped.
 ///
 /// A value that is a size rather than spacing (room for a gauge, centring a
 /// knob) belongs in a named constant next to the widget it measures; the scan
