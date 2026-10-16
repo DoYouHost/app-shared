@@ -4,7 +4,7 @@ description: >-
   dialog, the load-error and empty views, the bottom sheet, the snack bar, the
   width cap, the spinners, the button pair, the logged app bar, the form
   fields (select, filter select and picker field) and the date pickers.
-version: 0.1.4
+version: 0.1.5
 publish_to: none
 
 environment:
@@ -22,18 +22,18 @@ dependencies:
   app_diagnostics:
     git:
       url: https://github.com/DoYouHost/app-shared.git
-      ref: v0.13.1
+      ref: v0.13.2
       path: packages/app_diagnostics
   # `ButtonPair` measures its labels with `textWidth`.
   app_util:
     git:
       url: https://github.com/DoYouHost/app-shared.git
-      ref: v0.13.1
+      ref: v0.13.2
       path: packages/app_util
   dash_ui:
     git:
       url: https://github.com/DoYouHost/app-shared.git
-      ref: v0.13.1
+      ref: v0.13.2
       path: packages/dash_ui
 
 dev_dependencies:

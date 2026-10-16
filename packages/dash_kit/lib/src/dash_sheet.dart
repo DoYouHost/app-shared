@@ -49,6 +49,11 @@ Future<T?> dashSurfaceSheet<T>(
   context: context,
   isScrollControlled: true,
   backgroundColor: Colors.transparent,
+  // The theme's sheet shape carries a border, and a transparent sheet still
+  // paints it. The surface inside sits in a SafeArea, so with a side inset (a
+  // landscape cutout) it moves off that border, which then shows as a ghost
+  // outline beside it. The surface draws its own hairline.
+  shape: const RoundedRectangleBorder(),
   barrierColor: barrierColor,
   isDismissible: dismissible,
   enableDrag: dismissible,

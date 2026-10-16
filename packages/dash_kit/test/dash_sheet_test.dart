@@ -2,6 +2,8 @@ import 'package:dash_kit/dash_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support.dart';
+
 void main() {
   const navBar = 48.0;
   final contentKey = UniqueKey();
@@ -102,5 +104,43 @@ void main() {
       isFalse,
       reason: 'no handle inviting a drag that does nothing',
     );
+  });
+
+  testWidgets('a surface sheet paints no border of its own', (tester) async {
+    // The theme gives sheets a bordered shape; a surface sheet draws its own,
+    // and a second border shows beside it once a side inset moves the surface.
+    expect(
+      (testTheme.bottomSheetTheme.shape! as OutlinedBorder).side,
+      isNot(BorderSide.none),
+      reason: 'the premise: the theme does carry a border',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: testTheme,
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => dashSurfaceSheet<void>(
+                context,
+                builder: (_) => const SizedBox(height: 120),
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    final sheet = tester.widget<Material>(
+      find
+          .descendant(
+            of: find.byType(BottomSheet),
+            matching: find.byType(Material),
+          )
+          .first,
+    );
+    expect((sheet.shape! as OutlinedBorder).side, BorderSide.none);
   });
 }
