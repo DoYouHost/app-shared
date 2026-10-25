@@ -4,7 +4,7 @@ description: >-
   coercion, reading a number a person typed, measuring a label, asking a
   platform channel, byte sizes and hex colours, the demo-mode HTTP adapter, a
   server address, and the classification of a failed request.
-version: 0.2.4
+version: 0.3.0
 publish_to: none
 
 environment:
@@ -25,6 +25,7 @@ dependencies:
   # classification names every type so that the next one added is a compile
   # error here rather than a silent default.
   dio: ^5.10.0
+  material_ui: ^1.8.0
 
 dev_dependencies:
   http_mock_adapter: ^0.6.1

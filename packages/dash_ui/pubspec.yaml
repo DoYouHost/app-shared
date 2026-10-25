@@ -14,6 +14,7 @@ dependencies:
     sdk: flutter
   # Pinned by the Flutter SDK; HCT tones for DashBrand.fromSchemes.
   material_color_utilities: any
+  material_ui: ^1.8.0
 
 dev_dependencies:
   flutter_test:

@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:dash_ui/dash_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 
 /// Asks before doing something. `true` only when the user confirms; the cancel

@@ -4,7 +4,7 @@ description: >-
   dialog, the load-error and empty views, the bottom sheet, the snack bar, the
   width cap, the spinners, the button pair, the logged app bar, the form
   fields (select, filter select and picker field) and the date pickers.
-version: 0.1.6
+version: 0.2.0
 publish_to: none
 
 environment:
@@ -35,6 +35,7 @@ dependencies:
       url: https://github.com/DoYouHost/app-shared.git
       ref: v0.14.0
       path: packages/dash_ui
+  material_ui: ^1.8.0
 
 dev_dependencies:
   # Only to build a recorder in the tests, whose redactor comes from here.
@@ -43,8 +44,6 @@ dev_dependencies:
       url: https://github.com/DoYouHost/app-shared.git
       ref: v0.2.0
       path: packages/app_report_client
-  flutter_localizations:
-    sdk: flutter
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0

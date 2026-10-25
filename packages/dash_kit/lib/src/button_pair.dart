@@ -1,5 +1,5 @@
 import 'package:app_util/app_util.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Two buttons side by side — but only while both labels fit on one line.
 ///

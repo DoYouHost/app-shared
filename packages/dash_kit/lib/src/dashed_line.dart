@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// One-pixel dashed rule, used as a separator inside cards where a solid line
 /// would read as a section break.

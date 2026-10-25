@@ -3,7 +3,7 @@ description: >-
   The half of a bug report that produces it: the recording session, the log
   record and its file mirror, the merge across isolates, the review summary, and
   the probes that observe taps, routes, requests, errors and lifecycle.
-version: 0.3.1
+version: 0.4.0
 publish_to: none
 
 environment:
@@ -44,6 +44,7 @@ dependencies:
   path_provider: ^2.1.5
   # The running session's id, which both isolates read.
   shared_preferences: ^2.3.3
+  material_ui: ^1.8.0
 
 dev_dependencies:
   flutter_test:

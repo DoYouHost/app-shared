@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:app_report_client/app_report_client.dart';
 import 'package:app_report_ui/app_report_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 

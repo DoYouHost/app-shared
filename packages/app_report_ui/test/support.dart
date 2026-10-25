@@ -6,7 +6,7 @@ import 'package:app_report_client/app_report_client.dart';
 import 'package:app_report_ui/app_report_ui.dart';
 import 'package:dash_kit/dash_kit.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -114,6 +114,15 @@ class Rig {
 
 ThemeData get testTheme => buildDashThemeData(Brightness.light, brand: _brand);
 
+/// The package's strings plus material_ui's own. Not the generated
+/// `ReportLocalizations.localizationsDelegates`: `gen-l10n` still fills it
+/// from `flutter_localizations`, whose Material strings are the in-framework
+/// type material_ui widgets do not look up.
+final reportTestDelegates = [
+  ReportLocalizations.delegate,
+  ...GlobalMaterialLocalizations.delegates,
+];
+
 /// The app the screens run in, in Polish: the strings the tests look for are
 /// the package's own translations.
 Widget plApp(Widget home, {GlobalKey<NavigatorState>? navigatorKey}) =>
@@ -121,7 +130,7 @@ Widget plApp(Widget home, {GlobalKey<NavigatorState>? navigatorKey}) =>
       locale: const Locale('pl'),
       theme: testTheme,
       navigatorKey: navigatorKey,
-      localizationsDelegates: ReportLocalizations.localizationsDelegates,
+      localizationsDelegates: reportTestDelegates,
       supportedLocales: ReportLocalizations.supportedLocales,
       home: home,
     );

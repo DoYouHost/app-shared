@@ -1,6 +1,6 @@
 import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:dash_ui/dash_ui.dart' as dash;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Names a hand-built [AppBar] `chrome.appbar` in the log without restyling it.
 ///

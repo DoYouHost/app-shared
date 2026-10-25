@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:app_report_client/app_report_client.dart';
 import 'package:dash_kit/dash_kit.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// What a screen shows while it has nothing else: the spinner, centred.
 class DashLoading extends StatelessWidget {

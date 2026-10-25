@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:app_diagnostics/app_diagnostics.dart';
 import 'package:app_report_client/app_report_client.dart';
 import 'package:app_report_ui/app_report_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -151,7 +151,7 @@ void main() {
         child: MaterialApp.router(
           locale: const Locale('pl'),
           theme: testTheme,
-          localizationsDelegates: ReportLocalizations.localizationsDelegates,
+          localizationsDelegates: reportTestDelegates,
           supportedLocales: ReportLocalizations.supportedLocales,
           routerConfig: router,
         ),
@@ -930,7 +930,7 @@ void main() {
             locale: const Locale('pl'),
             theme: testTheme,
             navigatorKey: rig.navigatorKey,
-            localizationsDelegates: ReportLocalizations.localizationsDelegates,
+            localizationsDelegates: reportTestDelegates,
             supportedLocales: ReportLocalizations.supportedLocales,
             builder: (context, child) => RecordingBannerScaffold(
               child: child ?? const SizedBox.shrink(),
