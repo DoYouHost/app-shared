@@ -278,6 +278,7 @@ ThemeData buildDashThemeData(
     ),
     inputDecorationTheme: InputDecorationTheme(
       isDense: true,
+      constraints: const BoxConstraints(minHeight: kMinInteractiveDimension),
       filled: true,
       fillColor: t.subCard,
       labelStyle: TextStyle(

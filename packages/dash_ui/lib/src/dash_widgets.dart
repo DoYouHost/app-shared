@@ -147,6 +147,8 @@ InputDecoration dashFieldDecoration(
       );
   return InputDecoration(
     isDense: true,
+    // Dense alone draws a 45 dp field; 48 dp is Android's touch-target floor.
+    constraints: const BoxConstraints(minHeight: kMinInteractiveDimension),
     filled: true,
     fillColor: t.subCard,
     labelText: labelText,

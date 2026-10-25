@@ -451,4 +451,35 @@ void main() {
       );
     });
   });
+
+  // Dense fields drew 45 dp, under the 48 dp androidTapTargetGuideline asks for.
+  testWidgets('a field is at least a touch target tall', (tester) async {
+    const tokens = DashTokens.dark(testBrand);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildDashThemeData(Brightness.dark, brand: testBrand),
+        home: Scaffold(
+          body: Column(
+            children: [
+              // The test font's line is taller than the app's, so a small one
+              // stands in for the real fields the dense inset left at 45 dp.
+              TextField(
+                style: const TextStyle(fontSize: 10),
+                decoration: dashFieldDecoration(tokens, labelText: 'A'),
+              ),
+              const TextField(style: TextStyle(fontSize: 10)),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    for (final field in tester.widgetList(find.byType(TextField))) {
+      expect(
+        tester.getSize(find.byWidget(field)).height,
+        greaterThanOrEqualTo(kMinInteractiveDimension),
+      );
+    }
+    await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+  });
 }

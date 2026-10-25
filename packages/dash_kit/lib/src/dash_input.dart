@@ -40,6 +40,7 @@ InputDecorationTheme dashInputTheme(DashTokens t) {
   final d = dashFieldDecoration(t);
   return InputDecorationTheme(
     isDense: d.isDense ?? true,
+    constraints: d.constraints,
     filled: d.filled ?? true,
     fillColor: d.fillColor,
     labelStyle: d.labelStyle,
