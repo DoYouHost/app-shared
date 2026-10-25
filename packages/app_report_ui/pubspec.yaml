@@ -21,7 +21,7 @@ dependencies:
   app_diagnostics:
     git:
       url: https://github.com/DoYouHost/app-shared.git
-      ref: v0.14.1
+      ref: v0.14.2
       path: packages/app_diagnostics
   app_report_client:
     git:
@@ -35,7 +35,7 @@ dependencies:
   dash_kit:
     git:
       url: https://github.com/DoYouHost/app-shared.git
-      ref: v0.14.1
+      ref: v0.14.2
       path: packages/dash_kit
   # Only `saveFile` is called here. The upper bound stops before 11, which
   # replaced `FilePicker.platform.x()` with static methods and, in 13, dropped
