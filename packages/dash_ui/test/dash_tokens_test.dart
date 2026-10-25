@@ -69,6 +69,32 @@ void main() {
     expect(from.lerp(null, 1), from);
   });
 
+  // A surface change must rebuild the theme, so it has to break equality.
+  test('brand equality includes the surfaces', () {
+    const tinted = DashBrand(
+      dark: DashAccent(fill: Color(0xFF5FE08A), ink: Color(0xFF5FE08A)),
+      light: DashAccent(fill: Color(0xFF34C46E), ink: Color(0xFF18733D)),
+      onAccent: Color(0xFF0A0C08),
+      darkSurfaces: DashSurfaces(
+        glow: Color(0xFF101418),
+        middle: Color(0xFF07090A),
+        edge: Color(0xFF050605),
+        cardEnd: Color(0x04FFFFFF),
+        overlay: Color(0xFF0E1310),
+        scaffold: Color(0xFF07090A),
+      ),
+    );
+
+    expect(green.darkSurfaces, DashSurfaces.classicDark);
+    expect(green.lightSurfaces, DashSurfaces.classicLight);
+    expect(tinted, isNot(green));
+    expect(tinted.hashCode, isNot(green.hashCode));
+    expect(
+      DashBrand(dark: green.dark, light: green.light, onAccent: green.onAccent),
+      green,
+    );
+  });
+
   test('copyWith re-resolves the palette', () {
     final dark = const DashTokens.light(
       green,
