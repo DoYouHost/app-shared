@@ -95,6 +95,90 @@ void main() {
     );
   });
 
+  // The constants the tokens held before brands carried surfaces; a brand that
+  // names none must paint exactly these, or every existing app shifts.
+  test('a brand without surfaces paints the classic grounds', () {
+    const dark = DashTokens.dark(green);
+    const light = DashTokens.light(green);
+
+    expect(
+      dark.backgroundGradient,
+      const RadialGradient(
+        center: Alignment(-0.6, -1),
+        radius: 1.4,
+        colors: [Color(0xFF131A12), Color(0xFF07090A), Color(0xFF050605)],
+        stops: [0.0, 0.55, 1.0],
+      ),
+    );
+    expect(
+      dark.cardGradient,
+      const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0x0DFFFFFF), Color(0x04FFFFFF)],
+      ),
+    );
+    expect(dark.overlaySurface, const Color(0xFF0E1310));
+    expect(dark.scaffold, const Color(0xFF07090A));
+
+    expect(
+      light.backgroundGradient,
+      const RadialGradient(
+        center: Alignment(-0.6, -1),
+        radius: 1.4,
+        colors: [Color(0xFFEAF2E7), Color(0xFFF6F8F4), Color(0xFFFDFEFC)],
+        stops: [0.0, 0.55, 1.0],
+      ),
+    );
+    expect(
+      light.cardGradient,
+      const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFFFFFFFF), Color(0xFFF5F7F3)],
+      ),
+    );
+    expect(light.overlaySurface, const Color(0xFFF6F8F4));
+    expect(light.scaffold, const Color(0xFFFDFEFC));
+  });
+
+  test('custom surfaces change the grounds and nothing else', () {
+    const surfaces = DashSurfaces(
+      glow: Color(0xFF111111),
+      middle: Color(0xFF222222),
+      edge: Color(0xFF333333),
+      cardEnd: Color(0xFF444444),
+      overlay: Color(0xFF555555),
+      scaffold: Color(0xFF666666),
+    );
+    final brand = DashBrand(
+      dark: green.dark,
+      light: green.light,
+      onAccent: green.onAccent,
+      darkSurfaces: surfaces,
+    );
+    final t = DashTokens.dark(brand);
+    const classic = DashTokens.dark(green);
+
+    expect((t.backgroundGradient as RadialGradient).colors, [
+      surfaces.glow,
+      surfaces.middle,
+      surfaces.edge,
+    ]);
+    expect(t.cardGradient.colors, [const Color(0x0DFFFFFF), surfaces.cardEnd]);
+    expect(t.overlaySurface, surfaces.overlay);
+    expect(t.scaffold, surfaces.scaffold);
+    expect(t.overlayBorder, classic.overlayBorder);
+    expect(t.textTertiary, classic.textTertiary);
+    expect(t.accent, classic.accent);
+    expect(
+      DashTokens.light(brand).backgroundGradient,
+      const DashTokens.light(green).backgroundGradient,
+    );
+    expect(t, isNot(classic));
+    expect(t.lerp(classic, 0.5), classic);
+  });
+
   test('copyWith re-resolves the palette', () {
     final dark = const DashTokens.light(
       green,

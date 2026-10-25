@@ -7,23 +7,14 @@ import 'dash_brand.dart';
 /// shared secondary accents.
 ///
 /// Layout, type and radii are the same in both brightnesses; only colours
-/// differ. Everything but the accent is fixed by [brightness], which is why
-/// equality is [brightness] and [brand] alone.
+/// differ. Everything but the accent and the grounds is fixed by [brightness],
+/// and both of those come from [brand], which is why equality is [brightness]
+/// and [brand] alone.
 @immutable
 class DashTokens extends ThemeExtension<DashTokens> {
   const DashTokens.dark(this.brand)
     : brightness = Brightness.dark,
-      backgroundGradient = const RadialGradient(
-        center: Alignment(-0.6, -1),
-        radius: 1.4,
-        colors: [Color(0xFF131A12), Color(0xFF07090A), Color(0xFF050605)],
-        stops: [0.0, 0.55, 1.0],
-      ),
-      cardGradient = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0x0DFFFFFF), Color(0x04FFFFFF)],
-      ),
+      _cardStart = const Color(0x0DFFFFFF),
       cardBorder = const Color(0x12FFFFFF),
       subCard = const Color(0x08FFFFFF),
       subCardBorder = const Color(0x0DFFFFFF),
@@ -44,22 +35,11 @@ class DashTokens extends ThemeExtension<DashTokens> {
       hairline = const Color(0x14FFFFFF),
       dottedRule = const Color(0x24FFFFFF),
       navBar = const Color(0x59000000),
-      overlaySurface = const Color(0xFF0E1310),
       overlayBorder = const Color(0x24FFFFFF);
 
   const DashTokens.light(this.brand)
     : brightness = Brightness.light,
-      backgroundGradient = const RadialGradient(
-        center: Alignment(-0.6, -1),
-        radius: 1.4,
-        colors: [Color(0xFFEAF2E7), Color(0xFFF6F8F4), Color(0xFFFDFEFC)],
-        stops: [0.0, 0.55, 1.0],
-      ),
-      cardGradient = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFFFFFFFF), Color(0xFFF5F7F3)],
-      ),
+      _cardStart = const Color(0xFFFFFFFF),
       cardBorder = const Color(0x14000000),
       subCard = const Color(0x05000000),
       subCardBorder = const Color(0x0F000000),
@@ -80,7 +60,6 @@ class DashTokens extends ThemeExtension<DashTokens> {
       hairline = const Color(0x14000000),
       dottedRule = const Color(0x1F000000),
       navBar = const Color(0x0A000000),
-      overlaySurface = const Color(0xFFF6F8F4),
       overlayBorder = const Color(0x14000000);
 
   factory DashTokens.resolve(Brightness brightness, DashBrand brand) =>
@@ -107,9 +86,24 @@ class DashTokens extends ThemeExtension<DashTokens> {
   final DashBrand brand;
 
   /// Full-screen backdrop behind the card list.
-  final Gradient backgroundGradient;
+  Gradient get backgroundGradient {
+    final s = brand.surfacesOf(brightness);
+    return RadialGradient(
+      center: const Alignment(-0.6, -1),
+      radius: 1.4,
+      colors: [s.glow, s.middle, s.edge],
+      stops: const [0.0, 0.55, 1.0],
+    );
+  }
 
-  final Gradient cardGradient;
+  Gradient get cardGradient => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [_cardStart, brand.surfacesOf(brightness).cardEnd],
+  );
+
+  /// The card's lit corner: a white wash, which carries no brand tint.
+  final Color _cardStart;
   final Color cardBorder;
 
   /// Small tiles inside a card, and form fields.
@@ -171,8 +165,10 @@ class DashTokens extends ThemeExtension<DashTokens> {
   /// Opaque fill for dialogs, menus, snackbars and sheets. The card tokens are
   /// translucent washes meant for [backgroundGradient]; an overlay floats over
   /// an arbitrary route and needs a solid ground to stay legible.
-  final Color overlaySurface;
+  Color get overlaySurface => brand.surfacesOf(brightness).overlay;
   final Color overlayBorder;
+
+  Color get scaffold => brand.surfacesOf(brightness).scaffold;
 
   /// The brand accent as a fill — gauges, dots, ON states, the primary button.
   Color get accent => brand.of(brightness).fill;
