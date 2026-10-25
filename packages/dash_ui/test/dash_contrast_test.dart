@@ -142,4 +142,25 @@ void main() {
       contains((Brightness.light, 'textTertiary')),
     );
   });
+
+  // The scaffold is painted behind a page's text; a brand may set it apart
+  // from the gradient, so it is measured on its own.
+  test('a scaffold too dark for the light inks fails', () {
+    final brand = withSurfaces(
+      green,
+      light: DashSurfaces(
+        glow: DashSurfaces.classicLight.glow,
+        middle: DashSurfaces.classicLight.middle,
+        edge: DashSurfaces.classicLight.edge,
+        cardEnd: DashSurfaces.classicLight.cardEnd,
+        overlay: DashSurfaces.classicLight.overlay,
+        scaffold: const Color(0xFF606060),
+      ),
+    );
+
+    expect(
+      dashContrastAudit(brand).map((i) => (i.brightness, i.token)),
+      contains((Brightness.light, 'textTertiary')),
+    );
+  });
 }

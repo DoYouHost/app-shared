@@ -24,8 +24,9 @@ class DashAccent {
   int get hashCode => Object.hash(fill, ink);
 }
 
-/// One theme's opaque grounds: the backdrop gradient, the far end of a card,
-/// the overlay behind dialogs and sheets, and the scaffold.
+/// One theme's grounds: the opaque backdrop gradient, the far end of a card
+/// (a translucent wash in the classic dark theme), the overlay behind dialogs
+/// and sheets, and the scaffold.
 ///
 /// Three named stops rather than a list, so `==` compares values and an
 /// instance can be `const`.

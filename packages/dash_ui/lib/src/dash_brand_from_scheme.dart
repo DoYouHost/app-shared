@@ -60,10 +60,13 @@ DashBrand _brandFromSchemes(ColorScheme light, ColorScheme dark) {
   final darkest = _surfacesOf(
     probe,
   ).map((s) => ColorUtils.lstarFromArgb(s.toARGB32())).reduce(math.min);
-  final inkTone = math.min(
-    Contrast.darker(tone: darkest, ratio: _smallText),
-    60.0,
-  );
+  // Black when no tone reaches the ratio, as MCU's own fallback has it.
+  var inkTone = Contrast.darkerUnsafe(tone: darkest, ratio: _smallText);
+  // The tone is continuous and the ink is 8-bit; rounding can land a hair
+  // under the ratio the audit then measures on the rounded colour.
+  while (inkTone > 0 && dashWorstContrast(tone(inkTone), probe) < _smallText) {
+    inkTone = math.max(0, inkTone - 0.5);
+  }
 
   return DashBrand(
     dark: DashAccent(fill: darkAccent, ink: darkAccent),

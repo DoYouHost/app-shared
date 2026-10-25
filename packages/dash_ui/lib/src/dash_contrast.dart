@@ -126,7 +126,7 @@ const _smallText = 4.5;
 const _maxHueDrift = 8.0;
 
 /// Every surface a theme can put behind small text: each stop of the
-/// background gradient and the overlay surface, each bare, under a sub-card,
+/// background gradient, the overlay surface and the scaffold, each bare, under a sub-card,
 /// under either end of a card, and under a sub-card on a card.
 ///
 /// All of them rather than a guess at the worst, because the guess flips with
@@ -139,6 +139,7 @@ List<Color> _surfacesOf(DashTokens t) {
     for (final ground in [
       ...t.backgroundGradient.colors,
       t.overlaySurface,
+      t.scaffold,
     ]) ...[
       ground,
       _over(t.subCard, ground),

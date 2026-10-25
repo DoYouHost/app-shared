@@ -112,4 +112,36 @@ void main() {
     expect(a.hashCode, b.hashCode);
     expect(a, isNot(fromSeed(const Color(0xFFD72E7D))));
   });
+
+  // Light containers far darker than Material's own, to reach the edges of
+  // the ink tone search.
+  DashBrand onGround(int hue, double groundTone) {
+    final ground = Color(Hct.from(hue.toDouble(), 4, groundTone).toInt());
+    return DashBrand.fromSchemes(
+      light: ColorScheme.fromSeed(seedColor: seedOf(hue, 0.6)).copyWith(
+        surfaceContainerLowest: ground,
+        surfaceContainerLow: ground,
+        surfaceContainer: ground,
+      ),
+      dark: ColorScheme.fromSeed(
+        seedColor: seedOf(hue, 0.6),
+        brightness: Brightness.dark,
+      ),
+    );
+  }
+
+  // Contrast.darker's tone is continuous and the ink is 8-bit: on this ground
+  // the rounded ink measured 4.497:1 before the tone was checked after
+  // rounding (found by sweeping hues and ground tones).
+  test('the light ink holds 4.5:1 after rounding to 8 bits', () {
+    final brand = onGround(180, 52);
+    expect(
+      dashWorstContrast(brand.light.ink, DashTokens.light(brand)),
+      greaterThanOrEqualTo(4.5),
+    );
+  });
+
+  test('a ground no tone can clear gets a black ink', () {
+    expect(onGround(30, 40).light.ink, const Color(0xFF000000));
+  });
 }
