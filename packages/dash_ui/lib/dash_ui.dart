@@ -19,7 +19,7 @@
 library;
 
 export 'src/dash_brand.dart';
-export 'src/dash_contrast.dart';
+export 'src/dash_contrast.dart' hide brandFromSchemes;
 export 'src/dash_fonts.dart';
 export 'src/dash_recipes.dart';
 export 'src/dash_space.dart';

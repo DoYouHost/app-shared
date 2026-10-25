@@ -1,9 +1,12 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:material_color_utilities/material_color_utilities.dart';
 
 import 'dash_brand.dart';
 import 'dash_tokens.dart';
+
+part 'dash_brand_from_scheme.dart';
 
 /// One requirement a brand fails in one theme.
 @immutable
@@ -43,8 +46,8 @@ class DashContrastIssue {
 ///   4.5:1 on the worst surface the theme can put behind it;
 /// * [DashTokens.onAccent] on the accent fill and [DashTokens.onDanger] on the
 ///   red one at 4.5:1, since a button label is text;
-/// * each ink within 8° of the hue of the fill it darkens — contrast measures
-///   lightness alone, and an amber darkened far enough reads as brown;
+/// * each ink within 8° of the HCT hue of the fill it darkens — contrast
+///   measures lightness alone, and an amber darkened far enough reads as brown;
 /// * the three text inks as a visible hierarchy.
 List<DashContrastIssue> dashContrastAudit(DashBrand brand) => [
   for (final brightness in Brightness.values)
@@ -112,6 +115,13 @@ List<DashContrastIssue> _audit(DashTokens t) {
 double dashWorstContrast(Color ink, DashTokens t) =>
     _worst(ink, _surfacesOf(t)).$1;
 
+/// The body of [DashBrand.fromSchemes], here for the private contrast
+/// helpers; `dash_ui.dart` hides it from the package's API.
+DashBrand brandFromSchemes({
+  required ColorScheme light,
+  required ColorScheme dark,
+}) => _brandFromSchemes(light, dark);
+
 const _smallText = 4.5;
 const _maxHueDrift = 8.0;
 
@@ -169,11 +179,23 @@ double _luminance(Color c) {
   return 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b);
 }
 
-/// Around the colour wheel, so 358° and 2° are 4° apart.
+/// Around the colour wheel, so 358° and 2° are 4° apart. HCT hue, the one
+/// Material keeps constant along a tonal palette; HSL hue is not perceptual,
+/// so an ink darkened at a fixed HSL hue can still look like another colour.
+///
+/// Zero when either colour is under Material's own chroma cutoff for a hue
+/// worth theming with (`Score._cutoffChroma` in material_color_utilities):
+/// there an 8-bit rounding moves the hue by tens of degrees nobody can see.
 double _hueDistance(Color a, Color b) {
-  final d = (HSLColor.fromColor(a).hue - HSLColor.fromColor(b).hue).abs();
+  final (ha, hb) = (Hct.fromInt(a.toARGB32()), Hct.fromInt(b.toARGB32()));
+  if (ha.chroma < _hueChromaCutoff || hb.chroma < _hueChromaCutoff) return 0;
+  final d = (ha.hue - hb.hue).abs();
   return math.min(d, 360 - d);
 }
+
+const _hueChromaCutoff = 5.0;
+
+bool _isGrey(Color c) => c.r == c.g && c.g == c.b;
 
 String _hex(Color c) =>
     '#${c.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'dash_contrast.dart';
+
 /// One theme's brand accent: the vivid [fill] and the [ink] used where the
 /// accent is text or an icon.
 ///
@@ -106,6 +108,14 @@ class DashBrand {
     final accent = DashAccent(fill: scheme.primary, ink: scheme.primary);
     return DashBrand(dark: accent, light: accent, onAccent: scheme.onPrimary);
   }
+
+  /// A brand generated from a Material scheme pair — the system's dynamic
+  /// colours, or `ColorScheme.fromSeed` for a preset — accent and grounds
+  /// alike, built to pass [dashContrastAudit].
+  factory DashBrand.fromSchemes({
+    required ColorScheme light,
+    required ColorScheme dark,
+  }) => brandFromSchemes(light: light, dark: dark);
 
   final DashAccent dark;
   final DashAccent light;
