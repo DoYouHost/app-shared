@@ -1,3 +1,5 @@
+import 'dart:ui' show Tristate;
+
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,11 +10,10 @@ import 'support.dart';
 /// The diagnostic identifier and the words a screen reader announces have to
 /// land on the **same** semantics node.
 ///
-/// Wrapping the switch row in `MergeSemantics` — the obvious fix for the switch
-/// being a second stop for a reader — splits them: the identifier keeps a node
-/// of its own and the wording moves to another, so the log can no longer say
-/// which row was pressed. Measured against the framework, there is nothing to
-/// win either: `SwitchListTile` also leaves the switch its own node.
+/// Wrapping the switch row in `MergeSemantics` splits them: the identifier
+/// keeps a node of its own and the wording moves to another, so the log can no
+/// longer say which row was pressed. The row instead puts the switch's state on
+/// its own node, as `SwitchListTile` presents itself to a reader.
 void main() {
   /// Every semantics node under the app, flattened. Walked from
   /// [WidgetTester.getSemantics] rather than from the binding's semantics
@@ -65,6 +66,89 @@ void main() {
       allOf(contains('Keep the bed warm'), contains('chamber-heated')),
       reason: 'the id sits on the node carrying the wording, not beside it',
     );
+
+    handle.dispose();
+  });
+
+  // A reader stopping on a bare "switch, on" cannot tell which setting it is;
+  // `SwitchListTile` gives the switch no stop of its own, and neither may the
+  // row.
+  testWidgets('the switch is the row\'s state, not a nameless second stop', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    var value = true;
+
+    await pumpPhone(
+      tester,
+      Scaffold(
+        body: StatefulBuilder(
+          builder: (context, setState) => SettingsCard(
+            rows: [
+              SettingsSwitchRow(
+                tag: 'settings.row',
+                title: 'Keep the bed warm',
+                subtitle: 'Between two chamber-heated prints',
+                value: value,
+                onChanged: (v) => setState(() => value = v),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    final tagged = nodes(
+      tester,
+    ).where((n) => n.identifier == 'settings.row').single;
+    expect(tagged.flagsCollection.isToggled, Tristate.isTrue);
+    expect(tagged.hasAction(SemanticsAction.tap), isTrue);
+
+    await tester.tap(find.text('Keep the bed warm'));
+    await tester.pumpAndSettle();
+    expect(
+      nodes(tester)
+          .where((n) => n.identifier == 'settings.row')
+          .single
+          .flagsCollection
+          .isToggled,
+      Tristate.isFalse,
+    );
+
+    handle.dispose();
+  });
+
+  // A row whose setting has no effect right now is dimmed; a reader has to
+  // hear that too, and find nothing to press.
+  testWidgets('a disabled row says so and offers no tap', (tester) async {
+    final handle = tester.ensureSemantics();
+
+    await pumpPhone(
+      tester,
+      const Scaffold(
+        body: SettingsCard(
+          rows: [
+            SettingsSwitchRow(
+              tag: 'settings.row',
+              title: 'Keep the bed warm',
+              subtitle: 'Between two chamber-heated prints',
+              value: false,
+              onChanged: null,
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final tagged = nodes(
+      tester,
+    ).where((n) => n.identifier == 'settings.row').single;
+    expect(tagged.flagsCollection.isEnabled, Tristate.isFalse);
+    expect(tagged.hasAction(SemanticsAction.tap), isFalse);
+    expect(tagged.flagsCollection.isToggled, Tristate.isFalse);
 
     handle.dispose();
   });

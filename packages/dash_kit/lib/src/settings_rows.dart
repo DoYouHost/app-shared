@@ -100,39 +100,46 @@ class SettingsSwitchRow extends StatelessWidget {
       // into the tappable node already; wrapping the lot in `MergeSemantics`
       // moved the identifier onto a node of its own and left the label on
       // another — the exact split `logTag` warns about, which costs the log the
-      // ability to say which row was pressed. The switch keeps a second node
-      // either way: that is `Switch`, not this row, and `SwitchListTile` reads
-      // identically (measured).
+      // ability to say which row was pressed. The switch's state goes on that
+      // same node instead and the switch itself is hidden from a reader, which
+      // is how `SwitchListTile` presents itself: one stop, "title, switch, on",
+      // not a second, nameless "switch, on".
       child: logTag(
         tag,
-        InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: enabled ? () => onChanged!(!value) : null,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: DashSpace.md,
-              vertical: DashSpace.md,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(title, style: t.titleSm),
-                      const SizedBox(height: DashSpace.xs),
-                      Text(subtitle, style: t.label),
-                    ],
+        Semantics(
+          toggled: value,
+          enabled: enabled,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: enabled ? () => onChanged!(!value) : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: DashSpace.md,
+                vertical: DashSpace.md,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(title, style: t.titleSm),
+                        const SizedBox(height: DashSpace.xs),
+                        Text(subtitle, style: t.label),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: DashSpace.md),
-                Switch(
-                  value: value,
-                  onChanged: onChanged,
-                  activeThumbColor: t.accent,
-                ),
-              ],
+                  const SizedBox(width: DashSpace.md),
+                  ExcludeSemantics(
+                    child: Switch(
+                      value: value,
+                      onChanged: onChanged,
+                      activeThumbColor: t.accent,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
