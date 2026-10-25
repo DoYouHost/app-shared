@@ -42,4 +42,42 @@ void main() {
     final contentBottom = tester.getRect(find.byKey(contentKey)).bottom;
     expect(surfaceBottom - contentBottom, 0);
   });
+
+  testWidgets('the sheet is painted with the brand\'s overlay', (tester) async {
+    const overlay = Color(0xFF101820);
+    const brand = DashBrand(
+      dark: DashAccent(fill: Color(0xFF5FE08A), ink: Color(0xFF5FE08A)),
+      light: DashAccent(fill: Color(0xFF34C46E), ink: Color(0xFF18733D)),
+      onAccent: Color(0xFF0A0C08),
+      darkSurfaces: DashSurfaces(
+        glow: Color(0xFF131A12),
+        middle: Color(0xFF07090A),
+        edge: Color(0xFF050605),
+        cardEnd: Color(0x04FFFFFF),
+        overlay: overlay,
+        scaffold: Color(0xFF07090A),
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildDashThemeData(Brightness.dark, brand: brand),
+        home: SheetSurface(child: SizedBox(key: contentKey)),
+      ),
+    );
+
+    final box = tester.widget<Container>(
+      find
+          .descendant(
+            of: find.byType(SheetSurface),
+            matching: find.byType(Container),
+          )
+          .first,
+    );
+    final decoration = box.decoration! as BoxDecoration;
+    expect(decoration.color, overlay);
+    expect(
+      (decoration.border! as Border).top.color,
+      const DashTokens.dark(brand).overlayBorder,
+    );
+  });
 }

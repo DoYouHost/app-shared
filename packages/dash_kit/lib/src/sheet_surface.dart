@@ -63,13 +63,9 @@ class SheetSurface extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: t.isDark ? const Color(0xFF0E1310) : const Color(0xFFF6F8F4),
+        color: t.overlaySurface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        border: Border(
-          top: BorderSide(
-            color: t.isDark ? const Color(0x24FFFFFF) : const Color(0x14000000),
-          ),
-        ),
+        border: Border(top: BorderSide(color: t.overlayBorder)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: t.isDark ? 0.5 : 0.22),

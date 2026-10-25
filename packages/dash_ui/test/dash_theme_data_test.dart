@@ -99,4 +99,33 @@ void main() {
       },
     );
   }
+
+  test('the scaffold is the brand\'s', () {
+    const scaffold = Color(0xFF0B0D10);
+    final brand = DashBrand(
+      dark: green.dark,
+      light: green.light,
+      onAccent: green.onAccent,
+      darkSurfaces: const DashSurfaces(
+        glow: Color(0xFF131A12),
+        middle: Color(0xFF07090A),
+        edge: Color(0xFF050605),
+        cardEnd: Color(0x04FFFFFF),
+        overlay: Color(0xFF0E1310),
+        scaffold: scaffold,
+      ),
+    );
+
+    expect(
+      buildDashThemeData(Brightness.dark, brand: brand).scaffoldBackgroundColor,
+      scaffold,
+    );
+    expect(
+      buildDashThemeData(
+        Brightness.light,
+        brand: green,
+      ).scaffoldBackgroundColor,
+      const Color(0xFFFDFEFC),
+    );
+  });
 }

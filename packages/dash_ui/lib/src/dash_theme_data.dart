@@ -53,9 +53,7 @@ ThemeData buildDashThemeData(
     extensions: [t],
     brightness: brightness,
     colorScheme: colorScheme,
-    scaffoldBackgroundColor: t.isDark
-        ? const Color(0xFF07090A)
-        : const Color(0xFFFDFEFC),
+    scaffoldBackgroundColor: t.scaffold,
     textTheme: baseText,
     primaryTextTheme: baseText,
     iconTheme: IconThemeData(color: t.textSecondary),

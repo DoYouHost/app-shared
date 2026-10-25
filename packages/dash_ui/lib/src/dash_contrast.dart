@@ -117,13 +117,14 @@ const _maxHueDrift = 8.0;
 
 /// Every surface a theme can put behind small text: each stop of the
 /// background gradient and the overlay surface, each bare, under a sub-card,
-/// under a card, and under a sub-card on a card.
+/// under either end of a card, and under a sub-card on a card.
 ///
 /// All of them rather than a guess at the worst, because the guess flips with
 /// brightness: a light ink suffers most on the palest surface, a dark ink on
-/// the bare background corner, where the white card flatters it.
+/// the bare background corner, where the white card flatters it. Both card
+/// ends, because a brand's own surfaces can make the far end the darker one.
 List<Color> _surfacesOf(DashTokens t) {
-  final card = t.cardGradient.colors.first;
+  final cardEnds = t.cardGradient.colors;
   return [
     for (final ground in [
       ...t.backgroundGradient.colors,
@@ -131,8 +132,10 @@ List<Color> _surfacesOf(DashTokens t) {
     ]) ...[
       ground,
       _over(t.subCard, ground),
-      _over(card, ground),
-      _over(t.subCard, _over(card, ground)),
+      for (final card in [cardEnds.first, cardEnds.last]) ...[
+        _over(card, ground),
+        _over(t.subCard, _over(card, ground)),
+      ],
     ],
   ];
 }

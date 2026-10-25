@@ -85,4 +85,61 @@ void main() {
     expect(dashWorstContrast(light.danger, light), lessThan(4.5));
     expect(dashWorstContrast(light.warning, light), lessThan(4.5));
   });
+
+  DashBrand withSurfaces(
+    DashBrand brand, {
+    DashSurfaces? dark,
+    DashSurfaces? light,
+  }) => DashBrand(
+    dark: brand.dark,
+    light: brand.light,
+    onAccent: brand.onAccent,
+    darkSurfaces: dark ?? brand.darkSurfaces,
+    lightSurfaces: light ?? brand.lightSurfaces,
+  );
+
+  DashSurfaces surfacesWith(DashSurfaces s, {Color? cardEnd, Color? overlay}) =>
+      DashSurfaces(
+        glow: s.glow,
+        middle: s.middle,
+        edge: s.edge,
+        cardEnd: cardEnd ?? s.cardEnd,
+        overlay: overlay ?? s.overlay,
+        scaffold: s.scaffold,
+      );
+
+  test('a brand whose overlay is too pale fails, naming the overlay', () {
+    const overlay = Color(0xFF6E6E6E);
+    final issues = dashContrastAudit(
+      withSurfaces(
+        green,
+        dark: surfacesWith(DashSurfaces.classicDark, overlay: overlay),
+      ),
+    );
+
+    expect(issues, isNotEmpty);
+    expect(issues.every((i) => i.brightness == Brightness.dark), isTrue);
+    // The worst ground is the overlay under a card and a sub-card, which the
+    // two white washes lift from #6e6e6e to #7a7a7a.
+    expect(issues.map((i) => i.problem), everyElement(endsWith('#7a7a7a')));
+  });
+
+  // The card's far end used to be left out: harmless while it was a fixed
+  // near-white, not once a brand chooses it.
+  test('the far end of a card is measured', () {
+    final issues = dashContrastAudit(
+      withSurfaces(
+        green,
+        light: surfacesWith(
+          DashSurfaces.classicLight,
+          cardEnd: const Color(0xFF8A8A8A),
+        ),
+      ),
+    );
+
+    expect(
+      issues.map((i) => (i.brightness, i.token)),
+      contains((Brightness.light, 'textTertiary')),
+    );
+  });
 }
