@@ -43,7 +43,8 @@ class DashContrastIssue {
 /// * every ink that carries small text — the two muted inks, [DashTokens.accentInk],
 ///   [DashTokens.accentOrangeInk], [DashTokens.dangerInk] and
 ///   [DashTokens.warningInk] — at WCAG AA's
-///   4.5:1 on the worst surface the theme can put behind it;
+///   4.5:1 on the worst surface the theme can put behind it, and the accent
+///   ink also on those surfaces under the accent's own wash;
 /// * [DashTokens.onAccent] on the accent fill and [DashTokens.onDanger] on the
 ///   red one at 4.5:1, since a button label is text;
 /// * each ink within 8° of the HCT hue of the fill it darkens — contrast
@@ -60,10 +61,10 @@ List<DashContrastIssue> _audit(DashTokens t) {
       issues.add(DashContrastIssue(t.brightness, token, problem));
 
   final surfaces = _surfacesOf(t);
+  final accentSurfaces = _accentSurfacesOf(t);
   for (final (token, ink) in [
     ('textSecondary', t.textSecondary),
     ('textTertiary', t.textTertiary),
-    ('accentInk', t.accentInk),
     ('accentOrangeInk', t.accentOrangeInk),
     ('dangerInk', t.dangerInk),
     ('warningInk', t.warningInk),
@@ -72,6 +73,13 @@ List<DashContrastIssue> _audit(DashTokens t) {
     if (ratio < _smallText) {
       fail(token, 'is ${ratio.toStringAsFixed(2)}:1 over ${_hex(surface)}');
     }
+  }
+  final (accentRatio, accentSurface) = _worst(t.accentInk, accentSurfaces);
+  if (accentRatio < _smallText) {
+    fail(
+      'accentInk',
+      'is ${accentRatio.toStringAsFixed(2)}:1 over ${_hex(accentSurface)}',
+    );
   }
 
   for (final (token, label, fill) in [
@@ -150,6 +158,18 @@ List<Color> _surfacesOf(DashTokens t) {
     ],
   ];
 }
+
+/// [_surfacesOf] plus each of them under the accent's own wash, at the
+/// strongest one dash_ui paints: the selected chip and segment
+/// (`dash_theme_data.dart`). The accent's ink is the text read on that wash —
+/// Material's on-container case — so it is measured there too.
+List<Color> _accentSurfacesOf(DashTokens t) {
+  final surfaces = _surfacesOf(t);
+  final wash = t.accent.withValues(alpha: _maxAccentWash);
+  return [...surfaces, for (final s in surfaces) _over(wash, s)];
+}
+
+const _maxAccentWash = 0.18;
 
 (double, Color) _worst(Color ink, List<Color> surfaces) {
   var worst = (double.infinity, surfaces.first);

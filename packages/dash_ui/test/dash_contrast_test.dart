@@ -23,13 +23,13 @@ void main() {
       withLightInk(gold, const Color(0xFF9A6E12)),
     );
 
-    // The background's first stop under a sub-card: the harshest ground for a
-    // dark ink, not the white card that flatters it.
+    // The accent's own wash over the background's first stop: the harshest
+    // ground for a dark accent ink, not the white card that flatters it.
     expect(issues, const [
       DashContrastIssue(
         Brightness.light,
         'accentInk',
-        'is 3.81:1 over #e5ede2',
+        'is 3.39:1 over #e3dfc0',
       ),
     ]);
   });
@@ -62,7 +62,7 @@ void main() {
   test('a label ink that disappears into the accent fill fails', () {
     const brand = DashBrand(
       dark: DashAccent(fill: Color(0xFF5FE08A), ink: Color(0xFF5FE08A)),
-      light: DashAccent(fill: Color(0xFF34C46E), ink: Color(0xFF18733D)),
+      light: DashAccent(fill: Color(0xFF34C46E), ink: Color(0xFF15713B)),
       onAccent: Color(0xFF2E8A50),
     );
 
@@ -119,9 +119,17 @@ void main() {
 
     expect(issues, isNotEmpty);
     expect(issues.every((i) => i.brightness == Brightness.dark), isTrue);
-    // The worst ground is the overlay under a card and a sub-card, which the
-    // two white washes lift from #6e6e6e to #7a7a7a.
-    expect(issues.map((i) => i.problem), everyElement(endsWith('#7a7a7a')));
+    // For the fixed inks the worst ground is the overlay under a card and a
+    // sub-card, which the two white washes lift from #6e6e6e to #7a7a7a; the
+    // accent ink fares worst on the overlay under its own wash.
+    expect(
+      issues.where((i) => i.token != 'accentInk').map((i) => i.problem),
+      everyElement(endsWith('#7a7a7a')),
+    );
+    expect(
+      issues.where((i) => i.token == 'accentInk').map((i) => i.problem),
+      everyElement(endsWith('#758c7d')),
+    );
   });
 
   // The card's far end used to be left out: harmless while it was a fixed
@@ -161,6 +169,24 @@ void main() {
     expect(
       dashContrastAudit(brand).map((i) => (i.brightness, i.token)),
       contains((Brightness.light, 'textTertiary')),
+    );
+  });
+
+  // The accent's own ink is read on the accent's wash — a selected chip or
+  // segment, a status pill — so the audit measures it there too, at the
+  // strongest wash dash_ui paints.
+  test('an accent ink that clears the grounds but not its own wash fails', () {
+    // 4.53:1 on every plain ground; the 18 % wash of its fill darkens the
+    // ground under it enough to drop it below 4.5.
+    final brand = withLightInk(green, const Color(0xFF207944));
+
+    expect(
+      dashWorstContrast(brand.light.ink, DashTokens.light(brand)),
+      greaterThanOrEqualTo(4.5),
+    );
+    expect(
+      dashContrastAudit(brand).map((i) => (i.brightness, i.token)),
+      contains((Brightness.light, 'accentInk')),
     );
   });
 }

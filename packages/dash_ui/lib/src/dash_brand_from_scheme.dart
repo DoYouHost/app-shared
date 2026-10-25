@@ -56,15 +56,17 @@ DashBrand _brandFromSchemes(ColorScheme light, ColorScheme dark) {
       lightSurfaces: lightSurfaces,
     ),
   );
-  // A dark ink fares worst on the darkest surface it can sit on.
-  final darkest = _surfacesOf(
+  // A dark ink fares worst on the darkest surface it can sit on, its own
+  // accent wash included.
+  final darkest = _accentSurfacesOf(
     probe,
   ).map((s) => ColorUtils.lstarFromArgb(s.toARGB32())).reduce(math.min);
   // Black when no tone reaches the ratio, as MCU's own fallback has it.
   var inkTone = Contrast.darkerUnsafe(tone: darkest, ratio: _smallText);
   // The tone is continuous and the ink is 8-bit; rounding can land a hair
   // under the ratio the audit then measures on the rounded colour.
-  while (inkTone > 0 && dashWorstContrast(tone(inkTone), probe) < _smallText) {
+  while (inkTone > 0 &&
+      _worst(tone(inkTone), _accentSurfacesOf(probe)).$1 < _smallText) {
     inkTone = math.max(0, inkTone - 0.5);
   }
 
