@@ -25,9 +25,9 @@ dependencies:
   # classification names every type so that the next one added is a compile
   # error here rather than a silent default.
   dio: ^5.10.0
-  material_ui: ^1.8.0
 
 dev_dependencies:
+  material_ui: ^1.8.0
   http_mock_adapter: ^0.6.1
   # Only to build a recorder in the tests, whose redactor comes from here.
   app_report_client:

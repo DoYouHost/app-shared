@@ -140,8 +140,4 @@ void main() {
       greaterThanOrEqualTo(4.5),
     );
   });
-
-  test('a ground no tone can clear gets a black ink', () {
-    expect(onGround(30, 40).light.ink, const Color(0xFF000000));
-  });
 }

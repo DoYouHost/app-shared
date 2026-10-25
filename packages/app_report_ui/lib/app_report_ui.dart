@@ -13,7 +13,11 @@
 /// The application wires three things:
 ///
 /// * `reportBindingsProvider` overridden in its root `ProviderScope`;
-/// * `ReportLocalizations.delegate` in `MaterialApp.localizationsDelegates`;
+/// * `ReportLocalizations.delegate` in `MaterialApp.localizationsDelegates`,
+///   beside material_ui's `GlobalMaterialLocalizations.delegates` — not the
+///   generated `ReportLocalizations.localizationsDelegates`, which `gen-l10n`
+///   still fills from `flutter_localizations`, whose Material strings
+///   material_ui widgets do not find;
 /// * `RecordingBannerScaffold` in `MaterialApp.builder`, and `BugReportScreen`
 ///   routed at [bugReportRoute].
 library;

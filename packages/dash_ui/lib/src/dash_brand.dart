@@ -25,8 +25,8 @@ class DashAccent {
 }
 
 /// One theme's grounds: the opaque backdrop gradient, the far end of a card
-/// (a translucent wash in the classic dark theme), the overlay behind dialogs
-/// and sheets, and the scaffold.
+/// (a translucent wash in every dark theme this package builds), the overlay
+/// behind dialogs and sheets, and the scaffold.
 ///
 /// Three named stops rather than a list, so `==` compares values and an
 /// instance can be `const`.
