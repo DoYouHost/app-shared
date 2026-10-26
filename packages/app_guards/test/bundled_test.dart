@@ -30,6 +30,7 @@ void main() {
       'check_l10n_sync.py',
       'check_l10n_language.py',
       'aab_versions.py',
+      'store_images.py',
       'log_coverage.py',
       'play_internal.py',
       'commit-msg',

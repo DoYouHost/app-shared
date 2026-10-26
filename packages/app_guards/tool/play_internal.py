@@ -2,11 +2,16 @@
 # requires-python = ">=3.11"
 # dependencies = ["google-api-python-client>=2.100", "google-auth>=2.20"]
 # ///
-"""Google Play publishing: list the tracks, or release bundles to internal testing.
+"""Google Play publishing: list the tracks, release bundles to internal testing,
+or replace the listing's screenshots.
 
   tracks                        list every track and the releases on it
   internal [--dry-run] AAB...   upload the bundles and release each one to
                                 internal testing, all in one committed edit
+  screenshots [--send-for-review]
+                                show what the listing holds and what the
+                                configuration's [screenshots] would put there;
+                                with the flag, replace them and commit
 
 A bundle whose versionCode is already on its track is skipped, so a re-run after
 a failure finishes the job instead of tripping over "version code already used".
@@ -17,7 +22,12 @@ the application (`--config` points elsewhere). The key lives outside the repo;
 PLAY_SA_KEY overrides its path. Run as `dart run app_guards:play`, which goes
 through uv for the dependencies declared above.
 
+A listing change cannot be committed without going to review — Play refuses
+`changesNotSentForReview` for it — so `screenshots` changes nothing unless told
+`--send-for-review`.
+
 usage: dart run app_guards:play tracks | internal [--dry-run] AAB...
+                              | screenshots [--send-for-review]
 """
 
 import argparse
@@ -38,6 +48,7 @@ from googleapiclient.http import MediaFileUpload
 # aab_versions.py ships next to this script.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from aab_versions import bundle_versions  # noqa: E402
+from store_images import screenshot_plan  # noqa: E402
 
 SCOPE = "https://www.googleapis.com/auth/androidpublisher"
 
@@ -49,11 +60,13 @@ KEY = Path()
 # into a bundle says which form factor it is — more reliably than the order or
 # the name of the files handed in.
 BANDS: list[tuple[int, str]] = []
+# The configuration's `[screenshots]` table; see store_images.py.
+SCREENSHOTS: dict = {}
 
 
 def load_config(path: str) -> None:
     """The application's half: see the `tool/play.toml` files."""
-    global PACKAGE, KEY, BANDS
+    global PACKAGE, KEY, BANDS, SCREENSHOTS
     with open(path, "rb") as f:
         config = tomllib.load(f)
     PACKAGE = config["package"]
@@ -67,6 +80,7 @@ def load_config(path: str) -> None:
         ((band["from"], band["track"]) for band in config.get("bands", [])),
         reverse=True,
     )
+    SCREENSHOTS = config.get("screenshots", {})
 
 
 def track_for(code: int) -> str:
@@ -169,6 +183,35 @@ def release_internal(edits, edit_id, bundles, dry_run):
     return changed
 
 
+def replace_screenshots(edits, edit_id, plan, send):
+    """Show what each image type holds and what replaces it; replace it when [send].
+
+    True when the edit needs a commit.
+    """
+    language = SCREENSHOTS.get("language", "en-US")
+    images = edits.images()
+    for kind, paths in plan.items():
+        held = images.list(
+            packageName=PACKAGE, editId=edit_id, language=language, imageType=kind
+        ).execute(num_retries=RETRIES).get("images", [])
+        print(f"{language} {kind}: {len(held)} on the listing, {len(paths)} in the configuration")
+        for path in paths:
+            print(f"    {path.name}")
+    if not send:
+        return False
+    for kind, paths in plan.items():
+        images.deleteall(
+            packageName=PACKAGE, editId=edit_id, language=language, imageType=kind
+        ).execute(num_retries=RETRIES)
+        for path in paths:
+            images.upload(
+                packageName=PACKAGE, editId=edit_id, language=language, imageType=kind,
+                media_body=MediaFileUpload(str(path), mimetype="image/png"),
+            ).execute(num_retries=RETRIES)
+        print(f"{language} {kind}: replaced")
+    return True
+
+
 def commit_edit(edits, edit_id):
     """Commits in whichever of Play's two states the Console is in.
 
@@ -176,16 +219,19 @@ def commit_edit(edits, edit_id):
     (a rejected Wear build left them there) only a held commit is accepted, and
     while they are in review the flag "must not be set". The held one goes
     first, so unsent changes are never sent from here; the plain one carries
-    only internal tracks, which Google publishes without a review.
+    internal tracks, which Google publishes without a review, or screenshots
+    the caller asked to send for review. True when the plain one went.
     """
     try:
         edits.commit(
             packageName=PACKAGE, editId=edit_id, changesNotSentForReview=True
         ).execute(num_retries=RETRIES)
+        return False
     except HttpError as e:
         if e.status_code != 400 or "must not be set" not in str(e.reason):
             raise
         edits.commit(packageName=PACKAGE, editId=edit_id).execute(num_retries=RETRIES)
+        return True
 
 
 def main():
@@ -197,12 +243,22 @@ def main():
     internal = commands.add_parser("internal", help="release bundles to internal testing")
     internal.add_argument("--dry-run", action="store_true", help="read and report, change nothing")
     internal.add_argument("bundles", nargs="+", metavar="AAB")
+    shots = commands.add_parser("screenshots", help="replace the listing's screenshots")
+    shots.add_argument("--send-for-review", action="store_true",
+                       help="replace them and commit, which sends the listing to review")
     args = parser.parse_args()
     load_config(args.config)
 
     # Read before touching the network, so a missing or mismatched bundle
     # costs nothing and leaves no edit behind.
     bundles = read_bundles(args.bundles) if args.command == "internal" else []
+    shots = {}
+    if args.command == "screenshots":
+        if not SCREENSHOTS:
+            sys.exit(f"{args.config}: no [screenshots] table")
+        shots, problems = screenshot_plan(SCREENSHOTS, Path.cwd())
+        if problems:
+            sys.exit("\n".join(problems))
     if not KEY.is_file():
         sys.exit(f"No service-account key at {KEY} (set PLAY_SA_KEY to override).")
     creds = service_account.Credentials.from_service_account_file(str(KEY), scopes=[SCOPE])
@@ -214,6 +270,13 @@ def main():
         try:
             if args.command == "tracks":
                 list_tracks(edits, edit_id)
+            elif args.command == "screenshots":
+                if replace_screenshots(edits, edit_id, shots, args.send_for_review):
+                    sent = commit_edit(edits, edit_id)
+                    committed = True
+                    print("Committed: the listing is in review." if sent else
+                          "Committed and held: Play holds unsent changes, which go"
+                          " to review together from the Console.")
             elif release_internal(edits, edit_id, bundles, args.dry_run):
                 commit_edit(edits, edit_id)
                 committed = True

@@ -2,9 +2,10 @@ import 'dart:io';
 
 import 'package:app_guards/src/bundled.dart';
 
-/// `dart run app_guards:play tracks | internal [--dry-run] AAB...` — Google Play
-/// publishing, configured by the application's `tool/play.toml`. Runs through
-/// uv, which resolves the script's Google API dependencies.
+/// `dart run app_guards:play tracks | internal [--dry-run] AAB... | screenshots
+/// [--send-for-review]` — Google Play publishing, configured by the application's
+/// `tool/play.toml`. Runs through uv, which resolves the script's Google API
+/// dependencies.
 Future<void> main(List<String> args) async => exit(
   await runBundled(
     'uv',
