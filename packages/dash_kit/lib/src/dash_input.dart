@@ -93,6 +93,20 @@ Widget dashCombo<T>(
     enableFilter: filterable,
     requestFocusOnTap: filterable,
     textStyle: textStyle,
+    // A filterable field is a text field, so its arrow is a button of its own for a
+    // screen reader (a plain select merges it into the field). The platform names it.
+    trailingIcon: filterable
+        ? Icon(
+            Icons.arrow_drop_down,
+            semanticLabel: MaterialLocalizations.of(context).showMenuTooltip,
+          )
+        : null,
+    selectedTrailingIcon: filterable
+        ? Icon(
+            Icons.arrow_drop_up,
+            semanticLabel: MaterialLocalizations.of(context).showMenuTooltip,
+          )
+        : null,
     inputDecorationTheme: theme.suffixIconConstraints == null
         ? theme.copyWith(suffixIconConstraints: _arrowBox)
         : theme,
@@ -101,11 +115,12 @@ Widget dashCombo<T>(
   ).tagged(id);
 }
 
-/// How much room the menu's arrow may claim. Flutter builds it as an `IconButton`
-/// with a 48x48 target, which pushes the field to 56 while every text field is 48. 40
-/// is a ceiling: the button's own `Padding(all: 4)` leaves 40 + 8 in a 48-tall field.
-/// The whole field is the real target, so the smaller button costs no reach.
-const _arrowBox = BoxConstraints.tightFor(width: 40, height: 40);
+/// How much room the menu's arrow may claim, **including** the 4 dp padding the menu
+/// puts around it: the button gets 8 dp less than this. Left alone the menu builds a
+/// 48 dp button plus that padding, which makes the field 56 while every text field is
+/// 48. 48 here keeps the field at 48 and leaves a 40 dp button; the whole field is
+/// the real target, so the a11y tests accept 40 for this one control and no less.
+const _arrowBox = BoxConstraints.tightFor(width: 48, height: 48);
 
 /// A [dashCombo] whose first row means "no filter". **Null is the any-row**, so [T] is
 /// bound to a non-null type and a filter's two states need no sentinel. [options]

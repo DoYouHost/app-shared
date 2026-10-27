@@ -55,6 +55,7 @@ class FilterButton extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.tune,
+                    semanticLabel: tooltip,
                     color: active ? t.accentInk : t.textSecondary,
                   ),
                 ),

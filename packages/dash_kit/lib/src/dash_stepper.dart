@@ -52,9 +52,8 @@ class DashStepper extends StatelessWidget {
           onPressed: change == null || to == null ? null : () => change(to),
           icon: Icon(icon, color: compact ? t.textSecondary : null),
           iconSize: compact ? 20 : null,
-          visualDensity: compact ? VisualDensity.compact : null,
           constraints: compact
-              ? const BoxConstraints.tightFor(width: 36, height: 36)
+              ? const BoxConstraints.tightFor(width: 48, height: 48)
               : null,
           padding: compact ? EdgeInsets.zero : null,
         ).tagged(id);

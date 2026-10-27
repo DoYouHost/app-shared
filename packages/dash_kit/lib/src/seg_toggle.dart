@@ -47,7 +47,7 @@ class DashSegToggle<T> extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: () => onChanged(seg.value),
         child: Container(
-          height: 44,
+          height: 48,
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: DashSpace.sm),
           decoration: BoxDecoration(
