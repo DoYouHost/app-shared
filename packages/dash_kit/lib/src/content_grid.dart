@@ -9,7 +9,9 @@ import 'package:material_ui/material_ui.dart';
 /// row is an [IntrinsicHeight] `Row` whose tiles stretch to the tallest one, so a
 /// tile that draws its own background fills the row evenly.
 ///
-/// The number of columns follows [minTileWidth], as many as fit. Pass it scaled
+/// The number of columns follows [minTileWidth], as many as fit, and never more
+/// than [maxColumns]: a pair of buttons asks for two so that a lone one is not
+/// left in half a row. Pass it scaled
 /// by the text scale when the tile is text, so a larger font gets fewer, wider
 /// tiles instead of a cut label. A last row with fewer tiles leaves its gaps empty.
 ///
@@ -23,12 +25,18 @@ class ContentGrid extends StatelessWidget {
     required this.children,
     this.spacing = DashSpace.sm,
     this.runSpacing = DashSpace.sm,
-  }) : assert(minTileWidth > 0);
+    this.maxColumns,
+  }) : assert(minTileWidth > 0),
+       assert(maxColumns == null || maxColumns > 0);
 
   /// The narrowest a tile may be before a column is dropped.
   final double minTileWidth;
   final double spacing;
   final double runSpacing;
+
+  /// An upper bound on the columns, e.g. the number of tiles when they should
+  /// share the width evenly instead of leaving room for more.
+  final int? maxColumns;
   final List<Widget> children;
 
   /// How many columns of at least [minTileWidth] fit in [width], at least one.
@@ -36,8 +44,11 @@ class ContentGrid extends StatelessWidget {
     double width, {
     required double minTileWidth,
     double spacing = DashSpace.sm,
-  }) =>
-      ((width + spacing) / (minTileWidth + spacing)).floor().clamp(1, 1 << 20);
+    int? maxColumns,
+  }) => ((width + spacing) / (minTileWidth + spacing)).floor().clamp(
+    1,
+    maxColumns ?? 1 << 20,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +59,7 @@ class ContentGrid extends StatelessWidget {
           constraints.maxWidth,
           minTileWidth: minTileWidth,
           spacing: spacing,
+          maxColumns: maxColumns,
         );
         final rows = <Widget>[];
         for (var start = 0; start < children.length; start += columns) {

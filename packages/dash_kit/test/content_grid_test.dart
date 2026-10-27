@@ -50,6 +50,46 @@ void main() {
     }
   });
 
+  test('maxColumns caps the columns however much room there is', () {
+    expect(
+      ContentGrid.columnsFor(
+        1000,
+        minTileWidth: 150,
+        spacing: 8,
+        maxColumns: 2,
+      ),
+      2,
+    );
+    expect(
+      ContentGrid.columnsFor(100, minTileWidth: 150, spacing: 8, maxColumns: 2),
+      1,
+    );
+  });
+
+  testWidgets('tiles that share the width evenly fill it, however few', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 400,
+              child: ContentGrid(
+                minTileWidth: 100,
+                maxColumns: 1,
+                spacing: 8,
+                children: [_tile('x', key: const Key('a'))],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(tester.getSize(find.byKey(const Key('a'))).width, 400);
+  });
+
   testWidgets('a row is as tall as its tallest tile and the others stretch', (
     tester,
   ) async {
