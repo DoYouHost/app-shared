@@ -13,6 +13,7 @@ export 'package:dash_ui/dash_ui.dart' hide dashAppBar;
 
 export 'src/button_pair.dart';
 export 'src/confirm_dialog.dart';
+export 'src/beside_or_below.dart';
 export 'src/content_grid.dart';
 export 'src/dash_app_bar.dart';
 export 'src/dash_icon_tile.dart';
