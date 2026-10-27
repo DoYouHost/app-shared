@@ -100,6 +100,36 @@ void main() {
     );
   }
 
+  for (final scale in [1.0, 1.5, 2.0]) {
+    testWidgets('the icon in a button grows with the text at $scale', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildDashThemeData(Brightness.light, brand: green),
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(scale)),
+            child: child!,
+          ),
+          home: Scaffold(
+            body: Center(
+              child: FilledButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.add),
+                label: const Text('Add'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // A Material button icon is 18 dp.
+      expect(tester.getSize(find.byIcon(Icons.add)).width, 18 * scale);
+    });
+  }
+
   test('the scaffold is the brand\'s', () {
     const scaffold = Color(0xFF0B0D10);
     final brand = DashBrand(

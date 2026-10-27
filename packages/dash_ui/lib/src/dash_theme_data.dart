@@ -56,15 +56,18 @@ ThemeData buildDashThemeData(
     scaffoldBackgroundColor: t.scaffold,
     textTheme: baseText,
     primaryTextTheme: baseText,
-    iconTheme: IconThemeData(color: t.textSecondary),
-    primaryIconTheme: IconThemeData(color: t.textPrimary),
+    iconTheme: IconThemeData(color: t.textSecondary, applyTextScaling: true),
+    primaryIconTheme: IconThemeData(
+      color: t.textPrimary,
+      applyTextScaling: true,
+    ),
     dividerTheme: DividerThemeData(color: t.hairline, thickness: 1, space: 1),
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.transparent,
       foregroundColor: t.textPrimary,
       elevation: 0,
       scrolledUnderElevation: 0,
-      iconTheme: IconThemeData(color: t.textPrimary),
+      iconTheme: IconThemeData(color: t.textPrimary, applyTextScaling: true),
       titleTextStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
         fontSize: 20,
@@ -181,7 +184,11 @@ ThemeData buildDashThemeData(
         color: t.accentInk,
       ),
       checkmarkColor: t.accentInk,
-      iconTheme: IconThemeData(color: t.textSecondary, size: 18),
+      iconTheme: IconThemeData(
+        color: t.textSecondary,
+        size: 18,
+        applyTextScaling: true,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(
