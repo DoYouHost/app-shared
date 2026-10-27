@@ -80,6 +80,7 @@ void main() {
       final t = DashTokens.resolve(brightness, green);
       expect(dashWorstContrast(t.dangerInk, t), greaterThanOrEqualTo(4.5));
       expect(dashWorstContrast(t.warningInk, t), greaterThanOrEqualTo(4.5));
+      expect(dashWorstContrast(t.accentBlueInk, t), greaterThanOrEqualTo(4.5));
     }
     const light = DashTokens.light(green);
     expect(dashWorstContrast(light.danger, light), lessThan(4.5));

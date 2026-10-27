@@ -66,6 +66,7 @@ List<DashContrastIssue> _audit(DashTokens t) {
     ('textSecondary', t.textSecondary),
     ('textTertiary', t.textTertiary),
     ('accentOrangeInk', t.accentOrangeInk),
+    ('accentBlueInk', t.accentBlueInk),
     ('dangerInk', t.dangerInk),
     ('warningInk', t.warningInk),
   ]) {
@@ -95,6 +96,7 @@ List<DashContrastIssue> _audit(DashTokens t) {
   for (final (token, fill, ink) in [
     ('accentInk', t.accent, t.accentInk),
     ('accentOrangeInk', t.accentOrange, t.accentOrangeInk),
+    ('accentBlueInk', t.accentBlue, t.accentBlueInk),
     ('dangerInk', t.danger, t.dangerInk),
     ('warningInk', t.warning, t.warningInk),
   ]) {

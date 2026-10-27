@@ -26,6 +26,7 @@ class DashTokens extends ThemeExtension<DashTokens> {
       accentOrange = const Color(0xFFFF9F5C),
       accentOrangeInk = const Color(0xFFFF9F5C),
       accentBlue = const Color(0xFF4FA6F7),
+      accentBlueInk = const Color(0xFF4FA6F7),
       danger = const Color(0xFFFF6B6B),
       dangerInk = const Color(0xFFFF6B6B),
       warning = const Color(0xFFE0A800),
@@ -51,6 +52,7 @@ class DashTokens extends ThemeExtension<DashTokens> {
       accentOrange = const Color(0xFFE07C36),
       accentOrangeInk = const Color(0xFFA05019),
       accentBlue = const Color(0xFF2C7FE0),
+      accentBlueInk = const Color(0xFF1F63B8),
       danger = const Color(0xFFD64545),
       dangerInk = const Color(0xFFBE2A2A),
       warning = const Color(0xFFE0A800),
@@ -130,6 +132,10 @@ class DashTokens extends ThemeExtension<DashTokens> {
   final Color accentOrangeInk;
 
   final Color accentBlue;
+
+  /// The blue as ink: the swatch reads 3.6-3.8:1 as text on the light grounds,
+  /// under the 4.5:1 small text needs.
+  final Color accentBlueInk;
 
   /// Warning, low, error, delete — as a fill, a border or a dot.
   final Color danger;

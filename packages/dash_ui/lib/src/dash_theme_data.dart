@@ -195,7 +195,7 @@ ThemeData buildDashThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
-              ? t.accent.withValues(alpha: 0.18)
+              ? t.accent.withValues(alpha: 0.14)
               : t.subCard,
         ),
         foregroundColor: WidgetStateProperty.resolveWith(
