@@ -113,6 +113,7 @@ class _DashSearchFieldState extends State<DashSearchField> {
                 '${widget.id}.clear',
                 IconButton(
                   icon: Icon(Icons.clear, color: t.textTertiary),
+                  tooltip: MaterialLocalizations.of(context).clearButtonTooltip,
                   onPressed: _clear,
                 ),
               ),

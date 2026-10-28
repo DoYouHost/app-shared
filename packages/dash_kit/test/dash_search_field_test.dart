@@ -63,6 +63,28 @@ void main() {
     expect(stop().last['id'], 'inventory.search.clear');
   });
 
+  testWidgets('the clear button is named for a screen reader', (tester) async {
+    // An icon-only button with no tooltip is a tappable node with no label.
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: testTheme,
+        home: Scaffold(
+          body: DashSearchField(
+            id: 'inventory.search',
+            hintText: 'Search',
+            onChanged: (_) {},
+          ),
+        ),
+      ),
+    );
+    await tester.enterText(find.byType(TextField), 'petg');
+    await tester.pump();
+
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    handle.dispose();
+  });
+
   testWidgets('hint and cursor sit in the middle of the pill', (tester) async {
     // The icon makes the pill 48 dp tall, a line of text is shorter, and a
     // borderless field aligns its text to the top: on a phone the hint sat
