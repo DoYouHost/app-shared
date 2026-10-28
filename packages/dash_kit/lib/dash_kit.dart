@@ -28,6 +28,7 @@ export 'src/date_picker.dart';
 export 'src/filter_controls.dart';
 export 'src/inline_note.dart';
 export 'src/max_content_width.dart';
+export 'src/picker_tile.dart';
 export 'src/progress.dart';
 export 'src/prompt_name_dialog.dart';
 export 'src/refresh_when_shown.dart';
