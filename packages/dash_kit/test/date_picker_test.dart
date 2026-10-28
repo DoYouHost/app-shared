@@ -23,6 +23,7 @@ void main() {
     _Answer answer, {
     DateTime? initial,
     DateTime? firstDate,
+    DatePickerEntryMode mode = DatePickerEntryMode.calendar,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -36,6 +37,7 @@ void main() {
                     context,
                     initial: initial,
                     firstDate: firstDate,
+                    initialEntryMode: mode,
                   );
                   answer.done = true;
                 },
@@ -61,6 +63,32 @@ void main() {
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
   }
+
+  testWidgets('the date dialog opens on a field to type into when asked', (
+    tester,
+  ) async {
+    final answer = _Answer();
+
+    await withClock(Clock.fixed(now), () async {
+      await open(tester, answer, mode: DatePickerEntryMode.input);
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.byType(CalendarDatePicker), findsNothing);
+      await accept(tester);
+      await accept(tester);
+    });
+
+    // The field starts on the day the calendar would have: the answer is the same.
+    expect(answer.at, DateTime(2026, 9, 3, 21));
+  });
+
+  testWidgets('and on the calendar by default', (tester) async {
+    final answer = _Answer();
+
+    await withClock(Clock.fixed(now), () => open(tester, answer));
+
+    expect(find.byType(CalendarDatePicker), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+  });
 
   testWidgets('a date and a time become one instant', (tester) async {
     final answer = _Answer();

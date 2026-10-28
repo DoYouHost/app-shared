@@ -6,16 +6,24 @@ import 'package:material_ui/material_ui.dart';
 ///
 /// A stored date the range no longer covers is how the picker's assert gets
 /// hit: an expired API key, a due date set years ago or years ahead.
+///
+/// [initialEntryMode] is how the dialog opens: the calendar by default, or a field
+/// to type the date into. Flutter's calendar is 48 dp a row in portrait only; in
+/// landscape its rows are 42 dp cut to the window's height over seven rows, so a
+/// caller in landscape may open on the field, which is a full-size target, and
+/// leave the toggle to the calendar for whoever wants it.
 Future<DateTime?> pickDate(
   BuildContext context, {
   required DateTime initial,
   required DateTime firstDate,
   required DateTime lastDate,
+  DatePickerEntryMode initialEntryMode = DatePickerEntryMode.calendar,
 }) => showDatePicker(
   context: context,
   initialDate: _openingDay(initial, firstDate, lastDate),
   firstDate: firstDate,
   lastDate: lastDate,
+  initialEntryMode: initialEntryMode,
 );
 
 /// [seed] clamped into [first]..[last] by **day**, because that is what the
@@ -38,12 +46,15 @@ DateTime _openingDay(DateTime seed, DateTime first, DateTime last) {
 /// a caller editing something whose time may already have passed passes an
 /// earlier day, so opening the picker does not silently move it.
 ///
+/// [initialEntryMode] is the date dialog's: see [pickDate].
+///
 /// Returns null when either step is dismissed, and when the screen goes away
 /// between them — half an answer is not one.
 Future<DateTime?> pickDateTime(
   BuildContext context, {
   DateTime? initial,
   DateTime? firstDate,
+  DatePickerEntryMode initialEntryMode = DatePickerEntryMode.calendar,
 }) async {
   final now = clock.now();
   final seed = initial ?? now.add(const Duration(hours: 1));
@@ -53,6 +64,7 @@ Future<DateTime?> pickDateTime(
     initial: seed,
     firstDate: firstDate ?? now,
     lastDate: DateTime(now.year + 5),
+    initialEntryMode: initialEntryMode,
   );
   if (date == null || !context.mounted) return null;
 
