@@ -26,11 +26,11 @@ class BesideOrBelow extends MultiChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _RenderBesideOrBelow(gap: gap, runGap: runGap);
+      _RenderBesideOrBelow(gap, runGap);
 
   @override
-  void updateRenderObject(BuildContext context, _RenderBesideOrBelow render) {
-    render
+  void updateRenderObject(BuildContext context, RenderObject renderObject) {
+    (renderObject as _RenderBesideOrBelow)
       ..gap = gap
       ..runGap = runGap;
   }
@@ -40,9 +40,7 @@ class _RenderBesideOrBelow extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, MultiChildLayoutParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, MultiChildLayoutParentData> {
-  _RenderBesideOrBelow({required double gap, required double runGap})
-    : _gap = gap,
-      _runGap = runGap;
+  _RenderBesideOrBelow(this._gap, this._runGap);
 
   double _gap;
   double get gap => _gap;
