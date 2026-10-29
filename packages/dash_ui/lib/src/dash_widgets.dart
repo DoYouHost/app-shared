@@ -2,6 +2,8 @@ import 'package:material_ui/material_ui.dart';
 
 import 'dash_tokens.dart';
 
+import 'dash_scale.dart';
+
 /// Full-screen gradient backdrop. Wrap a transparent [Scaffold] in it so the
 /// gradient shows through the app bar and the body.
 class DashBackground extends StatelessWidget {
@@ -93,9 +95,9 @@ class DashPill extends StatelessWidget {
           ? const EdgeInsets.symmetric(horizontal: 8, vertical: 3)
           : const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: dense ? 0.14 : 0.16),
+        color: accent.withValues(alpha: dense ? 0.14 : DashAlpha.wash),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: accent.withValues(alpha: 0.4)),
+        border: Border.all(color: accent.withValues(alpha: DashAlpha.outline)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
