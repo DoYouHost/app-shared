@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'dash_brand.dart';
 import 'dash_tokens.dart';
 import 'dash_widgets.dart';
+import 'dash_scale.dart';
 
 /// The application [ThemeData] for [brightness] and [brand].
 ///
@@ -44,9 +45,9 @@ ThemeData buildDashThemeData(
     displayColor: t.textPrimary,
   );
 
-  final radius14 = BorderRadius.circular(14);
-  final radius16 = BorderRadius.circular(16);
-  final radius20 = BorderRadius.circular(20);
+  final radius14 = BorderRadius.circular(DashRadius.lg);
+  final radius16 = BorderRadius.circular(DashRadius.lg);
+  final radius20 = BorderRadius.circular(DashRadius.xl);
 
   return ThemeData(
     useMaterial3: true,
@@ -70,7 +71,7 @@ ThemeData buildDashThemeData(
       iconTheme: IconThemeData(color: t.textPrimary, applyTextScaling: true),
       titleTextStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
-        fontSize: 20,
+        fontSize: DashFontSize.display,
         fontWeight: FontWeight.w700,
         color: t.textPrimary,
       ),
@@ -93,13 +94,13 @@ ThemeData buildDashThemeData(
       actionsPadding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
       titleTextStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
-        fontSize: 18,
+        fontSize: DashFontSize.heading,
         fontWeight: FontWeight.w700,
         color: t.textPrimary,
       ),
       contentTextStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
-        fontSize: 14,
+        fontSize: DashFontSize.title,
         color: t.textSecondary,
       ),
     ),
@@ -112,7 +113,7 @@ ThemeData buildDashThemeData(
       ),
       textStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
-        fontSize: 14,
+        fontSize: DashFontSize.title,
         fontWeight: FontWeight.w600,
         color: t.textPrimary,
       ),
@@ -123,7 +124,9 @@ ThemeData buildDashThemeData(
       surfaceTintColor: Colors.transparent,
       modalBackgroundColor: t.overlaySurface,
       shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(DashRadius.xl),
+        ),
         side: BorderSide(color: t.overlayBorder),
       ),
       dragHandleColor: t.textTertiary,
@@ -132,7 +135,7 @@ ThemeData buildDashThemeData(
       backgroundColor: t.overlaySurface,
       contentTextStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
-        fontSize: 13.5,
+        fontSize: DashFontSize.title,
         color: t.textPrimary,
       ),
       actionTextColor: t.accentInk,
@@ -155,38 +158,38 @@ ThemeData buildDashThemeData(
       textColor: t.textPrimary,
       titleTextStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
-        fontSize: 15,
+        fontSize: DashFontSize.lead,
         fontWeight: FontWeight.w600,
         color: t.textPrimary,
       ),
       subtitleTextStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
-        fontSize: 12.5,
+        fontSize: DashFontSize.body,
         color: t.textSecondary,
       ),
     ),
     chipTheme: ChipThemeData(
       backgroundColor: t.subCard,
-      selectedColor: t.accent.withValues(alpha: 0.18),
-      disabledColor: t.subCard.withValues(alpha: 0.5),
+      selectedColor: t.accent.withValues(alpha: DashAlpha.wash),
+      disabledColor: t.subCard.withValues(alpha: DashAlpha.scrim),
       side: BorderSide(color: t.subCardBorder),
       shape: StadiumBorder(side: BorderSide(color: t.subCardBorder)),
       labelStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
-        fontSize: 13,
+        fontSize: DashFontSize.body,
         fontWeight: FontWeight.w600,
         color: t.textPrimary,
       ),
       secondaryLabelStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
-        fontSize: 13,
+        fontSize: DashFontSize.body,
         fontWeight: FontWeight.w600,
         color: t.accentInk,
       ),
       checkmarkColor: t.accentInk,
       iconTheme: IconThemeData(
         color: t.textSecondary,
-        size: 18,
+        size: DashIcon.md,
         applyTextScaling: true,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -195,7 +198,7 @@ ThemeData buildDashThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
-              ? t.accent.withValues(alpha: 0.14)
+              ? t.accent.withValues(alpha: DashAlpha.wash)
               : t.subCard,
         ),
         foregroundColor: WidgetStateProperty.resolveWith(
@@ -206,14 +209,14 @@ ThemeData buildDashThemeData(
         side: WidgetStateProperty.resolveWith(
           (states) => BorderSide(
             color: states.contains(WidgetState.selected)
-                ? t.accent.withValues(alpha: 0.4)
+                ? t.accent.withValues(alpha: DashAlpha.outline)
                 : t.subCardBorder,
           ),
         ),
         textStyle: const WidgetStatePropertyAll(
           TextStyle(
             fontFamily: DashTokens.fontUi,
-            fontSize: 13,
+            fontSize: DashFontSize.body,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -226,7 +229,7 @@ ThemeData buildDashThemeData(
       ),
       trackColor: WidgetStateProperty.resolveWith(
         (states) => states.contains(WidgetState.selected)
-            ? t.accent.withValues(alpha: 0.4)
+            ? t.accent.withValues(alpha: DashAlpha.outline)
             : t.subCard,
       ),
       trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
@@ -250,7 +253,7 @@ ThemeData buildDashThemeData(
       activeTrackColor: t.accent,
       inactiveTrackColor: t.gaugeTrack,
       thumbColor: t.accent,
-      overlayColor: t.accent.withValues(alpha: 0.16),
+      overlayColor: t.accent.withValues(alpha: DashAlpha.wash),
       valueIndicatorColor: t.overlaySurface,
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -358,7 +361,7 @@ ThemeData buildDashThemeData(
     ),
     disabledColor: t.textTertiary,
     hintColor: t.textTertiary,
-    splashColor: t.accent.withValues(alpha: 0.08),
-    highlightColor: t.accent.withValues(alpha: 0.05),
+    splashColor: t.accent.withValues(alpha: DashAlpha.faint),
+    highlightColor: t.accent.withValues(alpha: DashAlpha.faint),
   );
 }

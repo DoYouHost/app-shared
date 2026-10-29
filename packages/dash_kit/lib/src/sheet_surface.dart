@@ -64,11 +64,15 @@ class SheetSurface extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: t.overlaySurface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(DashRadius.xl),
+        ),
         border: Border(top: BorderSide(color: t.overlayBorder)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: t.isDark ? 0.5 : 0.22),
+            color: Colors.black.withValues(
+              alpha: t.isDark ? DashAlpha.scrim : DashAlpha.wash,
+            ),
             blurRadius: 40,
             offset: const Offset(0, -12),
           ),
@@ -84,7 +88,7 @@ class SheetSurface extends StatelessWidget {
               color: t.isDark
                   ? const Color(0x40FFFFFF)
                   : const Color(0x33000000),
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(DashRadius.xs),
             ),
           ),
           const SizedBox(height: DashSpace.md),
@@ -125,7 +129,9 @@ class FittedSheetSurface extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: t.overlaySurface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(DashRadius.xl),
+          ),
           border: Border(top: BorderSide(color: t.subCardBorder)),
         ),
         child: Column(
@@ -136,8 +142,8 @@ class FittedSheetSurface extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: t.textTertiary.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
+                color: t.textTertiary.withValues(alpha: DashAlpha.outline),
+                borderRadius: BorderRadius.circular(DashRadius.xs),
               ),
             ),
             child,

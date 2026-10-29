@@ -37,19 +37,21 @@ class FilterButton extends StatelessWidget {
           width: 48,
           height: 48,
           child: Material(
-            color: active ? t.accent.withValues(alpha: 0.16) : t.subCard,
-            borderRadius: BorderRadius.circular(16),
+            color: active
+                ? t.accent.withValues(alpha: DashAlpha.wash)
+                : t.subCard,
+            borderRadius: BorderRadius.circular(DashRadius.lg),
             child: logTag(
               id,
               InkWell(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(DashRadius.lg),
                 onTap: onTap,
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(DashRadius.lg),
                     border: Border.all(
                       color: active
-                          ? t.accent.withValues(alpha: 0.4)
+                          ? t.accent.withValues(alpha: DashAlpha.outline)
                           : t.subCardBorder,
                     ),
                   ),

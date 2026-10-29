@@ -27,7 +27,7 @@ class TappableCard extends StatelessWidget {
       child: logTag(
         id,
         InkWell(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(DashRadius.xl),
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.all(DashSpace.lg),

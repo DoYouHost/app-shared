@@ -42,16 +42,16 @@ class DashSegToggle<T> extends StatelessWidget {
     final isSel = seg.value == selected;
     return Material(
       color: isSel ? t.accent : t.groupCard,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(DashRadius.md),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(DashRadius.md),
         onTap: () => onChanged(seg.value),
         child: Container(
           height: 48,
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: DashSpace.sm),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(DashRadius.md),
             border: Border.all(
               color: isSel ? Colors.transparent : t.groupCardBorder,
             ),
@@ -63,7 +63,7 @@ class DashSegToggle<T> extends StatelessWidget {
               if (seg.icon != null) ...[
                 Icon(
                   seg.icon,
-                  size: 16,
+                  size: DashIcon.sm,
                   color: isSel ? t.onAccent : t.textSecondary,
                 ),
                 const SizedBox(width: DashSpace.sm),

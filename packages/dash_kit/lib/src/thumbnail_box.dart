@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:dash_ui/dash_ui.dart';
 
 /// Corner radius of a thumbnail tile, from its size.
 ///
@@ -6,7 +7,7 @@ import 'package:material_ui/material_ui.dart';
 /// cover are the same design at two sizes, and a single radius makes the small
 /// one look blunt and the large one look sharp.
 BorderRadius thumbnailRadius(double size) =>
-    BorderRadius.circular(size < 64 ? 8 : 10);
+    BorderRadius.circular(size < 64 ? DashRadius.sm : DashRadius.md);
 
 /// What a thumbnail tile shows when there is no image: nothing is loaded yet,
 /// the server has none, or the fetch failed.

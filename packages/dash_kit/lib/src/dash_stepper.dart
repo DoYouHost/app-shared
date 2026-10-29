@@ -51,7 +51,7 @@ class DashStepper extends StatelessWidget {
           tooltip: tooltip,
           onPressed: change == null || to == null ? null : () => change(to),
           icon: Icon(icon, color: compact ? t.textSecondary : null),
-          iconSize: compact ? 20 : null,
+          iconSize: compact ? DashIcon.md : null,
           constraints: compact
               ? const BoxConstraints.tightFor(width: 48, height: 48)
               : null,

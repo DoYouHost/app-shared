@@ -9,6 +9,7 @@ library;
 
 export 'src/finder_copy.dart';
 export 'src/short_words.dart';
+export 'src/sizes.dart';
 export 'src/source_files.dart' show dartFiles;
 export 'src/spacing.dart';
 export 'src/wrap_run_spacing.dart';

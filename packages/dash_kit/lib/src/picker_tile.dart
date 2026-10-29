@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
+import 'package:dash_ui/dash_ui.dart';
 
 /// One choice in a grid of icons or colours: a [kMinInteractiveDimension] touch cell
 /// with the drawing centred in it, so the target meets the guideline while the
@@ -32,7 +33,9 @@ class PickerTile extends StatelessWidget {
   Widget build(BuildContext context) => InkWell(
     customBorder: round
         ? const CircleBorder()
-        : RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        : RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(DashRadius.sm),
+          ),
     onTap: onTap,
     child: SizedBox.square(
       dimension: kMinInteractiveDimension,

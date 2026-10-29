@@ -36,7 +36,7 @@ class SettingsEntryTile extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          DashIconTile(icon: icon, size: 44, radius: 14, iconSize: 21),
+          DashIconTile(icon: icon, size: 44, radius: 14, iconSize: DashIcon.md),
           const SizedBox(width: DashSpace.lg),
           Expanded(
             child: Column(

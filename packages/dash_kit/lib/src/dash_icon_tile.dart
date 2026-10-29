@@ -43,7 +43,7 @@ class DashIconTile extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: fill ?? t.accent.withValues(alpha: 0.14),
+        color: fill ?? t.accent.withValues(alpha: DashAlpha.wash),
         borderRadius: BorderRadius.circular(radius),
       ),
       child: Icon(icon, size: iconSize, color: ink ?? t.accentInk),

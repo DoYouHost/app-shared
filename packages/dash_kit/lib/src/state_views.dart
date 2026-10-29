@@ -78,7 +78,7 @@ class _AsyncErrorViewState extends State<AsyncErrorView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 48, color: t.textTertiary),
+              Icon(icon, size: DashIcon.xxl, color: t.textTertiary),
               const SizedBox(height: 12),
             ],
             Padding(
@@ -152,7 +152,7 @@ class _EmptyStateViewState extends State<EmptyStateView> {
       padding: const EdgeInsets.all(48),
       child: Column(
         children: [
-          Icon(widget.icon, size: 48, color: t.textTertiary),
+          Icon(widget.icon, size: DashIcon.xxl, color: t.textTertiary),
           const SizedBox(height: 12),
           Text(widget.message, textAlign: TextAlign.center),
         ],

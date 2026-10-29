@@ -110,7 +110,7 @@ class SettingsSwitchRow extends StatelessWidget {
           toggled: value,
           enabled: enabled,
           child: InkWell(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(DashRadius.lg),
             onTap: enabled ? () => onChanged!(!value) : null,
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -238,7 +238,7 @@ class SettingsSlider extends StatelessWidget {
                 activeTickMarkColor: Colors.transparent,
                 inactiveTickMarkColor: Colors.transparent,
                 thumbColor: t.accent,
-                overlayColor: t.accent.withValues(alpha: 0.15),
+                overlayColor: t.accent.withValues(alpha: DashAlpha.wash),
                 valueIndicatorColor: t.accent,
                 valueIndicatorTextStyle: TextStyle(
                   fontFamily: DashTokens.fontMono,

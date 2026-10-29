@@ -250,7 +250,7 @@ class _DashPickerFieldState extends State<_DashPickerField> {
     return Padding(
       padding: widget.padding,
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(DashRadius.lg),
         onTap: widget.onTap,
         onFocusChange: (has) => setState(() => _focused = has),
         child: InputDecorator(

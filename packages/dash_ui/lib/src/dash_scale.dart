@@ -20,10 +20,16 @@ abstract final class DashIcon {
 
   /// A hero glyph in an empty state or a big control.
   static const double xl = 32;
+
+  /// The glyph of a full-screen empty or error state.
+  static const double xxl = 48;
 }
 
 /// The corner radii of surfaces and controls, on the same 4 dp grid.
 abstract final class DashRadius {
+  /// A thumb, a bar's end, a tag.
+  static const double xs = 4;
+
   /// A small chip, a swatch, a menu row.
   static const double sm = 8;
 
@@ -35,24 +41,55 @@ abstract final class DashRadius {
 
   /// A sheet, a banner, a dialog.
   static const double xl = 20;
+
+  /// Fully round, whatever the height: a capsule, a dot.
+  static const double pill = 999;
 }
 
-/// The alpha an ink or an accent takes when it is a wash, an outline or a scrim.
-/// Named for the job, so two screens that mean the same thing cannot drift to
-/// 0.16 and 0.18.
+/// The alpha an ink or an accent takes when it is a wash, an outline or a scrim:
+/// eight steps, named for the job, so two screens that mean the same thing cannot
+/// drift to 0.16 and 0.18. A value in between takes the nearest.
 abstract final class DashAlpha {
-  /// The fill of a selected or tinted surface: an accent over the card.
-  static const double wash = 0.16;
+  /// A hover, a splash or a track: barely there.
+  static const double faint = 0.08;
 
-  /// The outline of the same surface.
+  /// The fill of a selected or tinted surface: an accent over the card.
+  static const double wash = 0.14;
+
+  /// A disabled ink, a muted outline, a divider on a picture.
+  static const double soft = 0.32;
+
+  /// The outline of a washed surface.
   static const double outline = 0.4;
 
   /// What dims the screen behind a dialog or a floating control.
   static const double scrim = 0.5;
 
+  /// A secondary ink over a picture or over an accent.
+  static const double strong = 0.7;
+
+  /// A surface that is almost opaque but lets the ground show.
+  static const double heavy = 0.85;
+
   /// A surface laid over a picture that must still read: a badge on a camera
   /// image, a bar over a canvas.
   static const double cover = 0.95;
+}
+
+/// The font sizes of the type scale ([DashTokens]'s text styles are built from
+/// these); a `fontSize:` anywhere else is one of these too.
+abstract final class DashFontSize {
+  static const double micro = 11;
+  static const double label = 12;
+  static const double body = 13;
+  static const double title = 14;
+  static const double lead = 16;
+  static const double heading = 18;
+  static const double display = 20;
+  static const double hero = 26;
+
+  /// A reading read across a room: a temperature, a percentage.
+  static const double numeral = 40;
 }
 
 /// The heights of a linear progress bar: a hairline in a list row, a thick bar

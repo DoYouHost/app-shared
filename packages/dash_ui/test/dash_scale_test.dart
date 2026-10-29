@@ -10,8 +10,15 @@ void main() {
       DashIcon.md,
       DashIcon.lg,
       DashIcon.xl,
+      DashIcon.xxl,
     ];
-    const radii = [DashRadius.sm, DashRadius.md, DashRadius.lg, DashRadius.xl];
+    const radii = [
+      DashRadius.xs,
+      DashRadius.sm,
+      DashRadius.md,
+      DashRadius.lg,
+      DashRadius.xl,
+    ];
     for (final scale in [icons, radii]) {
       for (final v in scale) {
         expect(v % 4, 0, reason: '$v is off the grid');
@@ -20,6 +27,7 @@ void main() {
         expect(scale[i] - scale[i - 1], greaterThanOrEqualTo(4));
       }
     }
+    expect(DashRadius.pill, greaterThan(DashRadius.xl));
   });
 
   test('the bar heights are on the grid', () {
@@ -28,11 +36,41 @@ void main() {
     expect(DashBar.thick, greaterThan(DashBar.thin));
   });
 
-  test('the alphas keep the values the pill and the theme were drawn with', () {
-    expect(DashAlpha.wash, 0.16);
+  test('the alphas rise and are far enough apart to tell', () {
+    const alphas = [
+      DashAlpha.faint,
+      DashAlpha.wash,
+      DashAlpha.soft,
+      DashAlpha.outline,
+      DashAlpha.scrim,
+      DashAlpha.strong,
+      DashAlpha.heavy,
+      DashAlpha.cover,
+    ];
+    for (var i = 1; i < alphas.length; i++) {
+      expect(alphas[i] - alphas[i - 1], greaterThanOrEqualTo(0.06));
+    }
+    expect(DashAlpha.wash, 0.14);
     expect(DashAlpha.outline, 0.4);
     expect(DashAlpha.scrim, 0.5);
     expect(DashAlpha.cover, 0.95);
+  });
+
+  test('the font sizes are the type scale and rise', () {
+    const sizes = [
+      DashFontSize.micro,
+      DashFontSize.label,
+      DashFontSize.body,
+      DashFontSize.title,
+      DashFontSize.lead,
+      DashFontSize.heading,
+      DashFontSize.display,
+      DashFontSize.hero,
+      DashFontSize.numeral,
+    ];
+    for (var i = 1; i < sizes.length; i++) {
+      expect(sizes[i], greaterThan(sizes[i - 1]));
+    }
   });
 
   testWidgets('dashLargeText turns on above 1.3 and not at it', (tester) async {

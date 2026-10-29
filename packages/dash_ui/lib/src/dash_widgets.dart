@@ -48,7 +48,7 @@ AppBar dashAppBar(
           title ?? '',
           style: TextStyle(
             fontFamily: DashTokens.fontUi,
-            fontSize: 26,
+            fontSize: DashFontSize.hero,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
             color: t.textPrimary,
@@ -95,8 +95,8 @@ class DashPill extends StatelessWidget {
           ? const EdgeInsets.symmetric(horizontal: 8, vertical: 3)
           : const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: dense ? 0.14 : DashAlpha.wash),
-        borderRadius: BorderRadius.circular(20),
+        color: accent.withValues(alpha: DashAlpha.wash),
+        borderRadius: BorderRadius.circular(DashRadius.xl),
         border: Border.all(color: accent.withValues(alpha: DashAlpha.outline)),
       ),
       child: Row(
@@ -110,14 +110,14 @@ class DashPill extends StatelessWidget {
             ),
             const SizedBox(width: 6),
           ] else if (icon != null) ...[
-            Icon(icon, size: dense ? 12 : 13, color: ink),
+            Icon(icon, size: DashIcon.xs, color: ink),
             SizedBox(width: dense ? 4 : 6),
           ],
           Text(
             label,
             style: TextStyle(
               fontFamily: DashTokens.fontUi,
-              fontSize: dense ? 11 : 12,
+              fontSize: dense ? DashFontSize.micro : DashFontSize.label,
               fontWeight: dense ? FontWeight.w600 : FontWeight.w700,
               letterSpacing: dense ? 0 : 0.3,
               color: ink,
@@ -141,7 +141,7 @@ InputDecoration dashFieldDecoration(
   Widget? suffixIcon,
   Widget? prefixIcon,
 }) {
-  final radius = BorderRadius.circular(14);
+  final radius = BorderRadius.circular(DashRadius.lg);
   OutlineInputBorder border(Color color, [double width = 1]) =>
       OutlineInputBorder(
         borderRadius: radius,
@@ -162,25 +162,25 @@ InputDecoration dashFieldDecoration(
     prefixIcon: prefixIcon,
     labelStyle: TextStyle(
       fontFamily: DashTokens.fontUi,
-      fontSize: 13,
+      fontSize: DashFontSize.body,
       fontWeight: FontWeight.w600,
       color: t.textSecondary,
     ),
     floatingLabelStyle: TextStyle(
       fontFamily: DashTokens.fontUi,
-      fontSize: 13,
+      fontSize: DashFontSize.body,
       fontWeight: FontWeight.w600,
       color: t.accentInk,
     ),
     hintStyle: TextStyle(fontFamily: DashTokens.fontUi, color: t.textTertiary),
     helperStyle: TextStyle(
       fontFamily: DashTokens.fontUi,
-      fontSize: 11,
+      fontSize: DashFontSize.micro,
       color: t.textTertiary,
     ),
     suffixStyle: TextStyle(
       fontFamily: DashTokens.fontMono,
-      fontSize: 11.5,
+      fontSize: DashFontSize.label,
       color: t.textTertiary,
     ),
     border: border(t.subCardBorder),
@@ -196,17 +196,19 @@ InputDecoration dashFieldDecoration(
 ButtonStyle dashPrimaryButtonStyle(DashTokens t) => FilledButton.styleFrom(
   backgroundColor: t.accent,
   foregroundColor: t.onAccent,
-  disabledBackgroundColor: t.accent.withValues(alpha: 0.35),
-  disabledForegroundColor: t.onAccent.withValues(alpha: 0.5),
+  disabledBackgroundColor: t.accent.withValues(alpha: DashAlpha.soft),
+  disabledForegroundColor: t.onAccent.withValues(alpha: DashAlpha.scrim),
   textStyle: const TextStyle(
     fontFamily: DashTokens.fontUi,
-    fontSize: 14,
+    fontSize: DashFontSize.title,
     fontWeight: FontWeight.w700,
   ),
   // The horizontal padding is for auto-width buttons such as dialog actions; a
   // full-width button centres its label regardless.
   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(DashRadius.lg),
+  ),
 );
 
 /// A call to action that destroys something: [dashPrimaryButtonStyle] in red,
@@ -214,31 +216,35 @@ ButtonStyle dashPrimaryButtonStyle(DashTokens t) => FilledButton.styleFrom(
 /// The answer that backs out: [dashPrimaryButtonStyle]'s shape and padding, so
 /// it stands the same height as the button beside it, on a quiet fill of the
 /// text colour.
-ButtonStyle dashNeutralButtonStyle(
-  DashTokens t,
-) => dashPrimaryButtonStyle(t).copyWith(
-  backgroundColor: WidgetStateProperty.resolveWith(
-    (states) => t.textPrimary.withValues(
-      alpha: states.contains(WidgetState.disabled) ? 0.04 : 0.09,
-    ),
-  ),
-  foregroundColor: WidgetStateProperty.resolveWith(
-    (states) =>
-        states.contains(WidgetState.disabled) ? t.textTertiary : t.textPrimary,
-  ),
-  overlayColor: WidgetStatePropertyAll(t.textPrimary.withValues(alpha: 0.06)),
-);
+ButtonStyle dashNeutralButtonStyle(DashTokens t) =>
+    dashPrimaryButtonStyle(t).copyWith(
+      backgroundColor: WidgetStateProperty.resolveWith(
+        (states) => t.textPrimary.withValues(
+          alpha: states.contains(WidgetState.disabled)
+              ? DashAlpha.faint
+              : DashAlpha.faint,
+        ),
+      ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled)
+            ? t.textTertiary
+            : t.textPrimary,
+      ),
+      overlayColor: WidgetStatePropertyAll(
+        t.textPrimary.withValues(alpha: DashAlpha.faint),
+      ),
+    );
 
 ButtonStyle dashDangerButtonStyle(DashTokens t) =>
     dashPrimaryButtonStyle(t).copyWith(
       backgroundColor: WidgetStateProperty.resolveWith(
         (states) => states.contains(WidgetState.disabled)
-            ? t.dangerInk.withValues(alpha: 0.35)
+            ? t.dangerInk.withValues(alpha: DashAlpha.soft)
             : t.dangerInk,
       ),
       foregroundColor: WidgetStateProperty.resolveWith(
         (states) => states.contains(WidgetState.disabled)
-            ? t.onDanger.withValues(alpha: 0.5)
+            ? t.onDanger.withValues(alpha: DashAlpha.scrim)
             : t.onDanger,
       ),
     );

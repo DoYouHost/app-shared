@@ -49,7 +49,9 @@ class DashSearchBarBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ink = DashTokens.of(context).textTertiary.withValues(alpha: 0.3);
+    final ink = DashTokens.of(
+      context,
+    ).textTertiary.withValues(alpha: DashAlpha.soft);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

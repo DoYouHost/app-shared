@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 
 import 'dash_tokens.dart';
+import 'dash_scale.dart';
 
 /// Categorical colours for a chart's series, in the order they are handed out.
 /// Past the end a chart pools the rest in `textTertiary` rather than reusing a
@@ -63,7 +64,7 @@ extension DashTokenRecipes on DashTokens {
   /// box. A card that needs a different border writes its own.
   BoxDecoration get cardBox => BoxDecoration(
     gradient: cardGradient,
-    borderRadius: BorderRadius.circular(22),
+    borderRadius: BorderRadius.circular(DashRadius.xl),
     border: Border.all(color: cardBorder),
   );
 }

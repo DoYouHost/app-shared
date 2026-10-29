@@ -43,7 +43,7 @@ class InlineNote extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: ink),
+          Icon(icon, size: DashIcon.sm, color: ink),
           const SizedBox(width: DashSpace.sm),
           Expanded(child: Text(text, style: t.labelSoft)),
         ],

@@ -72,7 +72,7 @@ class _DashSearchFieldState extends State<DashSearchField> {
       DecoratedBox(
         decoration: BoxDecoration(
           color: t.subCard,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(DashRadius.xl),
           border: Border.all(color: t.subCardBorder),
         ),
         child: TextField(

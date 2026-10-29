@@ -36,7 +36,7 @@ void main() {
 
       final box = tester.widget<Container>(find.byType(Container));
       final decoration = box.decoration! as BoxDecoration;
-      expect(decoration.color, tokens.accent.withValues(alpha: 0.14));
+      expect(decoration.color, tokens.accent.withValues(alpha: DashAlpha.wash));
       expect(decoration.borderRadius, BorderRadius.circular(11));
       expect(tester.getSize(find.byType(Container)), const Size(36, 36));
       expect(tester.widget<Icon>(find.byType(Icon)).color, tokens.accentInk);
