@@ -180,9 +180,8 @@ void main() {
   });
 
   test('copyWith re-resolves the palette', () {
-    final dark = const DashTokens.light(
-      green,
-    ).copyWith(brightness: Brightness.dark);
+    final dark = const DashTokens.light(green)
+        .copyWith(brightness: Brightness.dark);
 
     expect(dark, const DashTokens.dark(green));
     expect(dark.textPrimary, const DashTokens.dark(gold).textPrimary);
