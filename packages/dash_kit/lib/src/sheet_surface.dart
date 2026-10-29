@@ -73,7 +73,7 @@ class SheetSurface extends StatelessWidget {
             color: Colors.black.withValues(
               alpha: t.isDark ? DashAlpha.scrim : DashAlpha.wash,
             ),
-            blurRadius: 40,
+            blurRadius: DashBlur.lg,
             offset: const Offset(0, -12),
           ),
         ],
@@ -82,8 +82,8 @@ class SheetSurface extends StatelessWidget {
         children: [
           const SizedBox(height: DashSpace.md),
           Container(
-            width: 40,
-            height: 4,
+            width: DashSize.d40,
+            height: DashSize.d4,
             decoration: BoxDecoration(
               color: t.isDark
                   ? const Color(0x40FFFFFF)
@@ -139,8 +139,8 @@ class FittedSheetSurface extends StatelessWidget {
           children: [
             const SizedBox(height: DashSpace.md),
             Container(
-              width: 40,
-              height: 4,
+              width: DashSize.d40,
+              height: DashSize.d4,
               decoration: BoxDecoration(
                 color: t.textTertiary.withValues(alpha: DashAlpha.outline),
                 borderRadius: BorderRadius.circular(DashRadius.xs),

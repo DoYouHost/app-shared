@@ -26,7 +26,10 @@ class SettingsSectionHeader extends StatelessWidget {
         header: true,
         child: Text(
           text.toUpperCase(),
-          style: t.label.copyWith(color: t.accentInk, letterSpacing: 0.4),
+          style: t.label.copyWith(
+            color: t.accentInk,
+            letterSpacing: DashTracking.label,
+          ),
         ),
       ),
     );
@@ -243,7 +246,7 @@ class SettingsSlider extends StatelessWidget {
                 valueIndicatorTextStyle: TextStyle(
                   fontFamily: DashTokens.fontMono,
                   color: t.onAccent,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: DashWeight.bold,
                 ),
               ),
               child: Slider(

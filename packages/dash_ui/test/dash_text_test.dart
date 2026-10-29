@@ -11,8 +11,8 @@ void main() {
   /// screen using it, so it should have to change here first.
   final ladder = <String, (TextStyle, double, FontWeight)>{
     'displayLg': (t.displayLg, 26, FontWeight.w700),
-    'display': (t.display, 20, FontWeight.w800),
-    'titleLg': (t.titleLg, 18, FontWeight.w800),
+    'display': (t.display, 20, DashWeight.bold),
+    'titleLg': (t.titleLg, 18, DashWeight.bold),
     'titleMd': (t.titleMd, 16, FontWeight.w700),
     'titleSm': (t.titleSm, 14, FontWeight.w700),
     'bodyStrong': (t.bodyStrong, 14, FontWeight.w600),
@@ -26,7 +26,7 @@ void main() {
     'microSoft': (t.microSoft, 11, FontWeight.w400),
     'monoDisplay': (t.monoDisplay, 26, FontWeight.w700),
     'monoHeadline': (t.monoHeadline, 18, FontWeight.w700),
-    'monoTitle': (t.monoTitle, 16, FontWeight.w800),
+    'monoTitle': (t.monoTitle, 16, DashWeight.bold),
     'monoValue': (t.monoValue, 13, FontWeight.w600),
     'monoLabel': (t.monoLabel, 11, FontWeight.w600),
     'monoMicro': (t.monoMicro, 11, FontWeight.w400),

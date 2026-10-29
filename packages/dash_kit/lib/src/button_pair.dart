@@ -1,4 +1,5 @@
 import 'package:app_util/app_util.dart';
+import 'package:dash_ui/dash_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Two buttons side by side — but only while both labels fit on one line.
@@ -115,7 +116,7 @@ class ButtonPair extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(width: double.infinity, child: primary),
-            const SizedBox(height: 8),
+            const SizedBox(height: DashSpace.sm),
             SizedBox(width: double.infinity, child: secondary),
           ],
         );

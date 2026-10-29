@@ -120,7 +120,10 @@ Widget dashCombo<T>(
 /// 48 dp button plus that padding, which makes the field 56 while every text field is
 /// 48. 48 here keeps the field at 48 and leaves a 40 dp button; the whole field is
 /// the real target, so the a11y tests accept 40 for this one control and no less.
-const _arrowBox = BoxConstraints.tightFor(width: 48, height: 48);
+const _arrowBox = BoxConstraints.tightFor(
+  width: DashSize.d48,
+  height: DashSize.d48,
+);
 
 /// A [dashCombo] whose first row means "no filter". **Null is the any-row**, so [T] is
 /// bound to a non-null type and a filter's two states need no sentinel. [options]

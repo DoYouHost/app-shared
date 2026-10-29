@@ -18,16 +18,26 @@ final h = Icon(
   Icons.add,
   size: wide ? 20 : 16,
 );
+final w = TextStyle(fontWeight: FontWeight.w600);
+final ls = TextStyle(letterSpacing: 0.3);
+final st = CircularProgressIndicator(strokeWidth: 3);
+final bl = BoxShadow(blurRadius: 12);
+final el = Card(elevation: 8);
+final bd = Border.all(width: 1.5);
+final bx = Container(width: 40, height: 44);
+final sq = SpoolSwatch(size: 36, radius: 6);
+final mn = BoxConstraints(minHeight: 48);
 ''',
     });
 
     final hits = rawSizes(root: root);
 
-    expect(hits, hasLength(9));
-    expect(hits.first, endsWith('a.dart:1  icon size 18'));
+    expect(hits, hasLength(20));
+    expect(hits.first, endsWith('a.dart:1  size 18'));
     expect(hits, contains(endsWith('font size 12.5')));
     expect(hits, contains(endsWith('radius 14')));
     expect(hits, contains(endsWith('alpha 0.35')));
+    expect(hits, contains(endsWith('font weight FontWeight.w600')));
   });
 
   test('the scales, zero, one in an alpha and proportions pass', () {
@@ -44,6 +54,11 @@ final h = BorderRadius.circular(height / 2);
 final i = BorderRadius.circular(0);
 final j = IconButton(iconSize: DashIcon.lg * scale, onPressed: null);
 final k = Icon(Icons.add, size: DashIcon.md + 3);
+final l = TextStyle(fontWeight: DashWeight.bold, letterSpacing: DashTracking.label);
+final z = Card(elevation: 0);
+final bs = Border.all(width: DashStroke.hairline);
+final bz = Container(width: DashSize.d40, height: 1, child: x);
+final rt = SizedBox(height: size * 0.5, width: w / 2);
 ''',
     });
 

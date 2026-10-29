@@ -34,8 +34,8 @@ class FilterButton extends StatelessWidget {
         backgroundColor: t.accent,
         textColor: t.onAccent,
         child: SizedBox(
-          width: 48,
-          height: 48,
+          width: DashSize.d48,
+          height: DashSize.d48,
           child: Material(
             color: active
                 ? t.accent.withValues(alpha: DashAlpha.wash)

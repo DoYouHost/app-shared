@@ -92,6 +92,22 @@ abstract final class DashFontSize {
   static const double numeral = 40;
 }
 
+/// The font weights: every `fontWeight` is one of these four, a step of 100 apart
+/// at least. A weight in between (500, 550, 800) takes the nearest.
+abstract final class DashWeight {
+  /// Running text.
+  static const FontWeight regular = FontWeight.w400;
+
+  /// A quieter label, a second line.
+  static const FontWeight medium = FontWeight.w500;
+
+  /// A name, a value, a row's title.
+  static const FontWeight semibold = FontWeight.w600;
+
+  /// A heading, a number meant to be read across a room.
+  static const FontWeight bold = FontWeight.w700;
+}
+
 /// The heights of a linear progress bar: a hairline in a list row, a thick bar
 /// on a card.
 abstract final class DashBar {
@@ -106,9 +122,68 @@ abstract final class DashLeading {
   static const double snug = 1.25;
 }
 
-/// Letter spacing, for the one place the scale allows it: an upper-case label.
+/// The size of a box: a swatch, a thumbnail, a tile, a chart, a strip. One ladder
+/// for every width, height, minimum and maximum, named by what it measures in dp.
+///
+/// The steps widen as they grow, so no two are close enough to mistake: 4 apart to
+/// 24, 8 apart to 80, 16 to 128, then 32 or more. A size between two takes the
+/// nearer, the larger on a tie. A touch target is `kMinInteractiveDimension`
+/// (48, which is [d48]) and a gap is `DashSpace`, never one of these.
+abstract final class DashSize {
+  static const double d4 = 4;
+  static const double d8 = 8;
+  static const double d12 = 12;
+  static const double d16 = 16;
+  static const double d20 = 20;
+  static const double d24 = 24;
+  static const double d32 = 32;
+  static const double d40 = 40;
+  static const double d48 = 48;
+  static const double d56 = 56;
+  static const double d64 = 64;
+  static const double d72 = 72;
+  static const double d80 = 80;
+  static const double d96 = 96;
+  static const double d112 = 112;
+  static const double d128 = 128;
+  static const double d160 = 160;
+  static const double d192 = 192;
+  static const double d240 = 240;
+  static const double d320 = 320;
+}
+
+/// Letter spacing: a heading drawn tight, a label a little open, an upper-case
+/// caption wide, a spaced code (a PIN, a serial) wider still.
 abstract final class DashTracking {
-  static const double label = 0.3;
+  static const double tight = -0.4;
+  static const double label = 0.4;
+  static const double caps = 1.2;
+  static const double wide = 4;
+}
+
+/// The width of a line: a border or a stroked arc.
+abstract final class DashStroke {
+  /// A hairline border.
+  static const double hairline = 1;
+
+  /// A selected border, a gauge's arc.
+  static const double regular = 2;
+
+  /// A heavy ring.
+  static const double heavy = 4;
+}
+
+/// The blur of a shadow.
+abstract final class DashBlur {
+  static const double sm = 4;
+  static const double md = 8;
+  static const double lg = 16;
+}
+
+/// The elevation of a surface that floats above the screen: a menu, a sheet, a
+/// dialog. A flat surface has none.
+abstract final class DashElevation {
+  static const double raised = 8;
 }
 
 /// From this text scale up a layout stops fitting its design and reflows: a

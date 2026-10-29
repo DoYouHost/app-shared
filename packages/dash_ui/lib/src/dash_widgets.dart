@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'dash_tokens.dart';
 
 import 'dash_scale.dart';
+import 'dash_space.dart';
 
 /// Full-screen gradient backdrop. Wrap a transparent [Scaffold] in it so the
 /// gradient shows through the app bar and the body.
@@ -49,8 +50,8 @@ AppBar dashAppBar(
           style: TextStyle(
             fontFamily: DashTokens.fontUi,
             fontSize: DashFontSize.hero,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.5,
+            fontWeight: DashWeight.bold,
+            letterSpacing: DashTracking.tight,
             color: t.textPrimary,
           ),
         ),
@@ -90,40 +91,54 @@ class DashPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ink = accentInk ?? accent;
+    final text = Text(
+      label,
+      style: TextStyle(
+        fontFamily: DashTokens.fontUi,
+        fontSize: dense ? DashFontSize.micro : DashFontSize.label,
+        fontWeight: dense ? DashWeight.semibold : DashWeight.bold,
+        letterSpacing: dense ? 0 : DashTracking.label,
+        color: ink,
+      ),
+    );
     return Container(
       padding: dense
-          ? const EdgeInsets.symmetric(horizontal: 8, vertical: 3)
-          : const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          ? const EdgeInsets.symmetric(
+              horizontal: DashSpace.sm,
+              vertical: DashSpace.xs,
+            )
+          : const EdgeInsets.symmetric(
+              horizontal: DashSpace.md,
+              vertical: DashSpace.xs,
+            ),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: DashAlpha.wash),
         borderRadius: BorderRadius.circular(DashRadius.xl),
         border: Border.all(color: accent.withValues(alpha: DashAlpha.outline)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (leadingDot) ...[
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: 6),
-          ] else if (icon != null) ...[
-            Icon(icon, size: DashIcon.xs, color: ink),
-            SizedBox(width: dense ? 4 : 6),
+      // A label as long as its room (a cause, a profile name at 200 % text)
+      // wraps; with no limit above it the pill is as wide as the label.
+      child: LayoutBuilder(
+        builder: (context, constraints) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (leadingDot) ...[
+              Container(
+                width: DashSize.d8,
+                height: DashSize.d8,
+                decoration: BoxDecoration(
+                  color: accent,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: DashSpace.xs),
+            ] else if (icon != null) ...[
+              Icon(icon, size: DashIcon.xs, color: ink),
+              const SizedBox(width: DashSpace.xs),
+            ],
+            if (constraints.hasBoundedWidth) Flexible(child: text) else text,
           ],
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: DashTokens.fontUi,
-              fontSize: dense ? DashFontSize.micro : DashFontSize.label,
-              fontWeight: dense ? FontWeight.w600 : FontWeight.w700,
-              letterSpacing: dense ? 0 : 0.3,
-              color: ink,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -163,13 +178,13 @@ InputDecoration dashFieldDecoration(
     labelStyle: TextStyle(
       fontFamily: DashTokens.fontUi,
       fontSize: DashFontSize.body,
-      fontWeight: FontWeight.w600,
+      fontWeight: DashWeight.semibold,
       color: t.textSecondary,
     ),
     floatingLabelStyle: TextStyle(
       fontFamily: DashTokens.fontUi,
       fontSize: DashFontSize.body,
-      fontWeight: FontWeight.w600,
+      fontWeight: DashWeight.semibold,
       color: t.accentInk,
     ),
     hintStyle: TextStyle(fontFamily: DashTokens.fontUi, color: t.textTertiary),
@@ -201,11 +216,14 @@ ButtonStyle dashPrimaryButtonStyle(DashTokens t) => FilledButton.styleFrom(
   textStyle: const TextStyle(
     fontFamily: DashTokens.fontUi,
     fontSize: DashFontSize.title,
-    fontWeight: FontWeight.w700,
+    fontWeight: DashWeight.bold,
   ),
   // The horizontal padding is for auto-width buttons such as dialog actions; a
   // full-width button centres its label regardless.
-  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+  padding: const EdgeInsets.symmetric(
+    horizontal: DashSpace.lg,
+    vertical: DashSpace.lg,
+  ),
   shape: RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(DashRadius.lg),
   ),

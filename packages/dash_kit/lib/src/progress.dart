@@ -1,3 +1,4 @@
+import 'package:dash_ui/dash_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// What a screen shows while it has nothing else: the spinner, centred.
@@ -27,7 +28,7 @@ class DashSpinner extends StatelessWidget {
     width: size,
     height: size,
     child: CircularProgressIndicator(
-      strokeWidth: 2,
+      strokeWidth: DashStroke.regular,
       color: color,
       value: value,
     ),

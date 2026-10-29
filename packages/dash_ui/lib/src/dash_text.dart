@@ -18,49 +18,52 @@ import 'dash_scale.dart';
 extension DashTextStyles on DashTokens {
   // Display: readouts meant to be read at a distance.
   TextStyle get displayLg =>
-      _ui(DashFontSize.hero, FontWeight.w700, textPrimary);
+      _ui(DashFontSize.hero, DashWeight.bold, textPrimary);
   TextStyle get display =>
-      _ui(DashFontSize.display, FontWeight.w800, textPrimary);
+      _ui(DashFontSize.display, DashWeight.bold, textPrimary);
 
   TextStyle get titleLg =>
-      _ui(DashFontSize.heading, FontWeight.w800, textPrimary);
-  TextStyle get titleMd => _ui(DashFontSize.lead, FontWeight.w700, textPrimary);
+      _ui(DashFontSize.heading, DashWeight.bold, textPrimary);
+  TextStyle get titleMd => _ui(DashFontSize.lead, DashWeight.bold, textPrimary);
   TextStyle get titleSm =>
-      _ui(DashFontSize.title, FontWeight.w700, textPrimary);
+      _ui(DashFontSize.title, DashWeight.bold, textPrimary);
 
   /// The default for anything a user reads rather than scans.
   TextStyle get bodyStrong =>
-      _ui(DashFontSize.title, FontWeight.w600, textPrimary);
-  TextStyle get body => _ui(DashFontSize.body, FontWeight.w600, textPrimary);
+      _ui(DashFontSize.title, DashWeight.semibold, textPrimary);
+  TextStyle get body =>
+      _ui(DashFontSize.body, DashWeight.semibold, textPrimary);
 
   /// Section headings inside a card — bold, but not a title.
   TextStyle get bodyBold =>
-      _ui(DashFontSize.body, FontWeight.w700, textSecondary);
+      _ui(DashFontSize.body, DashWeight.bold, textSecondary);
   TextStyle get bodySoft =>
-      _ui(DashFontSize.body, FontWeight.w500, textSecondary);
+      _ui(DashFontSize.body, DashWeight.medium, textSecondary);
   TextStyle get bodyPlain =>
-      _ui(DashFontSize.body, FontWeight.w400, textSecondary);
+      _ui(DashFontSize.body, DashWeight.regular, textSecondary);
 
-  TextStyle get label => _ui(DashFontSize.label, FontWeight.w600, textTertiary);
+  TextStyle get label =>
+      _ui(DashFontSize.label, DashWeight.semibold, textTertiary);
   TextStyle get labelSoft =>
-      _ui(DashFontSize.label, FontWeight.w400, textTertiary);
-  TextStyle get micro => _ui(DashFontSize.micro, FontWeight.w600, textTertiary);
+      _ui(DashFontSize.label, DashWeight.regular, textTertiary);
+  TextStyle get micro =>
+      _ui(DashFontSize.micro, DashWeight.semibold, textTertiary);
   TextStyle get microSoft =>
-      _ui(DashFontSize.micro, FontWeight.w400, textTertiary);
+      _ui(DashFontSize.micro, DashWeight.regular, textTertiary);
 
   // Monospace: numbers that must not shift width as they tick.
   TextStyle get monoDisplay =>
-      _mono(DashFontSize.hero, FontWeight.w700, textPrimary);
+      _mono(DashFontSize.hero, DashWeight.bold, textPrimary);
   TextStyle get monoHeadline =>
-      _mono(DashFontSize.heading, FontWeight.w700, textPrimary);
+      _mono(DashFontSize.heading, DashWeight.bold, textPrimary);
   TextStyle get monoTitle =>
-      _mono(DashFontSize.lead, FontWeight.w800, textPrimary);
+      _mono(DashFontSize.lead, DashWeight.bold, textPrimary);
   TextStyle get monoValue =>
-      _mono(DashFontSize.body, FontWeight.w600, textPrimary);
+      _mono(DashFontSize.body, DashWeight.semibold, textPrimary);
   TextStyle get monoLabel =>
-      _mono(DashFontSize.micro, FontWeight.w600, textTertiary);
+      _mono(DashFontSize.micro, DashWeight.semibold, textTertiary);
   TextStyle get monoMicro =>
-      _mono(DashFontSize.micro, FontWeight.w400, textTertiary);
+      _mono(DashFontSize.micro, DashWeight.regular, textTertiary);
 
   TextStyle _ui(double size, FontWeight weight, Color color) => TextStyle(
     fontFamily: DashTokens.fontUi,

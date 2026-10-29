@@ -30,6 +30,71 @@ void main() {
     expect(DashRadius.pill, greaterThan(DashRadius.xl));
   });
 
+  test('the weights rise by at least a hundred', () {
+    const weights = [
+      DashWeight.regular,
+      DashWeight.medium,
+      DashWeight.semibold,
+      DashWeight.bold,
+    ];
+    for (var i = 1; i < weights.length; i++) {
+      expect(
+        weights[i].value - weights[i - 1].value,
+        greaterThanOrEqualTo(100),
+      );
+    }
+  });
+
+  test('the strokes, blurs and trackings rise and are told apart', () {
+    const strokes = [DashStroke.hairline, DashStroke.regular, DashStroke.heavy];
+    const blurs = [DashBlur.sm, DashBlur.md, DashBlur.lg];
+    const tracking = [
+      DashTracking.tight,
+      DashTracking.label,
+      DashTracking.caps,
+      DashTracking.wide,
+    ];
+    for (final scale in [strokes, blurs, tracking]) {
+      for (var i = 1; i < scale.length; i++) {
+        expect(scale[i], greaterThan(scale[i - 1]));
+      }
+    }
+    expect(DashTracking.tight, lessThan(0));
+  });
+
+  test('the size ladder rises and its steps widen', () {
+    const ladder = [
+      DashSize.d4,
+      DashSize.d8,
+      DashSize.d12,
+      DashSize.d16,
+      DashSize.d20,
+      DashSize.d24,
+      DashSize.d32,
+      DashSize.d40,
+      DashSize.d48,
+      DashSize.d56,
+      DashSize.d64,
+      DashSize.d72,
+      DashSize.d80,
+      DashSize.d96,
+      DashSize.d112,
+      DashSize.d128,
+      DashSize.d160,
+      DashSize.d192,
+      DashSize.d240,
+      DashSize.d320,
+    ];
+    var previousStep = 0.0;
+    for (var i = 1; i < ladder.length; i++) {
+      final step = ladder[i] - ladder[i - 1];
+      expect(step, greaterThanOrEqualTo(previousStep), reason: '${ladder[i]}');
+      previousStep = step;
+      expect(ladder[i] % 4, 0);
+    }
+    expect(DashSize.d48, 48);
+  });
+
   test('the bar heights are on the grid', () {
     expect(DashBar.thin % 4, 0);
     expect(DashBar.thick % 4, 0);

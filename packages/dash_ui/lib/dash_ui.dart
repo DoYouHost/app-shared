@@ -28,4 +28,5 @@ export 'src/dash_text.dart';
 export 'src/dash_theme_data.dart';
 export 'src/dash_tokens.dart';
 export 'src/dash_widgets.dart';
+export 'src/wear_scale.dart';
 export 'src/wear_space.dart';

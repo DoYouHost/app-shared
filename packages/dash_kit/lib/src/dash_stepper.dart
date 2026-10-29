@@ -53,7 +53,10 @@ class DashStepper extends StatelessWidget {
           icon: Icon(icon, color: compact ? t.textSecondary : null),
           iconSize: compact ? DashIcon.md : null,
           constraints: compact
-              ? const BoxConstraints.tightFor(width: 48, height: 48)
+              ? const BoxConstraints.tightFor(
+                  width: DashSize.d48,
+                  height: DashSize.d48,
+                )
               : null,
           padding: compact ? EdgeInsets.zero : null,
         ).tagged(id);
@@ -67,7 +70,9 @@ class DashStepper extends StatelessWidget {
           value > min ? value - 1 : null,
         ),
         ConstrainedBox(
-          constraints: BoxConstraints(minWidth: compact ? 24 : 40),
+          constraints: BoxConstraints(
+            minWidth: compact ? DashSize.d24 : DashSize.d40,
+          ),
           child: Text(
             '$value',
             textAlign: TextAlign.center,

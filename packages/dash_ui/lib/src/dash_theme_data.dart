@@ -4,6 +4,7 @@ import 'dash_brand.dart';
 import 'dash_tokens.dart';
 import 'dash_widgets.dart';
 import 'dash_scale.dart';
+import 'dash_space.dart';
 
 /// The application [ThemeData] for [brightness] and [brand].
 ///
@@ -72,7 +73,7 @@ ThemeData buildDashThemeData(
       titleTextStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
         fontSize: DashFontSize.display,
-        fontWeight: FontWeight.w700,
+        fontWeight: DashWeight.bold,
         color: t.textPrimary,
       ),
     ),
@@ -91,11 +92,16 @@ ThemeData buildDashThemeData(
       ),
       // The filled action button uses the heavy primary style (radius 14);
       // keep it clear of the dialog's rounded corner/border.
-      actionsPadding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+      actionsPadding: const EdgeInsets.fromLTRB(
+        DashSpace.xl,
+        DashSpace.sm,
+        DashSpace.xl,
+        DashSpace.xl,
+      ),
       titleTextStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
         fontSize: DashFontSize.heading,
-        fontWeight: FontWeight.w700,
+        fontWeight: DashWeight.bold,
         color: t.textPrimary,
       ),
       contentTextStyle: TextStyle(
@@ -114,7 +120,7 @@ ThemeData buildDashThemeData(
       textStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
         fontSize: DashFontSize.title,
-        fontWeight: FontWeight.w600,
+        fontWeight: DashWeight.semibold,
         color: t.textPrimary,
       ),
       iconColor: t.textSecondary,
@@ -159,7 +165,7 @@ ThemeData buildDashThemeData(
       titleTextStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
         fontSize: DashFontSize.lead,
-        fontWeight: FontWeight.w600,
+        fontWeight: DashWeight.semibold,
         color: t.textPrimary,
       ),
       subtitleTextStyle: TextStyle(
@@ -177,13 +183,13 @@ ThemeData buildDashThemeData(
       labelStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
         fontSize: DashFontSize.body,
-        fontWeight: FontWeight.w600,
+        fontWeight: DashWeight.semibold,
         color: t.textPrimary,
       ),
       secondaryLabelStyle: TextStyle(
         fontFamily: DashTokens.fontUi,
         fontSize: DashFontSize.body,
-        fontWeight: FontWeight.w600,
+        fontWeight: DashWeight.semibold,
         color: t.accentInk,
       ),
       checkmarkColor: t.accentInk,
@@ -192,7 +198,10 @@ ThemeData buildDashThemeData(
         size: DashIcon.md,
         applyTextScaling: true,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: DashSpace.md,
+        vertical: DashSpace.sm,
+      ),
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: ButtonStyle(
@@ -217,7 +226,7 @@ ThemeData buildDashThemeData(
           TextStyle(
             fontFamily: DashTokens.fontUi,
             fontSize: DashFontSize.body,
-            fontWeight: FontWeight.w700,
+            fontWeight: DashWeight.bold,
           ),
         ),
         shape: const WidgetStatePropertyAll(StadiumBorder()),
@@ -241,7 +250,7 @@ ThemeData buildDashThemeData(
       checkColor: WidgetStatePropertyAll(t.onAccent),
       // subCardBorder (~5% white) is invisible for an interactive control;
       // use the mid-contrast outline Material itself uses (onSurfaceVariant).
-      side: BorderSide(color: t.textSecondary, width: 1.5),
+      side: BorderSide(color: t.textSecondary, width: DashStroke.regular),
     ),
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith(
@@ -309,7 +318,7 @@ ThemeData buildDashThemeData(
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: radius14,
-        borderSide: BorderSide(color: t.accent, width: 1.5),
+        borderSide: BorderSide(color: t.accent, width: DashStroke.regular),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: radius14,
@@ -317,7 +326,7 @@ ThemeData buildDashThemeData(
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: radius14,
-        borderSide: BorderSide(color: t.danger, width: 1.5),
+        borderSide: BorderSide(color: t.danger, width: DashStroke.regular),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(style: dashPrimaryButtonStyle(t)),
@@ -327,11 +336,14 @@ ThemeData buildDashThemeData(
         foregroundColor: t.textPrimary,
         textStyle: const TextStyle(
           fontFamily: DashTokens.fontUi,
-          fontWeight: FontWeight.w700,
+          fontWeight: DashWeight.bold,
         ),
         // Match the filled button padding so heights line up when buttons of
         // different kinds sit side by side.
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        padding: const EdgeInsets.symmetric(
+          horizontal: DashSpace.lg,
+          vertical: DashSpace.lg,
+        ),
         shape: RoundedRectangleBorder(borderRadius: radius14),
       ),
     ),
@@ -341,11 +353,14 @@ ThemeData buildDashThemeData(
         side: BorderSide(color: t.subCardBorder),
         textStyle: const TextStyle(
           fontFamily: DashTokens.fontUi,
-          fontWeight: FontWeight.w700,
+          fontWeight: DashWeight.bold,
         ),
         // Match the filled button padding so heights line up when buttons of
         // different kinds sit side by side.
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        padding: const EdgeInsets.symmetric(
+          horizontal: DashSpace.lg,
+          vertical: DashSpace.lg,
+        ),
         shape: RoundedRectangleBorder(borderRadius: radius14),
       ),
     ),
@@ -354,7 +369,7 @@ ThemeData buildDashThemeData(
         foregroundColor: t.accentInk,
         textStyle: const TextStyle(
           fontFamily: DashTokens.fontUi,
-          fontWeight: FontWeight.w700,
+          fontWeight: DashWeight.bold,
         ),
         shape: RoundedRectangleBorder(borderRadius: radius14),
       ),

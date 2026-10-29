@@ -73,19 +73,19 @@ class _AsyncErrorViewState extends State<AsyncErrorView> {
           );
     final content = Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
+        padding: const EdgeInsets.symmetric(vertical: DashSpace.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
               Icon(icon, size: DashIcon.xxl, color: t.textTertiary),
-              const SizedBox(height: 12),
+              const SizedBox(height: DashSpace.md),
             ],
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: DashSpace.xl),
               child: Text(widget.message, textAlign: TextAlign.center),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: DashSpace.md),
             retry.tagged('error.retry'),
           ],
         ),
@@ -149,11 +149,11 @@ class _EmptyStateViewState extends State<EmptyStateView> {
   Widget build(BuildContext context) {
     final t = DashTokens.of(context);
     final body = Padding(
-      padding: const EdgeInsets.all(48),
+      padding: const EdgeInsets.all(DashSize.d48),
       child: Column(
         children: [
           Icon(widget.icon, size: DashIcon.xxl, color: t.textTertiary),
-          const SizedBox(height: 12),
+          const SizedBox(height: DashSpace.md),
           Text(widget.message, textAlign: TextAlign.center),
         ],
       ),

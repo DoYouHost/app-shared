@@ -8,14 +8,30 @@ final _labels = <(String, RegExp)>[
   ('font size', RegExp(r'(?<![\w.])fontSize:\s*')),
   ('alpha', RegExp(r'(?<![\w.])alpha:\s*')),
   ('radius', RegExp(r'\b(?:BorderRadius|Radius)\.circular\(\s*')),
+  ('width', RegExp(r'(?<![\w.])width:\s*')),
+  ('height', RegExp(r'(?<![\w.])height:\s*')),
+  (
+    'size',
+    RegExp(
+      r'(?<![\w.])(?:size|dimension|minHeight|minWidth|maxHeight|maxWidth|minTileWidth|reservedSize|centerSpaceRadius):\s*',
+    ),
+  ),
+  ('radius', RegExp(r'(?<![\w.])radius:\s*')),
+  ('letter spacing', RegExp(r'(?<![\w.])letterSpacing:\s*')),
+  ('stroke', RegExp(r'(?<![\w.])strokeWidth:\s*')),
+  ('blur', RegExp(r'(?<![\w.])blurRadius:\s*')),
+  ('elevation', RegExp(r'(?<![\w.])elevation:\s*')),
 ];
 final _iconCall = RegExp(r'(?<![\w.])(?:Icon|IconThemeData)\(');
 final _sizeLabel = RegExp(r'(?<![\w.])size:\s*');
+final _weight = RegExp(r'\bFontWeight\.(?:w\d00|bold|normal)\b');
 final _number = RegExp(r'(?<![\w.$])(\d+(?:\.\d+)?)(?![\w.])');
 
-/// Every icon size, font size, corner radius and alpha under [root] typed as a
+/// Every icon size, font size, font weight, corner radius, alpha, letter spacing,
+/// stroke and border width, shadow blur and elevation under [root] typed as a
 /// number rather than taken from its scale: `DashIcon`, `DashFontSize` (or a
-/// `DashTokens` text style), `DashRadius` and `DashAlpha`, all in `dash_ui`.
+/// `DashTokens` text style), `DashWeight`, `DashRadius` and `DashAlpha`, all in
+/// `dash_ui`.
 ///
 /// What passes: a token; zero and one in an alpha (transparent, opaque); zero in
 /// a radius; a number that is only a factor or a divisor of something measured
@@ -39,7 +55,14 @@ List<String> rawSizes({String root = 'lib', Set<String> skip = const {}}) {
       for (final n in _number.allMatches(expr)) {
         final value = double.parse(n.group(1)!);
         if (value == 0) continue;
-        if (what == 'alpha' && value == 1) continue;
+        if (value == 1 &&
+            (what == 'alpha' ||
+                what == 'width' ||
+                what == 'height' ||
+                what == 'size')) {
+          continue;
+        }
+        if (what == 'radius' && value < 2) continue;
         final before = expr.substring(0, n.start).trimRight();
         final after = expr.substring(n.end).trimLeft();
         final factor =
@@ -69,8 +92,18 @@ List<String> rawSizes({String root = 'lib', Set<String> skip = const {}}) {
         check('icon size', start, _expressionEnd(code, start));
       }
     }
+    for (final m in _weight.allMatches(code)) {
+      found.add((
+        m.start,
+        '${file.path}:${lineOf(source, m.start)}  font weight ${m.group(0)}',
+      ));
+    }
     found.sort((a, b) => a.$1.compareTo(b.$1));
-    offenders.addAll(found.map((f) => f.$2));
+    final seen = <int>{};
+    offenders.addAll([
+      for (final f in found)
+        if (seen.add(f.$1)) f.$2,
+    ]);
   }
   return offenders;
 }
