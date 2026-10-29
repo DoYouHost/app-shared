@@ -22,10 +22,9 @@ final _labels = <(String, RegExp)>[
   ('blur', RegExp(r'(?<![\w.])blurRadius:\s*')),
   ('elevation', RegExp(r'(?<![\w.])elevation:\s*')),
 ];
-final _iconCall = RegExp(r'(?<![\w.])(?:Icon|IconThemeData)\(');
-final _sizeLabel = RegExp(r'(?<![\w.])size:\s*');
 final _weight = RegExp(r'\bFontWeight\.(?:w\d00|bold|normal)\b');
-final _number = RegExp(r'(?<![\w.$])(\d+(?:\.\d+)?)(?![\w.])');
+// `.35` counts as a number: Dart accepts the leading-dot form.
+final _number = RegExp(r'(?<![\w.$])(\d+(?:\.\d+)?|\.\d+)(?![\w.])');
 
 /// Every icon size, font size, font weight, corner radius, alpha, letter spacing,
 /// stroke and border width, shadow blur and elevation under [root] typed as a
@@ -33,8 +32,9 @@ final _number = RegExp(r'(?<![\w.$])(\d+(?:\.\d+)?)(?![\w.])');
 /// `DashTokens` text style), `DashWeight`, `DashRadius` and `DashAlpha`, all in
 /// `dash_ui`.
 ///
-/// What passes: a token; zero and one in an alpha (transparent, opaque); zero in
-/// a radius; a number that is only a factor or a divisor of something measured
+/// What passes: a token; zero and one in an alpha (transparent, opaque); one in
+/// a width, height or size (a hairline); anything under 2 in a radius; a number
+/// that is only a factor or a divisor of something measured
 /// (`size * 0.6`, `height / 2`), because that is a proportion, not a size.
 /// Generated localizations are skipped, and so is any path that contains one of
 /// [skip]: a watch face has its own type scale, which is not this one.
@@ -84,14 +84,6 @@ List<String> rawSizes({String root = 'lib', Set<String> skip = const {}}) {
         check(what, m.end, _expressionEnd(code, m.end));
       }
     }
-    for (final call in _iconCall.allMatches(code)) {
-      final argsEnd = _expressionEnd(code, call.end, closeAtBracket: true);
-      final args = code.substring(call.end, argsEnd);
-      for (final m in _sizeLabel.allMatches(args)) {
-        final start = call.end + m.end;
-        check('icon size', start, _expressionEnd(code, start));
-      }
-    }
     for (final m in _weight.allMatches(code)) {
       found.add((
         m.start,
@@ -110,7 +102,7 @@ List<String> rawSizes({String root = 'lib', Set<String> skip = const {}}) {
 
 /// The end of the expression starting at [start]: the next comma, or the bracket
 /// that closes what it sits in, at its own depth.
-int _expressionEnd(String code, int start, {bool closeAtBracket = false}) {
+int _expressionEnd(String code, int start) {
   var depth = 0;
   for (var i = start; i < code.length; i++) {
     switch (code[i]) {
@@ -119,7 +111,7 @@ int _expressionEnd(String code, int start, {bool closeAtBracket = false}) {
       case ')' || ']' || '}':
         if (depth == 0) return i;
         depth--;
-      case ',' when depth == 0 && !closeAtBracket:
+      case ',' when depth == 0:
         return i;
     }
   }

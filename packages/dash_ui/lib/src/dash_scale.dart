@@ -93,7 +93,7 @@ abstract final class DashFontSize {
 }
 
 /// The font weights: every `fontWeight` is one of these four, a step of 100 apart
-/// at least. A weight in between (500, 550, 800) takes the nearest.
+/// at least. A weight in between (450, 550, 800) takes the nearest.
 abstract final class DashWeight {
   /// Running text.
   static const FontWeight regular = FontWeight.w400;

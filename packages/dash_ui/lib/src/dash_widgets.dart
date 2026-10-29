@@ -236,12 +236,8 @@ ButtonStyle dashPrimaryButtonStyle(DashTokens t) => FilledButton.styleFrom(
 /// text colour.
 ButtonStyle dashNeutralButtonStyle(DashTokens t) =>
     dashPrimaryButtonStyle(t).copyWith(
-      backgroundColor: WidgetStateProperty.resolveWith(
-        (states) => t.textPrimary.withValues(
-          alpha: states.contains(WidgetState.disabled)
-              ? DashAlpha.faint
-              : DashAlpha.faint,
-        ),
+      backgroundColor: WidgetStatePropertyAll(
+        t.textPrimary.withValues(alpha: DashAlpha.faint),
       ),
       foregroundColor: WidgetStateProperty.resolveWith(
         (states) => states.contains(WidgetState.disabled)

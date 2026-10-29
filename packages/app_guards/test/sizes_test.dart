@@ -27,16 +27,20 @@ final bd = Border.all(width: 1.5);
 final bx = Container(width: 40, height: 44);
 final sq = SpoolSwatch(size: 36, radius: 6);
 final mn = BoxConstraints(minHeight: 48);
+final lo = color.withValues(alpha: .35);
+final lt = TextStyle(letterSpacing: .4);
 ''',
     });
 
     final hits = rawSizes(root: root);
 
-    expect(hits, hasLength(20));
+    expect(hits, hasLength(22));
     expect(hits.first, endsWith('a.dart:1  size 18'));
     expect(hits, contains(endsWith('font size 12.5')));
     expect(hits, contains(endsWith('radius 14')));
     expect(hits, contains(endsWith('alpha 0.35')));
+    expect(hits, contains(endsWith('alpha .35')));
+    expect(hits, contains(endsWith('letter spacing .4')));
     expect(hits, contains(endsWith('font weight FontWeight.w600')));
   });
 

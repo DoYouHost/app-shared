@@ -46,7 +46,6 @@ ThemeData buildDashThemeData(
     displayColor: t.textPrimary,
   );
 
-  final radius14 = BorderRadius.circular(DashRadius.lg);
   final radius16 = BorderRadius.circular(DashRadius.lg);
   final radius20 = BorderRadius.circular(DashRadius.xl);
 
@@ -90,7 +89,7 @@ ThemeData buildDashThemeData(
         borderRadius: radius20,
         side: BorderSide(color: t.overlayBorder),
       ),
-      // The filled action button uses the heavy primary style (radius 14);
+      // The filled action button uses the heavy primary style (radius 16);
       // keep it clear of the dialog's rounded corner/border.
       actionsPadding: const EdgeInsets.fromLTRB(
         DashSpace.xl,
@@ -146,7 +145,7 @@ ThemeData buildDashThemeData(
       ),
       actionTextColor: t.accentInk,
       shape: RoundedRectangleBorder(
-        borderRadius: radius14,
+        borderRadius: radius16,
         side: BorderSide(color: t.overlayBorder),
       ),
       behavior: SnackBarBehavior.floating,
@@ -154,7 +153,7 @@ ThemeData buildDashThemeData(
     tooltipTheme: TooltipThemeData(
       decoration: BoxDecoration(
         color: t.overlaySurface,
-        borderRadius: radius14,
+        borderRadius: radius16,
         border: Border.all(color: t.overlayBorder),
       ),
       textStyle: TextStyle(fontFamily: DashTokens.fontUi, color: t.textPrimary),
@@ -309,23 +308,23 @@ ThemeData buildDashThemeData(
         color: t.textTertiary,
       ),
       border: OutlineInputBorder(
-        borderRadius: radius14,
+        borderRadius: radius16,
         borderSide: BorderSide(color: t.subCardBorder),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: radius14,
+        borderRadius: radius16,
         borderSide: BorderSide(color: t.subCardBorder),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: radius14,
+        borderRadius: radius16,
         borderSide: BorderSide(color: t.accent, width: DashStroke.regular),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: radius14,
+        borderRadius: radius16,
         borderSide: BorderSide(color: t.danger),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: radius14,
+        borderRadius: radius16,
         borderSide: BorderSide(color: t.danger, width: DashStroke.regular),
       ),
     ),
@@ -344,7 +343,7 @@ ThemeData buildDashThemeData(
           horizontal: DashSpace.lg,
           vertical: DashSpace.lg,
         ),
-        shape: RoundedRectangleBorder(borderRadius: radius14),
+        shape: RoundedRectangleBorder(borderRadius: radius16),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
@@ -361,7 +360,7 @@ ThemeData buildDashThemeData(
           horizontal: DashSpace.lg,
           vertical: DashSpace.lg,
         ),
-        shape: RoundedRectangleBorder(borderRadius: radius14),
+        shape: RoundedRectangleBorder(borderRadius: radius16),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
@@ -371,7 +370,7 @@ ThemeData buildDashThemeData(
           fontFamily: DashTokens.fontUi,
           fontWeight: DashWeight.bold,
         ),
-        shape: RoundedRectangleBorder(borderRadius: radius14),
+        shape: RoundedRectangleBorder(borderRadius: radius16),
       ),
     ),
     disabledColor: t.textTertiary,
