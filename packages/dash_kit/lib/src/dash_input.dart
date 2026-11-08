@@ -39,8 +39,8 @@ const _helperLines = 3;
 InputDecorationTheme dashInputTheme(DashTokens t) {
   final d = dashFieldDecoration(t);
   return InputDecorationTheme(
-    isDense: d.isDense ?? true,
-    constraints: d.constraints,
+    isDense: d.isDense,
+    contentPadding: d.contentPadding,
     filled: d.filled ?? true,
     fillColor: d.fillColor,
     labelStyle: d.labelStyle,
@@ -288,6 +288,15 @@ class _DashPickerFieldState extends State<_DashPickerField> {
                   unset ? widget.placeholder : value,
                   style: (widget.valueStyle ?? t.body).copyWith(
                     color: unset ? t.textTertiary : t.textPrimary,
+                  ),
+                  // A text field's line, whatever font the value is in. An M3
+                  // `TextField` merges its style onto `bodyLarge` and so takes
+                  // its 1.5 line height; without this the picker sat 1–2 dp
+                  // off a field beside it from 150 % text up.
+                  strutStyle: StrutStyle.fromTextStyle(
+                    Theme.of(context).textTheme.bodyLarge?.merge(t.body) ??
+                        t.body,
+                    forceStrutHeight: true,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),

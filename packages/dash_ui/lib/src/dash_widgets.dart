@@ -163,9 +163,16 @@ InputDecoration dashFieldDecoration(
         borderSide: BorderSide(color: color, width: width),
       );
   return InputDecoration(
-    isDense: true,
-    // Dense alone draws a 45 dp field; 48 dp is Android's touch-target floor.
-    constraints: const BoxConstraints(minHeight: kMinInteractiveDimension),
+    // M3's dense inset without `isDense`: only a non-dense decorator draws its
+    // border at least 48 dp tall. A dense one with a 48 dp `constraints` grew
+    // the layout box and still drew 44, a step next to any field with an icon.
+    isDense: false,
+    contentPadding: const EdgeInsetsDirectional.fromSTEB(
+      DashSpace.md,
+      DashSpace.lg,
+      DashSpace.md,
+      DashSpace.sm,
+    ),
     filled: true,
     fillColor: t.subCard,
     labelText: labelText,

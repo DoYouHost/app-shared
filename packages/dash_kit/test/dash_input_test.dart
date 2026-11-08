@@ -17,6 +17,19 @@ Iterable<String> _identifiers(WidgetTester tester) => tester
     .map((s) => s.properties.identifier)
     .whereType<String>();
 
+/// The border a decorator inside [field] draws, not the decorator's box: a
+/// 48 dp `constraints` once grew the box while the border stayed 44 dp.
+Rect _border(WidgetTester tester, Finder field) => tester.getRect(
+  find.descendant(
+    of: field,
+    matching: find.byWidgetPredicate(
+      (w) =>
+          w is CustomPaint &&
+          w.foregroundPainter.runtimeType.toString() == '_InputBorderPainter',
+    ),
+  ),
+);
+
 void main() {
   /// A `DropdownMenu` builds its own field, so it takes a theme instead of a
   /// decoration — and the two used to be written out separately and drift. They
@@ -41,7 +54,8 @@ void main() {
       expect(menu.focusedBorder, field.focusedBorder);
       expect(menu.errorBorder, field.errorBorder);
       expect(menu.focusedErrorBorder, field.focusedErrorBorder);
-      expect(menu.isDense, isTrue);
+      expect(menu.isDense, field.isDense);
+      expect(menu.contentPadding, field.contentPadding);
       expect(menu.filled, isTrue);
     });
 
@@ -305,14 +319,14 @@ void main() {
       expect(fieldText(tester), 'Four');
     });
 
-    testWidgets('a select is exactly as tall as a field beside it', (
+    testWidgets('a select and a picker draw exactly as tall as a field', (
       tester,
     ) async {
-      // Forms put the two in one `Row`, so a difference of a few pixels reads
+      // Forms put these in one `Row`, so a difference of a few pixels reads
       // as a rendering fault rather than as a style. The select used to run
       // 56 against the field's dense 48: Flutter hands its arrow a bare
       // `IconButton`, which claims the full 48x48 tap target and pushes the
-      // whole field out.
+      // whole field out. The text field then drew 44 beside both.
       await tester.pumpWidget(
         MaterialApp(
           theme: testTheme,
@@ -340,6 +354,19 @@ void main() {
                         decoration: dashFieldDecoration(t, labelText: 'Amount'),
                       ),
                     ),
+                    Expanded(
+                      child: dashPickerField(
+                        context,
+                        id: 'test.picker',
+                        label: 'Colour',
+                        placeholder: 'None',
+                        value: '000000FF',
+                        leading: const SizedBox.square(dimension: 24),
+                        trailingIcon: Icons.colorize,
+                        onTap: () {},
+                        padding: EdgeInsets.zero,
+                      ),
+                    ),
                   ],
                 ),
               );
@@ -349,9 +376,15 @@ void main() {
       );
       await _settle(tester);
 
+      final field = _border(tester, find.byType(TextFormField));
+      expect(field.height, greaterThanOrEqualTo(kMinInteractiveDimension));
       expect(
-        tester.getSize(find.byType(DropdownMenu<String>)).height,
-        tester.getSize(find.byType(TextFormField)).height,
+        _border(tester, find.byType(DropdownMenu<String>)).height,
+        field.height,
+      );
+      expect(
+        _border(tester, find.byType(InputDecorator).last).height,
+        field.height,
       );
     });
 
@@ -476,7 +509,7 @@ void main() {
 
     for (final field in tester.widgetList(find.byType(TextField))) {
       expect(
-        tester.getSize(find.byWidget(field)).height,
+        _border(tester, find.byWidget(field)).height,
         greaterThanOrEqualTo(kMinInteractiveDimension),
       );
     }

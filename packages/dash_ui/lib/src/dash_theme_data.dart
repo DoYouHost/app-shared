@@ -295,7 +295,10 @@ ThemeData buildDashThemeData(
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      isDense: true,
+      isDense: false,
+      contentPadding: dashFieldDecoration(t).contentPadding,
+      // A field with a decoration of its own (dense, own inset) still gets a
+      // touch target from this; it is not what makes a dash field draw 48.
       constraints: const BoxConstraints(minHeight: kMinInteractiveDimension),
       filled: true,
       fillColor: t.subCard,
