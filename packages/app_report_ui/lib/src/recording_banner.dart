@@ -262,87 +262,112 @@ class _RecordingLayerState extends ConsumerState<_RecordingLayer> {
       context,
       Padding(
         padding: const EdgeInsets.fromLTRB(2, 5, 6, 5),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+        // Two groups that sit on one line at normal text size and stack at a
+        // large one: a single Row overflowed by 87 px at 200 %.
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 4,
           children: [
-            Semantics(
-              identifier: 'bug_report.move',
-              label: l10n.bugReportBarMove,
-              child: GestureDetector(
-                onPanStart: (_) => _startDrag(),
-                onPanUpdate: _drag,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 8,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _named(
+                  'bug_report.move',
+                  Semantics(
+                    label: l10n.bugReportBarMove,
+                    child: GestureDetector(
+                      onPanStart: (_) => _startDrag(),
+                      onPanUpdate: _drag,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 8,
+                        ),
+                        child: Icon(
+                          Icons.drag_indicator,
+                          size: 18,
+                          color: t.textSecondary,
+                        ),
+                      ),
+                    ),
                   ),
-                  child: Icon(
-                    Icons.drag_indicator,
-                    size: 18,
+                ),
+                _dot(t),
+                const SizedBox(width: 8),
+                _clock(t, elapsed),
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _named(
+                  'bug_report.mark',
+                  // Label instead of `tooltip:` — a tooltip needs an Overlay, and
+                  // this bar lives in `MaterialApp.builder`, above the Navigator
+                  // that provides one. The label covers both the screen reader
+                  // and the log's naming of this button.
+                  _iconButton(
+                    icon: Icons.bookmark_add_outlined,
+                    label: l10n.bugReportMark,
                     color: t.textSecondary,
+                    onPressed: () {
+                      ref.read(bugReportProvider.notifier).mark();
+                      ScaffoldMessenger.of(
+                        context,
+                      ).snack(l10n.bugReportMarked, replaceCurrent: true);
+                    },
                   ),
                 ),
-              ),
-            ),
-            _dot(t),
-            const SizedBox(width: 8),
-            _clock(t, elapsed),
-            const SizedBox(width: 4),
-            Semantics(
-              identifier: 'bug_report.mark',
-              // Label instead of `tooltip:` — a tooltip needs an Overlay, and
-              // this bar lives in `MaterialApp.builder`, above the Navigator
-              // that provides one. The label covers both the screen reader and
-              // the log's naming of this button.
-              label: l10n.bugReportMark,
-              child: _iconButton(
-                icon: Icons.bookmark_add_outlined,
-                color: t.textSecondary,
-                onPressed: () {
-                  ref.read(bugReportProvider.notifier).mark();
-                  ScaffoldMessenger.of(
-                    context,
-                  ).snack(l10n.bugReportMarked, replaceCurrent: true);
-                },
-              ),
-            ),
-            const SizedBox(width: 2),
-            Semantics(
-              identifier: 'bug_report.stop',
-              // The full sentence for the screen reader; the button itself has
-              // room for one word only.
-              label: l10n.bugReportStop,
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: t.dangerInk,
-                  foregroundColor: t.onDanger,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  minimumSize: const Size(0, 32),
-                  textStyle: const TextStyle(
-                    fontFamily: DashTokens.fontUi,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                const SizedBox(width: 2),
+                _named(
+                  'bug_report.stop',
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: t.dangerInk,
+                      foregroundColor: t.onDanger,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      minimumSize: const Size(0, 32),
+                      textStyle: const TextStyle(
+                        fontFamily: DashTokens.fontUi,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    onPressed: () => _finish(context, ref),
+                    // The full sentence for the screen reader; the button itself
+                    // has room for one word only, so the word is replaced, not
+                    // read as well.
+                    child: Semantics(
+                      label: l10n.bugReportStop,
+                      excludeSemantics: true,
+                      child: Text(l10n.bugReportStopShort),
+                    ),
                   ),
                 ),
-                onPressed: () => _finish(context, ref),
-                child: Text(l10n.bugReportStopShort),
-              ),
-            ),
-            const SizedBox(width: 2),
-            Semantics(
-              identifier: 'bug_report.collapse',
-              label: l10n.bugReportBarCollapse,
-              child: _iconButton(
-                icon: Icons.close_fullscreen_rounded,
-                color: t.textSecondary,
-                onPressed: () => _setCollapsed(true),
-              ),
+                const SizedBox(width: 2),
+                _named(
+                  'bug_report.collapse',
+                  _iconButton(
+                    icon: Icons.close_fullscreen_rounded,
+                    label: l10n.bugReportBarCollapse,
+                    color: t.textSecondary,
+                    onPressed: () => _setCollapsed(true),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
+
+  /// The log identifier is a node of its own that merges what is inside it up,
+  /// but not what is around it. A button is a semantics container too, so its
+  /// name goes inside it (the icon's `semanticLabel`, the stop button's child):
+  /// a `label:` on a `Semantics` around the button left its node nameless.
+  Widget _named(String identifier, Widget child) =>
+      Semantics(identifier: identifier, child: child);
 
   /// Collapsed form: dot plus clock, still draggable, one tap to bring the
   /// controls back. Nothing here can end the recording — the pill is small
@@ -375,13 +400,14 @@ class _RecordingLayerState extends ConsumerState<_RecordingLayer> {
 
   Widget _iconButton({
     required IconData icon,
+    required String label,
     required Color color,
     required VoidCallback onPressed,
   }) => IconButton(
-    icon: Icon(icon, size: 19),
+    icon: Icon(icon, size: 19, semanticLabel: label),
     color: color,
     padding: EdgeInsets.zero,
-    visualDensity: VisualDensity.compact,
+    // No compact density: it shrinks the tap target from 48 dp to 40.
     constraints: const BoxConstraints.tightFor(width: 34, height: 34),
     onPressed: onPressed,
   );
