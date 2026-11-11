@@ -21,12 +21,12 @@ dependencies:
   app_diagnostics:
     git:
       url: https://github.com/DoYouHost/app-shared.git
-      ref: v0.14.8
+      ref: v0.14.9
       path: packages/app_diagnostics
   app_report_client:
     git:
       url: https://github.com/DoYouHost/app-shared.git
-      ref: v0.14.8
+      ref: v0.14.9
       path: packages/app_report_client
   # The screens here are built out of the same widgets the applications use, and
   # they have to carry the same log tags. `dash_kit` re-exports `dash_ui`, so
@@ -35,7 +35,7 @@ dependencies:
   dash_kit:
     git:
       url: https://github.com/DoYouHost/app-shared.git
-      ref: v0.14.8
+      ref: v0.14.9
       path: packages/dash_kit
   # Only `saveFile` is called here. The upper bound stops before 11, which
   # replaced `FilePicker.platform.x()` with static methods and, in 13, dropped
