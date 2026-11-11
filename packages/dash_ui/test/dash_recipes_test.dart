@@ -76,4 +76,15 @@ void main() {
       });
     });
   }
+
+  for (final MapEntry(:key, :value) in themes.entries) {
+    test('subCardBox is the sub-card fill and border at the radius asked '
+        '($key)', () {
+      final box = value.subCardBox(DashRadius.lg);
+      expect(box.color, value.subCard);
+      expect(box.borderRadius, BorderRadius.circular(DashRadius.lg));
+      expect(box.border, Border.all(color: value.subCardBorder));
+      expect(box.gradient, isNull);
+    });
+  }
 }

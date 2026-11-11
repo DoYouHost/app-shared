@@ -67,4 +67,13 @@ extension DashTokenRecipes on DashTokens {
     borderRadius: BorderRadius.circular(DashRadius.xl),
     border: Border.all(color: cardBorder),
   );
+
+  /// The card inside a card: [subCard] fill and a hairline [subCardBorder],
+  /// with corners of [radius] — a nested box takes the radius of its place,
+  /// so there is no default. bambuddy-mobile spelled it out thirty-six times.
+  BoxDecoration subCardBox(double radius) => BoxDecoration(
+    color: subCard,
+    borderRadius: BorderRadius.circular(radius),
+    border: Border.all(color: subCardBorder),
+  );
 }
