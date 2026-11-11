@@ -26,10 +26,10 @@ on:
         type: string
         default: ""
       flutter_version:
-        description: Flutter version for the hosted runner; empty takes the latest stable.
+        description: Flutter version for the hosted runner; keep it equal to the apps' CI pin.
         required: false
         type: string
-        default: ""
+        default: "3.47.7"
     secrets:
       claude_token:
         description: OAuth token for claude-code-action; the apps hold it under different names.
