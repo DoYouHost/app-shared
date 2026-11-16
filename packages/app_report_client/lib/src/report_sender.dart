@@ -291,6 +291,7 @@ class ReportSender {
         log: log,
       );
       await _outbox.clear();
+      _spendTicket(pending.ticket);
       _emit(SendState.sent(url, kind: pending.kind));
     } on RelayException catch (error) {
       if (error.retryable) {
@@ -301,8 +302,18 @@ class ReportSender {
       }
       // A dead end: keeping the report queued would retry it forever.
       await _outbox.clear();
+      _spendTicket(pending.ticket);
       _emit(SendState.failed(error.failure, kind: pending.kind));
     }
+  }
+
+  /// Forgets the held ticket once the relay has had its say on [spent].
+  ///
+  /// The relay spends a ticket on the first report that carries it, whatever
+  /// the verdict, so keeping it would send the next report in this session on a
+  /// ticket that can only come back as a replay.
+  void _spendTicket(RelayTicket spent) {
+    if (_ticket?.ticket == spent.ticket) _ticket = null;
   }
 
   /// Drops a queued report the user changed their mind about.

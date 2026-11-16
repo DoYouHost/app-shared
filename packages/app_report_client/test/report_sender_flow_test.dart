@@ -404,6 +404,53 @@ void main() {
       },
     );
   });
+
+  group('a ticket pays for one report', () {
+    // The relay spends a ticket on the first report that carries it, so a
+    // second report in the same session on the same ticket comes back 409.
+    RelayTicket numbered(int n) => RelayTicket(
+      ticket: 'signed-$n',
+      notBefore: DateTime.now(),
+      expiresAt: DateTime.now().add(const Duration(minutes: 30)),
+      challenge: const PowChallenge(seed: 'seed', bits: 0),
+    );
+
+    test(
+      'a second report buys a new ticket after the first was sent',
+      () async {
+        final relay = _Relay(issued: numbered(1));
+        final sender = senderWith(relay);
+        addTearDown(sender.dispose);
+
+        await submitBug(sender);
+        relay.issued = numbered(2);
+        await submitBug(sender);
+
+        expect(relay.challenges, 2);
+        expect(relay.sends, 2);
+      },
+    );
+
+    test(
+      'a refused report does not leave its ticket for the next one',
+      () async {
+        final relay = _Relay(
+          issued: numbered(1),
+          onSend: () async =>
+              throw const RelayException(RelayFailure.duplicate),
+        );
+        final sender = senderWith(relay);
+        addTearDown(sender.dispose);
+
+        await submitBug(sender);
+        relay.issued = numbered(2);
+        relay.onSend = null;
+        await submitBug(sender);
+
+        expect(relay.challenges, 2);
+      },
+    );
+  });
 }
 
 /// Storage that refuses to answer, the way an unresolvable support directory
